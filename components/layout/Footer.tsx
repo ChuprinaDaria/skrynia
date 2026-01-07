@@ -7,9 +7,11 @@ const Footer: React.FC = () => {
 
   const quickLinks = [
     { href: '/collections', label: 'Колекції' },
+    { href: '/blog', label: 'Блог' },
     { href: '/about', label: 'Про нас' },
     { href: '/shipping', label: 'Доставка' },
     { href: '/contact', label: 'Контакт' },
+    { href: '/account', label: 'Кабінет' },
   ];
 
   const languages = [

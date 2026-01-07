@@ -35,8 +35,11 @@ class Order(Base):
     id = Column(Integer, primary_key=True, index=True)
     order_number = Column(String, unique=True, index=True, nullable=False)
 
+    # User (optional - guests can order too)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+
     # Customer Info
-    customer_email = Column(String, nullable=False)
+    customer_email = Column(String, nullable=False, index=True)
     customer_name = Column(String, nullable=False)
     customer_phone = Column(String, nullable=True)
 
@@ -86,6 +89,7 @@ class Order(Base):
     delivered_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
+    user = relationship("User", back_populates="orders", foreign_keys=[user_id])
     items = relationship("OrderItem", back_populates="order", cascade="all, delete-orphan")
 
 
