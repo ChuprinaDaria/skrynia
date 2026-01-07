@@ -32,6 +32,23 @@ class Settings(BaseSettings):
     P24_API_KEY: str
     P24_TEST_MODE: bool = True
 
+    # InPost
+    INPOST_API_TOKEN: str = ""
+    INPOST_ORGANIZATION_ID: str = ""
+
+    # Nova Poshta
+    NOVA_POSHTA_API_KEY: str = ""
+    NOVA_POSHTA_CITY_SENDER: str = ""
+    NOVA_POSHTA_WAREHOUSE_SENDER: str = ""
+    NOVA_POSHTA_COUNTERPARTY_SENDER: str = ""
+    NOVA_POSHTA_CONTACT_SENDER: str = ""
+    NOVA_POSHTA_PHONE_SENDER: str = ""
+
+    # DHL
+    DHL_API_KEY: str = ""
+    DHL_API_SECRET: str = ""
+    DHL_ACCOUNT_NUMBER: str = ""
+
     # Email
     MAIL_USERNAME: str
     MAIL_PASSWORD: str

@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 from app.core.config import settings
-from app.api.v1.endpoints import auth, products, orders, payments, upload
+from app.api.v1.endpoints import auth, products, orders, payments, upload, admin, shipping
 
 # Create FastAPI app
 app = FastAPI(
@@ -35,6 +35,8 @@ app.include_router(products.router, prefix="/api/v1/products", tags=["Products"]
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
 app.include_router(payments.router, prefix="/api/v1/payments", tags=["Payments"])
 app.include_router(upload.router, prefix="/api/v1/upload", tags=["File Upload"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin Dashboard"])
+app.include_router(shipping.router, prefix="/api/v1/shipping", tags=["Shipping"])
 
 
 @app.get("/")
