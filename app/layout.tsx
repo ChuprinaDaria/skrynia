@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { CartProvider } from "@/contexts/CartContext";
+import CartDrawerWrapper from "@/components/cart/CartDrawerWrapper";
 
 export const metadata: Metadata = {
   title: "Скриня Пані Дарії | Автентичні Прикраси Ручної Роботи",
@@ -25,11 +27,14 @@ export default function RootLayout({
   return (
     <html lang="uk">
       <body className="min-h-screen flex flex-col">
-        <Header />
-        <main className="flex-grow">
-          {children}
-        </main>
-        <Footer />
+        <CartProvider>
+          <Header />
+          <main className="flex-grow">
+            {children}
+          </main>
+          <Footer />
+          <CartDrawerWrapper />
+        </CartProvider>
       </body>
     </html>
   );
