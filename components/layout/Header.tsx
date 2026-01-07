@@ -1,0 +1,203 @@
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
+import AlatyrIcon from '@/components/ui/icons/AlatyrIcon';
+
+const Header: React.FC = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [currentLang, setCurrentLang] = useState('UA');
+  const [cartItemsCount, setCartItemsCount] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const languages = ['UA', 'EN', 'DE', 'PL'];
+
+  const navLinks = [
+    { href: '/collections', label: 'Колекції', labelEn: 'Collections' },
+    { href: '/about', label: 'Про нас', labelEn: 'About' },
+    { href: '/contact', label: 'Контакт', labelEn: 'Contact' },
+  ];
+
+  return (
+    <header
+      className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        isScrolled ? 'glassmorphism border-b border-sage/30' : 'bg-transparent'
+      }`}
+    >
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="flex items-center justify-between h-20 md:h-20">
+          {/* Logo & Brand */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <AlatyrIcon
+              size={40}
+              variant="oxblood"
+              className="transition-transform duration-300 group-hover:rotate-180"
+            />
+            <span className="font-cinzel text-lg md:text-xl text-ivory group-hover:text-oxblood transition-colors duration-300 hidden sm:block">
+              Скриня Пані Дарії
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center gap-8">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="relative text-ivory hover:text-oxblood transition-colors duration-300 font-inter text-base group"
+              >
+                {link.label}
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-oxblood transition-all duration-300 group-hover:w-full" />
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right Side Icons */}
+          <div className="flex items-center gap-4 md:gap-6">
+            {/* Language Switcher */}
+            <div className="hidden md:flex items-center gap-2">
+              {languages.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => setCurrentLang(lang)}
+                  className={`text-sm font-inter transition-colors duration-200 ${
+                    currentLang === lang
+                      ? 'text-oxblood font-semibold'
+                      : 'text-ivory hover:text-sage'
+                  }`}
+                  aria-label={`Switch to ${lang}`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+
+            {/* Search Icon */}
+            <button
+              className="text-ivory hover:text-oxblood transition-colors duration-200"
+              aria-label="Search"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </button>
+
+            {/* Cart Icon */}
+            <Link
+              href="/cart"
+              className="relative text-ivory hover:text-oxblood transition-colors duration-200"
+              aria-label="Shopping cart"
+            >
+              <svg
+                className="w-5 h-5 md:w-6 md:h-6"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {cartItemsCount > 0 && (
+                <span className="absolute -top-2 -right-2 bg-oxblood text-ivory text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
+                  {cartItemsCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Mobile Menu Toggle */}
+            <button
+              className="md:hidden text-ivory hover:text-oxblood transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 glassmorphism border-b border-sage/30 animate-fade-in">
+          <nav className="container mx-auto px-4 py-6 flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-ivory hover:text-oxblood transition-colors duration-300 font-cinzel text-xl py-2"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {/* Mobile Language Switcher */}
+            <div className="flex items-center gap-4 pt-4 border-t border-sage/20">
+              {languages.map((lang) => (
+                <button
+                  key={lang}
+                  onClick={() => {
+                    setCurrentLang(lang);
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className={`text-base font-inter transition-colors duration-200 ${
+                    currentLang === lang
+                      ? 'text-oxblood font-semibold'
+                      : 'text-ivory hover:text-sage'
+                  }`}
+                >
+                  {lang}
+                </button>
+              ))}
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
+  );
+};
+
+export default Header;
