@@ -1,0 +1,24 @@
+# Przykładowa konfiguracja środowisk GitHub Actions
+# Skopiuj do .github/environments.yml i dostosuj do swoich potrzeb
+
+# Production Environment
+production:
+  url: https://runebox.eu
+  protection_rules:
+    - required_reviewers:
+        count: 1
+    - wait_timer:
+        minutes: 5
+  
+# Staging Environment  
+staging:
+  url: https://staging.runebox.eu
+  protection_rules:
+    - required_reviewers:
+        count: 0
+
+# Development Environment
+development:
+  url: https://dev.runebox.eu
+  protection_rules: []
+
