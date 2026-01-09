@@ -273,6 +273,16 @@ export interface Translations {
     addMoreForFreeShipping: string;
     securePayment: string;
     deliveryDays: string;
+    authReminder: {
+      title: string;
+      message: string;
+      login: string;
+      register: string;
+      benefits: string;
+      bonusPoints: string;
+      trackOrders: string;
+      saveAddresses: string;
+    };
   };
   legal: {
     terms: string;
