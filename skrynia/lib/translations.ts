@@ -206,6 +206,20 @@ export interface Translations {
       related: string;
       quality: string;
       freeShipping: string;
+      madeToOrder?: {
+        title: string;
+        duration: string;
+        orderButton: string;
+        formTitle: string;
+        name: string;
+        email: string;
+        phone: string;
+        customText: string;
+        customTextPlaceholder: string;
+        description: string;
+        descriptionPlaceholder: string;
+        submit: string;
+      };
     };
   cart: {
     title: string;
