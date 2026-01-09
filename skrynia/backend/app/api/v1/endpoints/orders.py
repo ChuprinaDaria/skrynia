@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 import uuid
 
@@ -14,7 +14,15 @@ from app.schemas.order import (
     OrderUpdate,
     OrderList
 )
-from app.core.security import get_current_admin_user
+from app.core.security import get_current_admin_user, get_current_user
+from app.services.bonus_service import (
+    can_use_bonus_points,
+    apply_bonus_to_order,
+    calculate_bonus_points,
+    update_user_loyalty_status
+)
+from app.services.order_notifications import send_order_status_email
+from fastapi import BackgroundTasks
 
 router = APIRouter()
 
@@ -43,9 +51,10 @@ def generate_order_number() -> str:
 @router.post("/", response_model=OrderSchema, status_code=status.HTTP_201_CREATED)
 def create_order(
     order_in: OrderCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user)  # Optional - guest checkout allowed
 ):
-    """Create a new order."""
+    """Create a new order. Supports bonus points if user is authenticated."""
     # Validate products and calculate totals
     subtotal = 0.0
     order_items_data = []
@@ -92,19 +101,49 @@ def create_order(
             "subtotal": item_subtotal
         })
 
-    # Calculate shipping
+    # Handle bonus points if user is authenticated
+    bonus_points_used = 0.0
+    bonus_points_earned = 0.0
+    original_subtotal = subtotal
+    
+    if current_user and order_in.bonus_points_used and order_in.bonus_points_used > 0:
+        # Verify user email matches order email
+        if current_user.email != order_in.customer_email:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Email mismatch. Order email must match authenticated user email."
+            )
+        
+        # Check if bonus can be used
+        can_use, error_msg = can_use_bonus_points(current_user, subtotal, order_in.bonus_points_used)
+        if not can_use:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=error_msg
+            )
+        
+        bonus_points_used = order_in.bonus_points_used
+        subtotal = apply_bonus_to_order(subtotal, bonus_points_used)
+        
+        # Deduct bonus points from user
+        current_user.bonus_points -= bonus_points_used
+        db.commit()
+
+    # Calculate shipping (after bonus applied to subtotal)
     shipping_cost = calculate_shipping(subtotal, order_in.shipping_country)
 
     # Calculate total
     total = subtotal + shipping_cost
 
     # Create order
-    order_data = order_in.model_dump(exclude={"items"})
+    order_data = order_in.model_dump(exclude={"items", "bonus_points_used"})
     order_data.update({
         "order_number": generate_order_number(),
-        "subtotal": subtotal,
+        "subtotal": original_subtotal,  # Original subtotal before bonus
         "shipping_cost": shipping_cost,
         "tax": 0.0,  # Add VAT calculation if needed
+        "bonus_points_used": bonus_points_used,
+        "bonus_points_earned": bonus_points_earned,  # Will be calculated after payment
         "total": total,
         "currency": "PLN",
         "status": OrderStatus.PENDING,
@@ -182,9 +221,10 @@ def get_order_by_number(
 
 
 @router.patch("/{order_id}", response_model=OrderSchema)
-def update_order(
+async def update_order(
     order_id: int,
     order_in: OrderUpdate,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_admin_user)
 ):
@@ -213,6 +253,21 @@ def update_order(
             # Also update order status
             if order.status == OrderStatus.PENDING:
                 update_data["status"] = OrderStatus.PAID
+            
+            # Award bonus points if not already awarded
+            if order.bonus_points_earned == 0.0:
+                user = db.query(User).filter(User.email == order.customer_email).first()
+                if user and user.email_verified:
+                    # Calculate bonus points (only from subtotal, not shipping)
+                    bonus_earned = calculate_bonus_points(order.subtotal, user)
+                    order.bonus_points_earned = bonus_earned
+                    
+                    # Add bonus points to user
+                    user.bonus_points += bonus_earned
+                    user.total_spent += order.total
+                    
+                    # Update loyalty status
+                    update_user_loyalty_status(user, db)
 
     for field, value in update_data.items():
         setattr(order, field, value)

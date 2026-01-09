@@ -50,6 +50,7 @@ class OrderBase(BaseModel):
 class OrderCreate(OrderBase):
     items: List[OrderItemCreate]
     payment_method: PaymentMethod
+    bonus_points_used: Optional[float] = Field(default=0.0, ge=0.0)  # Бонуси для використання
 
 
 class OrderUpdate(BaseModel):
@@ -66,6 +67,8 @@ class Order(OrderBase):
     subtotal: float
     shipping_cost: float
     tax: float
+    bonus_points_used: float
+    bonus_points_earned: float
     total: float
     currency: str
 

@@ -1,5 +1,6 @@
 # Import all models here for Alembic
 from app.models.user import User
+from app.models.user_address import UserAddress
 from app.models.product import Product, ProductImage
 from app.models.order import Order, OrderItem
 from app.models.category import Category
@@ -11,6 +12,7 @@ from app.models.contact_info import ContactInfo
 
 __all__ = [
     "User",
+    "UserAddress",
     "Product",
     "ProductImage",
     "Order",

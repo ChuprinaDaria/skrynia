@@ -214,27 +214,48 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Wait for images to be available
+      - name: Check if backend image exists
+        id: check-backend
         run: |
-          echo "Waiting for images to be available in registry..."
-          sleep 15
-          max_attempts=10
+          echo "Checking if backend image exists..."
+          sleep 10
+          max_attempts=15
           attempt=0
           while [ $attempt -lt $max_attempts ]; do
             if docker manifest inspect ${{ env.REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest > /dev/null 2>&1; then
               echo "Backend image is available"
-              break
+              echo "backend_exists=true" >> $GITHUB_OUTPUT
+              exit 0
             fi
             echo "Attempt $((attempt+1))/$max_attempts: Backend image not yet available, waiting..."
             sleep 5
             attempt=$((attempt+1))
           done
-          if [ $attempt -eq $max_attempts ]; then
-            echo "Warning: Backend image may not be available yet"
-          fi
+          echo "Warning: Backend image not found after $max_attempts attempts"
+          echo "backend_exists=false" >> $GITHUB_OUTPUT
+
+      - name: Check if frontend image exists
+        id: check-frontend
+        run: |
+          echo "Checking if frontend image exists..."
+          sleep 10
+          max_attempts=15
+          attempt=0
+          while [ $attempt -lt $max_attempts ]; do
+            if docker manifest inspect ${{ env.REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest > /dev/null 2>&1; then
+              echo "Frontend image is available"
+              echo "frontend_exists=true" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "Attempt $((attempt+1))/$max_attempts: Frontend image not yet available, waiting..."
+            sleep 5
+            attempt=$((attempt+1))
+          done
+          echo "Warning: Frontend image not found after $max_attempts attempts"
+          echo "frontend_exists=false" >> $GITHUB_OUTPUT
 
       - name: Run Trivy vulnerability scanner (backend)
-        if: success()
+        if: steps.check-backend.outputs.backend_exists == 'true'
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
         env:
@@ -248,7 +269,7 @@ jobs:
           exit-code: '0'
 
       - name: Run Trivy vulnerability scanner (frontend)
-        if: success()
+        if: steps.check-frontend.outputs.frontend_exists == 'true'
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
         env:

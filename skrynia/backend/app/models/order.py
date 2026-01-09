@@ -58,6 +58,8 @@ class Order(Base):
     subtotal = Column(Float, nullable=False)
     shipping_cost = Column(Float, default=0.0)
     tax = Column(Float, default=0.0)
+    bonus_points_used = Column(Float, default=0.0)  # Бонуси використані для оплати
+    bonus_points_earned = Column(Float, default=0.0)  # Бонуси нараховані за замовлення
     total = Column(Float, nullable=False)
     currency = Column(String, default="PLN")
 

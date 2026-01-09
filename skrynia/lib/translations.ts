@@ -65,6 +65,38 @@ export interface Translations {
         description: string;
       };
     };
+    bonusSystem: {
+      title: string;
+      subtitle: string;
+      description: string;
+      levels: {
+        human: {
+          name: string;
+          description: string;
+          bonus: string;
+        };
+        elf: {
+          name: string;
+          description: string;
+          bonus: string;
+          requirement: string;
+        };
+        dwarf: {
+          name: string;
+          description: string;
+          bonus: string;
+          requirement: string;
+        };
+      };
+      benefits: {
+        title: string;
+        earn: string;
+        use: string;
+        track: string;
+      };
+      cta: string;
+      register: string;
+    };
   };
   newsletter: {
     title: string;
@@ -496,6 +528,16 @@ const translations: Record<Language, Translations> = {
       addMoreForFreeShipping: 'Додайте ще {amount} zł для безкоштовної доставки',
       securePayment: 'Безпечна оплата',
       deliveryDays: 'Доставка 3-5 днів',
+      authReminder: {
+        title: 'Зарєєструйтеся або увійдіть',
+        message: 'Зарєєструйтеся, щоб отримувати бонуси з кожної покупки та відстежувати замовлення',
+        login: 'Увійти',
+        register: 'Зареєструватися',
+        benefits: 'Переваги реєстрації',
+        bonusPoints: 'Нараховуйте бонуси з кожної покупки',
+        trackOrders: 'Відстежуйте статус замовлень',
+        saveAddresses: 'Зберігайте адреси доставки',
+      },
     },
     legal: {
       terms: 'Регламент',
@@ -572,6 +614,38 @@ const translations: Record<Language, Translations> = {
           title: 'Shipping',
           description: 'Throughout the European Union',
         },
+      },
+      bonusSystem: {
+        title: 'Bonus System',
+        subtitle: 'Earn bonuses with every purchase',
+        description: 'Register and earn bonus points with every purchase. Use them to pay up to 20% of product costs.',
+        levels: {
+          human: {
+            name: 'Human',
+            description: 'Starting status',
+            bonus: '1% bonus from each purchase',
+          },
+          elf: {
+            name: 'Elf',
+            description: 'After purchases of 1000+ PLN',
+            bonus: '2% bonus from each purchase',
+            requirement: 'Requires: 1000 PLN',
+          },
+          dwarf: {
+            name: 'Dwarf',
+            description: 'After purchases of 5000+ PLN',
+            bonus: '3% bonus from each purchase',
+            requirement: 'Requires: 5000 PLN',
+          },
+        },
+        benefits: {
+          title: 'Registration Benefits',
+          earn: 'Earn bonuses with every purchase',
+          use: 'Pay up to 20% of products with bonuses',
+          track: 'Track order status',
+        },
+        cta: 'Register now',
+        register: 'Register',
       },
     },
     newsletter: {
@@ -732,6 +806,16 @@ const translations: Record<Language, Translations> = {
       addMoreForFreeShipping: 'Add {amount} zł more for free shipping',
       securePayment: 'Secure payment',
       deliveryDays: 'Delivery 3-5 days',
+      authReminder: {
+        title: 'Register or log in',
+        message: 'Register to earn bonuses with every purchase and track your orders',
+        login: 'Log in',
+        register: 'Register',
+        benefits: 'Registration benefits',
+        bonusPoints: 'Earn bonuses with every purchase',
+        trackOrders: 'Track order status',
+        saveAddresses: 'Save delivery addresses',
+      },
     },
     legal: {
       terms: 'Terms & Conditions',
@@ -806,11 +890,43 @@ const translations: Record<Language, Translations> = {
         },
         freeShipping: {
           title: 'Versand',
-          description: 'In der gesamten Europäischen Union',
-        },
+        description: 'In der gesamten Europäischen Union',
       },
     },
-    newsletter: {
+    bonusSystem: {
+      title: 'Bonussystem',
+      subtitle: 'Verdienen Sie Boni bei jedem Kauf',
+      description: 'Registrieren Sie sich und verdienen Sie Bonuspunkte bei jedem Kauf. Nutzen Sie sie, um bis zu 20% der Produktkosten zu bezahlen.',
+      levels: {
+        human: {
+          name: 'Mensch',
+          description: 'Anfangsstatus',
+          bonus: '1% Bonus bei jedem Kauf',
+        },
+        elf: {
+          name: 'Elf',
+          description: 'Nach Käufen ab 1000+ PLN',
+          bonus: '2% Bonus bei jedem Kauf',
+          requirement: 'Erfordert: 1000 PLN',
+        },
+        dwarf: {
+          name: 'Zwerg',
+          description: 'Nach Käufen ab 5000+ PLN',
+          bonus: '3% Bonus bei jedem Kauf',
+          requirement: 'Erfordert: 5000 PLN',
+        },
+      },
+      benefits: {
+        title: 'Registrierungsvorteile',
+        earn: 'Verdienen Sie Boni bei jedem Kauf',
+        use: 'Bezahlen Sie bis zu 20% der Produkte mit Boni',
+        track: 'Verfolgen Sie den Bestellstatus',
+      },
+      cta: 'Jetzt registrieren',
+      register: 'Registrieren',
+    },
+  },
+  newsletter: {
       title: 'Magische Angebote erhalten',
       subtitle: 'Abonnieren Sie unseren Newsletter und erfahren Sie als Erster von neuen Kollektionen und exklusiven Rabatten',
       placeholder: 'Ihre E-Mail',
@@ -968,6 +1084,16 @@ const translations: Record<Language, Translations> = {
       addMoreForFreeShipping: 'Fügen Sie noch {amount} zł hinzu für kostenlosen Versand',
       securePayment: 'Sichere Zahlung',
       deliveryDays: 'Lieferung 3-5 Tage',
+      authReminder: {
+        title: 'Registrieren Sie sich oder melden Sie sich an',
+        message: 'Registrieren Sie sich, um Boni bei jedem Kauf zu verdienen und Ihre Bestellungen zu verfolgen',
+        login: 'Anmelden',
+        register: 'Registrieren',
+        benefits: 'Registrierungsvorteile',
+        bonusPoints: 'Verdienen Sie Boni bei jedem Kauf',
+        trackOrders: 'Verfolgen Sie den Bestellstatus',
+        saveAddresses: 'Speichern Sie Lieferadressen',
+      },
     },
     legal: {
       terms: 'AGB',
@@ -1044,6 +1170,38 @@ const translations: Record<Language, Translations> = {
           title: 'Dostawa',
           description: 'W całej Unii Europejskiej',
         },
+      },
+      bonusSystem: {
+        title: 'System Bonusowy',
+        subtitle: 'Zarabiaj bonusy przy każdym zakupie',
+        description: 'Zarejestruj się i zarabiaj punkty bonusowe przy każdym zakupie. Użyj ich, aby zapłacić do 20% kosztów produktów.',
+        levels: {
+          human: {
+            name: 'Człowiek',
+            description: 'Status początkowy',
+            bonus: '1% bonusu z każdego zakupu',
+          },
+          elf: {
+            name: 'Elf',
+            description: 'Po zakupach za 1000+ PLN',
+            bonus: '2% bonusu z każdego zakupu',
+            requirement: 'Wymaga: 1000 PLN',
+          },
+          dwarf: {
+            name: 'Krasnolud',
+            description: 'Po zakupach za 5000+ PLN',
+            bonus: '3% bonusu z każdego zakupu',
+            requirement: 'Wymaga: 5000 PLN',
+          },
+        },
+        benefits: {
+          title: 'Korzyści z rejestracji',
+          earn: 'Zarabiaj bonusy przy każdym zakupie',
+          use: 'Płać do 20% produktów bonusami',
+          track: 'Śledź status zamówień',
+        },
+        cta: 'Zarejestruj się teraz',
+        register: 'Zarejestruj się',
       },
     },
     newsletter: {
@@ -1204,6 +1362,16 @@ const translations: Record<Language, Translations> = {
       addMoreForFreeShipping: 'Dodaj jeszcze {amount} zł, aby uzyskać darmową dostawę',
       securePayment: 'Bezpieczna płatność',
       deliveryDays: 'Dostawa 3-5 dni',
+      authReminder: {
+        title: 'Zarejestruj się lub zaloguj',
+        message: 'Zarejestruj się, aby zarabiać bonusy przy każdym zakupie i śledzić zamówienia',
+        login: 'Zaloguj się',
+        register: 'Zarejestruj się',
+        benefits: 'Korzyści z rejestracji',
+        bonusPoints: 'Zarabiaj bonusy przy każdym zakupie',
+        trackOrders: 'Śledź status zamówień',
+        saveAddresses: 'Zapisz adresy dostawy',
+      },
     },
     legal: {
       terms: 'Regulamin',

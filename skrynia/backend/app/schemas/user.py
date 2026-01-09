@@ -22,6 +22,10 @@ class User(UserBase):
     id: int
     is_active: bool
     is_admin: bool
+    email_verified: bool
+    loyalty_status: Optional[str] = None
+    bonus_points: float = 0.0
+    total_spent: float = 0.0
     created_at: datetime
 
     class Config:

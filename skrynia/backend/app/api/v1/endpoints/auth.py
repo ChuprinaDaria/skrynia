@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError
-from datetime import timedelta
+from datetime import timedelta, datetime
 from pydantic import BaseModel
 
 from app.core.config import settings
@@ -16,6 +16,12 @@ from app.core.two_factor import generate_secret, get_totp_uri, generate_qr_code,
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.user import UserLogin, Token, UserCreate, User as UserSchema
+from app.services.email_service import (
+    send_verification_email, 
+    generate_verification_token,
+    send_password_reset_code_email,
+    generate_password_reset_code
+)
 
 router = APIRouter()
 
@@ -59,7 +65,13 @@ def login(user_credentials: Login2FA, db: Session = Depends(get_db)):
     if not user.is_active:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Inactive user"
+            detail="Account not activated. Please verify your email."
+        )
+    
+    if not user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email not verified. Please check your email for verification link."
         )
 
     # Check if 2FA is enabled
@@ -86,8 +98,12 @@ def login(user_credentials: Login2FA, db: Session = Depends(get_db)):
 
 
 @router.post("/register", response_model=UserSchema)
-def register(user_in: UserCreate, db: Session = Depends(get_db)):
-    """Register a new user (customers only, not admin)."""
+async def register(
+    user_in: UserCreate, 
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Register a new user (customers only, not admin). Sends verification email."""
     # Check if user already exists
     user = db.query(User).filter(User.email == user_in.email).first()
     if user:
@@ -96,21 +112,105 @@ def register(user_in: UserCreate, db: Session = Depends(get_db)):
             detail="Email already registered"
         )
 
-    # Create new user
+    # Generate verification token
+    verification_token = generate_verification_token()
+    
+    # Create new user (inactive until email verified)
     hashed_password = get_password_hash(user_in.password)
     new_user = User(
         email=user_in.email,
         hashed_password=hashed_password,
         full_name=user_in.full_name,
-        is_active=True,
-        is_admin=False
+        is_active=False,  # Will be activated after email verification
+        is_admin=False,
+        email_verified=False,
+        email_verification_token=verification_token,
+        email_verification_sent_at=datetime.utcnow()
     )
 
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
 
+    # Send verification email in background
+    background_tasks.add_task(
+        send_verification_email,
+        email=new_user.email,
+        token=verification_token,
+        full_name=new_user.full_name
+    )
+
     return new_user
+
+
+@router.get("/verify-email")
+async def verify_email(token: str, db: Session = Depends(get_db)):
+    """Verify user email with token from email link."""
+    user = db.query(User).filter(User.email_verification_token == token).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Invalid verification token"
+        )
+    
+    # Check if token is expired (24 hours)
+    if user.email_verification_sent_at:
+        time_diff = datetime.utcnow() - user.email_verification_sent_at
+        if time_diff > timedelta(hours=24):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Verification token expired. Please request a new one."
+            )
+    
+    # Verify email and activate account
+    user.email_verified = True
+    user.is_active = True
+    user.email_verification_token = None
+    user.email_verification_sent_at = None
+    
+    db.commit()
+    
+    return {"message": "Email verified successfully. You can now log in."}
+
+
+@router.post("/resend-verification")
+async def resend_verification(
+    email: str,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Resend verification email."""
+    user = db.query(User).filter(User.email == email).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    if user.email_verified:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already verified"
+        )
+    
+    # Generate new token
+    verification_token = generate_verification_token()
+    user.email_verification_token = verification_token
+    user.email_verification_sent_at = datetime.utcnow()
+    
+    db.commit()
+    
+    # Send verification email in background
+    background_tasks.add_task(
+        send_verification_email,
+        email=user.email,
+        token=verification_token,
+        full_name=user.full_name
+    )
+    
+    return {"message": "Verification email sent"}
 
 
 @router.post("/2fa/setup", response_model=TwoFactorSetup)
@@ -187,3 +287,129 @@ def disable_2fa(
     db.commit()
     
     return {"message": "2FA disabled successfully"}
+
+
+class PasswordResetRequest(BaseModel):
+    email: str
+
+
+class PasswordResetVerify(BaseModel):
+    email: str
+    code: str
+    new_password: str
+
+
+@router.post("/forgot-password")
+async def forgot_password(
+    request: PasswordResetRequest,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """Request password reset - sends 5-digit code to email."""
+    user = db.query(User).filter(User.email == request.email).first()
+    
+    # Don't reveal if user exists for security
+    if not user:
+        # Return success even if user doesn't exist to prevent email enumeration
+        return {"message": "If the email exists, a reset code has been sent"}
+    
+    # Check if too many attempts (prevent abuse)
+    if user.password_reset_code_attempts and user.password_reset_code_attempts >= 5:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many reset attempts. Please try again later."
+        )
+    
+    # Check if code was sent recently (rate limiting)
+    if user.password_reset_code_sent_at:
+        time_diff = datetime.utcnow() - user.password_reset_code_sent_at
+        if time_diff < timedelta(minutes=2):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Please wait before requesting another code"
+            )
+    
+    # Generate 5-digit code
+    reset_code = generate_password_reset_code()
+    
+    # Save code and timestamp
+    user.password_reset_code = reset_code
+    user.password_reset_code_sent_at = datetime.utcnow()
+    user.password_reset_code_attempts = 0  # Reset attempts counter
+    
+    db.commit()
+    
+    # Send code via email in background
+    background_tasks.add_task(
+        send_password_reset_code_email,
+        email=user.email,
+        code=reset_code,
+        full_name=user.full_name
+    )
+    
+    return {"message": "If the email exists, a reset code has been sent"}
+
+
+@router.post("/reset-password")
+async def reset_password(
+    reset_data: PasswordResetVerify,
+    db: Session = Depends(get_db)
+):
+    """Verify reset code and set new password."""
+    user = db.query(User).filter(User.email == reset_data.email).first()
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Check if code exists
+    if not user.password_reset_code:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No reset code found. Please request a new one."
+        )
+    
+    # Check if code is expired (15 minutes)
+    if user.password_reset_code_sent_at:
+        time_diff = datetime.utcnow() - user.password_reset_code_sent_at
+        if time_diff > timedelta(minutes=15):
+            # Clear expired code
+            user.password_reset_code = None
+            user.password_reset_code_sent_at = None
+            db.commit()
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Reset code expired. Please request a new one."
+            )
+    
+    # Check attempts
+    if user.password_reset_code_attempts and user.password_reset_code_attempts >= 5:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many failed attempts. Please request a new code."
+        )
+    
+    # Verify code
+    if user.password_reset_code != reset_data.code:
+        # Increment attempts
+        user.password_reset_code_attempts = (user.password_reset_code_attempts or 0) + 1
+        db.commit()
+        
+        remaining_attempts = 5 - user.password_reset_code_attempts
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid code. {remaining_attempts} attempts remaining."
+        )
+    
+    # Code is valid - reset password
+    hashed_password = get_password_hash(reset_data.new_password)
+    user.hashed_password = hashed_password
+    user.password_reset_code = None
+    user.password_reset_code_sent_at = None
+    user.password_reset_code_attempts = 0
+    
+    db.commit()
+    
+    return {"message": "Password reset successfully. You can now log in with your new password."}
