@@ -33,7 +33,21 @@ services:
       DEBUG: ${DEBUG:-False}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-dchuprina@lazysoft.pl}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD}
-      # Add all other environment variables
+      # Stripe
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY}
+      STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      # Przelewy24
+      P24_MERCHANT_ID: ${P24_MERCHANT_ID}
+      P24_POS_ID: ${P24_POS_ID}
+      P24_CRC: ${P24_CRC}
+      P24_API_KEY: ${P24_API_KEY}
+      # Mail
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      MAIL_FROM: ${MAIL_FROM}
+      MAIL_SERVER: ${MAIL_SERVER}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME}
     volumes:
       - ./backend/static:/app/static
     networks:
