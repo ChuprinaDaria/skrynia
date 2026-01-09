@@ -238,11 +238,13 @@ def get_products_catalog_csv(db: Session = Depends(get_db)):
     output.close()
     
     # Return CSV as response with UTF-8 encoding
+    # Note: Using inline disposition for Meta compatibility
     return Response(
         content=csv_content.encode('utf-8-sig'),  # UTF-8 with BOM for Excel compatibility
-        media_type="text/csv; charset=utf-8",
+        media_type="text/csv",
         headers={
-            "Content-Disposition": "attachment; filename=catalog_products.csv",
+            "Content-Type": "text/csv; charset=utf-8",
+            "Content-Disposition": "inline; filename=catalog_products.csv",  # inline for Meta
             "Cache-Control": "public, max-age=3600"  # Cache for 1 hour
         }
     )
