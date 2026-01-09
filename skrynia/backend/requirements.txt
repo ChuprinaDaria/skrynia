@@ -1,0 +1,44 @@
+# FastAPI Core
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+sqlalchemy==2.0.25
+psycopg2-binary==2.9.9
+alembic==1.13.1
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-dotenv==1.0.1
+bcrypt==4.1.2
+pyotp==2.9.0
+qrcode[pil]==7.4.2
+
+# Payment Gateways
+stripe==8.2.0
+# Przelewy24 (using requests for API calls)
+requests==2.31.0
+
+# Email
+fastapi-mail==1.4.1
+
+# Image Processing
+Pillow==10.2.0
+
+# Validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0
+
+# CORS (handled by FastAPI middleware, no separate package needed)
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+httpx==0.26.0
+
+# Utils
+python-slugify==8.0.2
+markdown==3.5.2

@@ -1,0 +1,44 @@
+# Frontend
+node_modules
+.next
+.git
+.gitignore
+npm-debug.log
+README.md
+.env*.local
+.env
+
+# Backend
+backend/__pycache__
+backend/.pytest_cache
+backend/venv
+backend/.env
+backend/static/uploads/*
+backend/alembic/versions/*.pyc
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+coverage
+.pytest_cache
+*.pyc
+__pycache__
+
+# Logs
+*.log
+logs
+
+# Secrets
+*.pem
+*.key
+secrets/
+.env.production
+.env.local

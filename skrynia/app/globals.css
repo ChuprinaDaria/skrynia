@@ -1,0 +1,272 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import Fonts with Cyrillic Support */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;600;700&display=swap&subset=cyrillic');
+
+/* Rutenia Font - Ukrainian decorative font */
+/* Примітка: Для використання справжнього шрифту Rutenia, завантажте файли з abetkarutenia.com.ua 
+   та розмістіть їх у public/fonts/rutenia.woff2 та public/fonts/rutenia.woff */
+/* Тимчасово використовуємо Playfair Display як найближчий аналог до Rutenia */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap&subset=cyrillic');
+/* ВАЖЛИВО: не оголошуємо @font-face з локальними файлами, якщо їх немає в public/fonts,
+   інакше браузер буде спамити 404 на /fonts/rutenia.* */
+
+/* Custom Scrollbar */
+@layer base {
+  * {
+    @apply border-sage/20;
+  }
+
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-deep-black text-ivory font-inter antialiased;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-deep-black;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-sage/30 hover:bg-sage/50 rounded-full;
+  }
+
+  /* Headings */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-rutenia;
+  }
+
+  h1 {
+    @apply text-5xl md:text-6xl font-semibold tracking-wide;
+  }
+
+  h2 {
+    @apply text-3xl md:text-4xl font-semibold tracking-wide;
+  }
+
+  h3 {
+    @apply text-2xl md:text-3xl font-semibold;
+  }
+
+  /* Focus states for accessibility */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-oxblood ring-offset-2 ring-offset-deep-black;
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .text-shadow-sm {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .text-shadow-glow {
+    text-shadow: 0 0 10px rgba(102, 0, 0, 0.5);
+  }
+
+  .wood-texture {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 100px 100px, 100px 100px;
+  }
+
+  .parchment-texture {
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+  }
+
+  .glassmorphism {
+    background: rgba(11, 12, 16, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes colorShift {
+  0%, 100% {
+    filter: hue-rotate(0deg) brightness(1) saturate(1);
+  }
+  25% {
+    filter: hue-rotate(10deg) brightness(1.1) saturate(1.2);
+  }
+  50% {
+    filter: hue-rotate(-10deg) brightness(0.9) saturate(1.1);
+  }
+  75% {
+    filter: hue-rotate(5deg) brightness(1.05) saturate(1.15);
+  }
+}
+
+.animate-color-shift {
+  animation: colorShift 4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    #0B0C10 0%,
+    #7A8B8B 50%,
+    #0B0C10 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* Skeleton Loading */
+.skeleton {
+  @apply bg-sage/10 animate-shimmer;
+}
+
+/* Image hover zoom effect */
+.image-zoom {
+  @apply transition-transform duration-300 ease-out;
+}
+
+.image-zoom:hover {
+  @apply scale-110;
+}
+
+/* Card lift effect */
+.card-lift {
+  @apply transition-all duration-300;
+}
+
+.card-lift:hover {
+  @apply -translate-y-1 shadow-oxblood-glow;
+}
+
+/* Hero Background Image Optimization */
+.hero-background-container {
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-color: #0a0a0a; /* Complementary dark background */
+}
+
+/* Responsive padding for hero background */
+@media (max-width: 375px) {
+  .hero-background-container {
+    padding: 0.5rem;
+  }
+}
+
+@media (min-width: 376px) and (max-width: 768px) {
+  .hero-background-container {
+    padding: 1rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .hero-background-container {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-background-container {
+    padding: 2rem;
+  }
+}
+
+/* Ensure image doesn't overflow on very wide screens */
+@media (min-width: 1920px) {
+  .hero-background-container {
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+}
+
+/* Markdown Editor Dark Theme Styles */
+.w-md-editor {
+  background-color: #0B0C10 !important;
+  border-color: rgba(122, 139, 139, 0.3) !important;
+  color: #FFFFF0 !important;
+}
+
+.w-md-editor-text-pre,
+.w-md-editor-text-input {
+  background-color: #0B0C10 !important;
+  color: #FFFFF0 !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input > code {
+  background-color: #1A1C20 !important;
+  color: #7A8B8B !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: #1A1C20 !important;
+  border-bottom-color: rgba(122, 139, 139, 0.3) !important;
+}
+
+.w-md-editor-toolbar button {
+  color: #FFFFF0 !important;
+}
+
+.w-md-editor-toolbar button:hover {
+  background-color: rgba(102, 0, 0, 0.2) !important;
+  color: #660000 !important;
+}
+
+.w-md-editor-text-pre h1,
+.w-md-editor-text-input h1 {
+  color: #FFFFF0 !important;
+  font-family: 'Cinzel', serif !important;
+}
+
+.w-md-editor-text-pre h2,
+.w-md-editor-text-input h2 {
+  color: #FFFFF0 !important;
+  font-family: 'Cinzel', serif !important;
+}
+
+.w-md-editor-text-pre strong,
+.w-md-editor-text-input strong {
+  color: #FFFFF0 !important;
+  font-weight: 600 !important;
+}
+
+.w-md-editor-text-pre a,
+.w-md-editor-text-input a {
+  color: #660000 !important;
+}
+
+.w-md-editor-text-pre a:hover,
+.w-md-editor-text-input a:hover {
+  color: rgba(102, 0, 0, 0.8) !important;
+}
