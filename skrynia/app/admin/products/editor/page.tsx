@@ -715,7 +715,7 @@ export default function ProductEditor() {
                   }}
                   preview="live"
                   hideToolbar={false}
-                  visibleDragBar={true}
+                  visibleDragbar={true}
                   height={400}
                   data-color-mode="dark"
                 />
