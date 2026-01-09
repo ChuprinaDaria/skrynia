@@ -80,6 +80,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-title"
+        onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-sage/20">
@@ -87,9 +88,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
             {t.cart.title}
           </h2>
           <button
-            onClick={onClose}
+            onClick={(e) => {
+              e.stopPropagation();
+              onClose();
+            }}
             className="text-ivory hover:text-oxblood transition-colors duration-200"
             aria-label="Close cart"
+            type="button"
           >
             <svg
               className="w-6 h-6"
@@ -126,7 +131,13 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               <p className="text-sage font-inter mb-6">
                 {t.cart.empty.message}
               </p>
-              <Button onClick={onClose} variant="primary">
+              <Button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose();
+                }} 
+                variant="primary"
+              >
                 {t.cart.empty.continue}
               </Button>
             </div>
@@ -337,8 +348,12 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
 
             {/* Continue Shopping */}
             <button
-              onClick={onClose}
+              onClick={(e) => {
+                e.stopPropagation();
+                onClose();
+              }}
               className="w-full text-center text-sage hover:text-ivory font-inter text-sm transition-colors duration-200"
+              type="button"
             >
               {t.cart.continueShopping}
             </button>
