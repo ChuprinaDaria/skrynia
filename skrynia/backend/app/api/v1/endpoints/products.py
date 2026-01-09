@@ -78,7 +78,7 @@ def get_products(
     return result
 
 
-@router.get("/catalog.csv")
+@router.api_route("/catalog.csv", methods=["GET", "HEAD"])
 def get_products_catalog_csv(db: Session = Depends(get_db)):
     """
     Generate Meta (Facebook) product catalog CSV feed.
