@@ -8,7 +8,7 @@ import Button from '@/components/ui/Button';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://skrynia.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 // Sample product data - in real app, this would be fetched based on slug
 const productData = {

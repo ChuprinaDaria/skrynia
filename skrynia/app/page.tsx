@@ -10,7 +10,7 @@ import BonusSystem from '@/components/layout/BonusSystem';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://skrynia.com';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 // Sample featured products data
 const featuredProducts: Product[] = [

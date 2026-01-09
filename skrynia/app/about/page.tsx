@@ -11,7 +11,7 @@ const aboutJsonLd = {
   '@type': 'AboutPage',
   name: 'Про Скриню Пані Дарії',
   description: 'Історія створення та філософія бренду автентичних прикрас ручної роботи',
-  url: 'https://skrynia.com/about',
+  url: 'https://runebox.eu/about',
   mainEntity: {
     '@type': 'Organization',
     name: 'Скриня Пані Дарії',
