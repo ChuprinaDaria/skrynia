@@ -21,6 +21,11 @@ requests==2.31.0
 
 # Email
 fastapi-mail==1.4.1
+aiosmtplib==3.0.1
+
+# Celery & Redis
+celery==5.3.6
+redis==5.0.1
 
 # Image Processing
 Pillow==10.2.0
