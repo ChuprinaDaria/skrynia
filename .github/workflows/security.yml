@@ -46,6 +46,7 @@ jobs:
           no-banner: true
           exit-code: 0
           exit-on-error: false
+          additional-args: '--no-git'
 
   docker-scan:
     runs-on: ubuntu-latest
