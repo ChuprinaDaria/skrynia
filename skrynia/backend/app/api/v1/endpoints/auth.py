@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import OperationalError, ProgrammingError
 from datetime import timedelta, datetime
 from pydantic import BaseModel
 
@@ -104,8 +104,26 @@ async def register(
     db: Session = Depends(get_db)
 ):
     """Register a new user (customers only, not admin). Sends verification email."""
-    # Check if user already exists
-    user = db.query(User).filter(User.email == user_in.email).first()
+    try:
+        # Check if user already exists
+        user = db.query(User).filter(User.email == user_in.email).first()
+    except (OperationalError, ProgrammingError) as e:
+        error_msg = str(e)
+        if "does not exist" in error_msg or "relation" in error_msg.lower():
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Database tables are not initialized. Please run migrations.",
+            )
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Database connection error. Please check database configuration.",
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Internal server error: {str(e)}",
+        )
+    
     if user:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -128,9 +146,16 @@ async def register(
         email_verification_sent_at=datetime.utcnow()
     )
 
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
+    try:
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create user: {str(e)}",
+        )
 
     # Send verification email in background
     background_tasks.add_task(

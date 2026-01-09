@@ -52,8 +52,26 @@ export default function RegisterPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
-        setError(data.detail || 'Помилка реєстрації');
+        let errorMessage = 'Помилка реєстрації';
+        try {
+          const contentType = response.headers.get('content-type');
+          if (contentType && contentType.includes('application/json')) {
+            const data = await response.json();
+            errorMessage = data.detail || errorMessage;
+          } else {
+            // Server returned HTML error page (500, 502, etc.)
+            const text = await response.text();
+            if (response.status === 500) {
+              errorMessage = 'Помилка сервера. Будь ласка, спробуйте пізніше або зв\'яжіться з підтримкою.';
+            } else {
+              errorMessage = `Помилка ${response.status}: ${response.statusText}`;
+            }
+          }
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+          errorMessage = `Помилка сервера (${response.status}). Спробуйте пізніше.`;
+        }
+        setError(errorMessage);
         setLoading(false);
         return;
       }
@@ -64,12 +82,15 @@ export default function RegisterPage() {
         router.push('/login');
       }, 3000);
     } catch (err) {
+      console.error('Registration error:', err);
       if (err instanceof TypeError && err.message.includes('fetch')) {
         setError('Не вдалося підключитися до сервера. Перевірте з\'єднання.');
+      } else if (err instanceof SyntaxError) {
+        // JSON parsing error - server probably returned HTML error page
+        setError('Помилка сервера. Будь ласка, спробуйте пізніше або зв\'яжіться з підтримкою.');
       } else {
         setError('Помилка реєстрації. Спробуйте ще раз.');
       }
-      console.error('Registration error:', err);
     } finally {
       setLoading(false);
     }
