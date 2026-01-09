@@ -146,6 +146,19 @@ jobs:
           BACKEND_URL=${{ secrets.BACKEND_URL }}
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PUBLIC_KEY=${{ secrets.STRIPE_PUBLIC_KEY }}
+          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          P24_MERCHANT_ID=${{ secrets.P24_MERCHANT_ID }}
+          P24_POS_ID=${{ secrets.P24_POS_ID }}
+          P24_CRC=${{ secrets.P24_CRC }}
+          P24_API_KEY=${{ secrets.P24_API_KEY }}
+          MAIL_USERNAME=${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD=${{ secrets.MAIL_PASSWORD }}
+          MAIL_FROM=${{ secrets.MAIL_FROM }}
+          MAIL_SERVER=${{ secrets.MAIL_SERVER }}
+          MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
+          ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
           BACKEND_IMAGE=ghcr.io/chuprinadaria/skrynia/backend:latest
           FRONTEND_IMAGE=ghcr.io/chuprinadaria/skrynia/frontend:latest
           EOF
