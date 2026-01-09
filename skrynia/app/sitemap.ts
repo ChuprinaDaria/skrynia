@@ -95,7 +95,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Сторінки колекцій
-  const collectionPages = collections.map((collection) => ({
+  const collectionPages = collections.map((collection: { slug: string; lastModified: string }) => ({
     url: `${siteUrl}/collections/${collection.slug}`,
     lastModified: collection.lastModified,
     changeFrequency: 'weekly' as const,
@@ -103,7 +103,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   // Сторінки продуктів
-  const productPages = products.map((product) => ({
+  const productPages = products.map((product: { slug: string; lastModified: string }) => ({
     url: `${siteUrl}/products/${product.slug}`,
     lastModified: product.lastModified,
     changeFrequency: 'weekly' as const,
