@@ -51,11 +51,13 @@ env/
 ENV/
 
 # Backend
+venv/
 backend/venv/
 backend/__pycache__/
 backend/.pytest_cache/
 backend/static/uploads/*
 !backend/static/uploads/.gitkeep
+skrynia/backend/venv/
 
 # IDE
 .vscode/
