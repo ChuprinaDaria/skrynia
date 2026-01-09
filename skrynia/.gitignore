@@ -58,6 +58,8 @@ backend/.pytest_cache/
 backend/static/uploads/*
 !backend/static/uploads/.gitkeep
 skrynia/backend/venv/
+backend/.env
+skrynia/backend/.env
 
 # IDE
 .vscode/
