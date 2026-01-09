@@ -1,0 +1,176 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: skrynia_db
+    environment:
+      POSTGRES_USER: skrynia_user
+      POSTGRES_PASSWORD: skrynia_password
+      POSTGRES_DB: skrynia_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U skrynia_user"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - skrynia_network
+
+  # Redis for Celery
+  redis:
+    image: redis:7-alpine
+    container_name: skrynia_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - skrynia_network
+    volumes:
+      - redis_data:/data
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skrynia_backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://skrynia_user:skrynia_password@db:5432/skrynia_db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-super-secret-key-change-in-production}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@skrynia.com}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-admin123}
+      FRONTEND_URL: http://localhost:3000
+      DEBUG: ${DEBUG:-True}
+
+      # Stripe
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-sk_test_dummy}
+      STRIPE_PUBLIC_KEY: ${STRIPE_PUBLIC_KEY:-pk_test_dummy}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-whsec_dummy}
+
+      # Przelewy24
+      P24_MERCHANT_ID: ${P24_MERCHANT_ID:-123456}
+      P24_POS_ID: ${P24_POS_ID:-123456}
+      P24_CRC: ${P24_CRC:-dummy_crc}
+      P24_API_KEY: ${P24_API_KEY:-dummy_key}
+
+      # Email (SMTP)
+      MAIL_USERNAME: ${MAIL_USERNAME:-noreply@skrynia.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-dummy}
+      MAIL_FROM: ${MAIL_FROM:-noreply@skrynia.com}
+      MAIL_SERVER: ${MAIL_SERVER:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_FROM_NAME: "Skrynia Pani Darii"
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-True}
+      MAIL_SSL_TLS: ${MAIL_SSL_TLS:-False}
+    volumes:
+      - ./backend/static:/app/static
+      - ./backend/app:/app/app
+    ports:
+      - "8000:8000"
+    command: sh -c "alembic upgrade head && python init_db.py && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    networks:
+      - skrynia_network
+
+  # Celery Worker
+  celery_worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skrynia_celery_worker
+    depends_on:
+      - backend
+      - redis
+    environment:
+      DATABASE_URL: postgresql://skrynia_user:skrynia_password@db:5432/skrynia_db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-super-secret-key-change-in-production}
+      FRONTEND_URL: http://localhost:3000
+
+      # Email (SMTP)
+      MAIL_USERNAME: ${MAIL_USERNAME:-noreply@skrynia.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-dummy}
+      MAIL_FROM: ${MAIL_FROM:-noreply@skrynia.com}
+      MAIL_SERVER: ${MAIL_SERVER:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_FROM_NAME: "Skrynia Pani Darii"
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-True}
+      MAIL_SSL_TLS: ${MAIL_SSL_TLS:-False}
+    volumes:
+      - ./backend/app:/app/app
+    command: celery -A app.celery_worker worker --loglevel=info
+    networks:
+      - skrynia_network
+
+  # Celery Beat (Scheduler)
+  celery_beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skrynia_celery_beat
+    depends_on:
+      - backend
+      - redis
+    environment:
+      DATABASE_URL: postgresql://skrynia_user:skrynia_password@db:5432/skrynia_db
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+      SECRET_KEY: ${SECRET_KEY:-super-secret-key-change-in-production}
+      FRONTEND_URL: http://localhost:3000
+
+      # Email (SMTP)
+      MAIL_USERNAME: ${MAIL_USERNAME:-noreply@skrynia.com}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-dummy}
+      MAIL_FROM: ${MAIL_FROM:-noreply@skrynia.com}
+      MAIL_SERVER: ${MAIL_SERVER:-smtp.gmail.com}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_FROM_NAME: "Skrynia Pani Darii"
+      MAIL_STARTTLS: ${MAIL_STARTTLS:-True}
+      MAIL_SSL_TLS: ${MAIL_SSL_TLS:-False}
+    volumes:
+      - ./backend/app:/app/app
+    command: celery -A app.celery_worker beat --loglevel=info
+    networks:
+      - skrynia_network
+
+  # Next.js Frontend
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: skrynia_frontend
+    depends_on:
+      - backend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    networks:
+      - skrynia_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  skrynia_network:
+    driver: bridge
