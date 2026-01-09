@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 
 from app.db.session import get_db
 from app.models.social_link import SocialLink
@@ -17,7 +17,7 @@ router = APIRouter()
 
 @router.get("/", response_model=List[SocialLinkSchema])
 def get_social_links(
-    is_active: bool = None,
+    is_active: Optional[bool] = Query(None, description="Filter by active status"),
     db: Session = Depends(get_db)
 ):
     """Get all social links (public endpoint)."""
