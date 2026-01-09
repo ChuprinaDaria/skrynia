@@ -14,7 +14,15 @@ RUN npm ci
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+
+# Copy all necessary files (excluding node_modules, .next, etc. via .dockerignore)
+COPY package.json package-lock.json* ./
+COPY next.config.js tsconfig.json tailwind.config.ts postcss.config.mjs ./
+COPY app ./app
+COPY components ./components
+COPY contexts ./contexts
+COPY lib ./lib
+COPY public ./public
 
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED 1
