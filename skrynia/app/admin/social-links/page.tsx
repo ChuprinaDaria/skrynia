@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AdminNav from '@/components/admin/AdminNav';
 import { useRouter } from 'next/navigation';
 import { Plus, Trash2, Edit2, Instagram, Facebook, Twitter, Youtube, Linkedin, Share2 } from 'lucide-react';
+import { getApiEndpoint } from '@/lib/api';
 
 interface SocialLink {
   id: number;
@@ -52,8 +53,7 @@ export default function SocialLinksPage() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/social-links/`, {
+      const res = await fetch(getApiEndpoint('/api/v1/social-links/'), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -102,10 +102,9 @@ export default function SocialLinksPage() {
 
     try {
       const token = localStorage.getItem('admin_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
       const url = editingLink
-        ? `${apiUrl}/api/v1/social-links/${editingLink.id}`
-        : `${apiUrl}/api/v1/social-links/`;
+        ? getApiEndpoint(`/api/v1/social-links/${editingLink.id}`)
+        : getApiEndpoint('/api/v1/social-links/');
 
       const method = editingLink ? 'PATCH' : 'POST';
 
@@ -138,8 +137,7 @@ export default function SocialLinksPage() {
 
     try {
       const token = localStorage.getItem('admin_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/social-links/${id}`, {
+      const res = await fetch(getApiEndpoint(`/api/v1/social-links/${id}`), {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -157,8 +155,7 @@ export default function SocialLinksPage() {
   const toggleActive = async (link: SocialLink) => {
     try {
       const token = localStorage.getItem('admin_token');
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/social-links/${link.id}`, {
+      const res = await fetch(getApiEndpoint(`/api/v1/social-links/${link.id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

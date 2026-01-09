@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AdminNav from '@/components/admin/AdminNav';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import { getApiEndpoint } from '@/lib/api';
 
 interface Product {
   id: number;
@@ -57,7 +58,7 @@ export default function ProductsManagement() {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const res = await fetch('http://localhost:8000/api/v1/products?is_active=true&limit=100');
+      const res = await fetch(getApiEndpoint('/api/v1/products?is_active=true&limit=100'));
 
       if (res.ok) {
         const data = await res.json();
@@ -107,8 +108,8 @@ export default function ProductsManagement() {
     try {
       const token = localStorage.getItem('admin_token');
       const url = editingProduct
-        ? `http://localhost:8000/api/v1/products/${editingProduct.id}`
-        : 'http://localhost:8000/api/v1/products';
+        ? getApiEndpoint(`/api/v1/products/${editingProduct.id}`)
+        : getApiEndpoint('/api/v1/products');
 
       const method = editingProduct ? 'PATCH' : 'POST';
 
@@ -141,7 +142,7 @@ export default function ProductsManagement() {
 
     try {
       const token = localStorage.getItem('admin_token');
-      const res = await fetch(`http://localhost:8000/api/v1/products/${productId}`, {
+      const res = await fetch(getApiEndpoint(`/api/v1/products/${productId}`), {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

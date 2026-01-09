@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminNav from '@/components/admin/AdminNav';
 import { useRouter } from 'next/navigation';
+import { getApiEndpoint } from '@/lib/api';
 
 interface MadeToOrderRequest {
   id: number;
@@ -42,8 +43,8 @@ export default function MadeToOrderPage() {
       }
 
       const url = filter === 'all' 
-        ? 'http://localhost:8000/api/v1/made-to-order/'
-        : `http://localhost:8000/api/v1/made-to-order/?status=${filter}`;
+        ? getApiEndpoint('/api/v1/made-to-order/')
+        : getApiEndpoint(`/api/v1/made-to-order/?status=${filter}`);
 
       const res = await fetch(url, {
         headers: {
@@ -57,7 +58,7 @@ export default function MadeToOrderPage() {
         const requestsWithProducts = await Promise.all(
           data.map(async (req: MadeToOrderRequest) => {
             try {
-              const productRes = await fetch(`http://localhost:8000/api/v1/products/by-id/${req.product_id}`);
+              const productRes = await fetch(getApiEndpoint(`/api/v1/products/by-id/${req.product_id}`));
               if (productRes.ok) {
                 const product = await productRes.json();
                 return { ...req, product: { title_uk: product.title_uk, slug: product.slug } };
@@ -83,7 +84,7 @@ export default function MadeToOrderPage() {
   const updateStatus = async (id: number, status: string) => {
     try {
       const token = localStorage.getItem('admin_token');
-      const res = await fetch(`http://localhost:8000/api/v1/made-to-order/${id}`, {
+      const res = await fetch(getApiEndpoint(`/api/v1/made-to-order/${id}`), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

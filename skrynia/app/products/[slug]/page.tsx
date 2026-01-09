@@ -7,6 +7,8 @@ import Script from 'next/script';
 import Button from '@/components/ui/Button';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getApiEndpoint } from '@/lib/api';
+import { useCart } from '@/contexts/CartContext';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
@@ -191,6 +193,7 @@ const generateBreadcrumbJsonLd = () => ({
 
 export default function ProductDetailPage() {
   const { t } = useLanguage();
+  const { addItem } = useCart();
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isMadeToOrder, setIsMadeToOrder] = useState(false);
@@ -210,8 +213,15 @@ export default function ProductDetailPage() {
   // In production, fetch from: `/api/v1/products/${slug}`
 
   const handleAddToCart = () => {
-    // Add to cart logic here
-    alert(`Додано до кошика: ${productData.title} x${quantity}`);
+    addItem({
+      productId: parseInt(productData.id),
+      title: productData.title,
+      price: productData.price,
+      currency: productData.currency,
+      quantity: quantity,
+      image: productData.images[0],
+      slug: productData.slug,
+    });
   };
 
   const handleMadeToOrderSubmit = async (e: React.FormEvent) => {
@@ -219,7 +229,7 @@ export default function ProductDetailPage() {
     setIsSubmitting(true);
     
     try {
-      const response = await fetch('http://localhost:8000/api/v1/made-to-order/', {
+      const response = await fetch(getApiEndpoint('/api/v1/made-to-order/'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

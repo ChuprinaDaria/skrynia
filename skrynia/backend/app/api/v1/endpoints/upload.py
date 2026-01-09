@@ -14,7 +14,20 @@ from app.db.session import get_db
 router = APIRouter()
 
 UPLOAD_DIR = Path(settings.UPLOAD_DIR)
-UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def ensure_upload_dir():
+    """Ensure upload directory exists, create if it doesn't."""
+    try:
+        UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+    except PermissionError:
+        # If we can't create the directory, try to use it anyway
+        # It might already exist or be mounted as a volume
+        if not UPLOAD_DIR.exists():
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Cannot create upload directory: {UPLOAD_DIR}. Check permissions."
+            )
 
 
 def validate_image(file: UploadFile) -> bool:
@@ -65,6 +78,9 @@ async def upload_image(
     Upload a product image (admin only).
     Automatically optimizes and resizes images.
     """
+    # Ensure upload directory exists
+    ensure_upload_dir()
+    
     # Validate file
     validate_image(file)
 
@@ -116,6 +132,9 @@ async def upload_multiple_images(
     db: Session = Depends(get_db)
 ):
     """Upload multiple product images at once (admin only)."""
+    # Ensure upload directory exists
+    ensure_upload_dir()
+    
     if len(files) > 10:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

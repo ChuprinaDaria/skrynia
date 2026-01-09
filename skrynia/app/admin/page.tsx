@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import AdminNav from '@/components/admin/AdminNav';
+import { getApiEndpoint } from '@/lib/api';
 import {
   LineChart,
   Line,
@@ -56,7 +57,7 @@ export default function AdminDashboard() {
       }
 
       // Fetch dashboard stats
-      const statsRes = await fetch(`http://localhost:8000/api/v1/admin/dashboard?days=${days}`, {
+      const statsRes = await fetch(getApiEndpoint(`/api/v1/admin/dashboard?days=${days}`), {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -73,7 +74,7 @@ export default function AdminDashboard() {
       }
 
       // Fetch chart data
-      const chartRes = await fetch(`http://localhost:8000/api/v1/admin/sales-chart?days=${days}`, {
+      const chartRes = await fetch(getApiEndpoint(`/api/v1/admin/sales-chart?days=${days}`), {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('admin_token')}`,
         },

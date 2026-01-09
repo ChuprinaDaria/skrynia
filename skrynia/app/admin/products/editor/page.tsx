@@ -21,6 +21,7 @@ import {
   Sparkles,
   Video,
 } from 'lucide-react';
+import { getApiEndpoint } from '@/lib/api';
 
 // Dynamically import MDEditor to avoid SSR issues
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
@@ -196,7 +197,7 @@ function ProductEditorContent() {
   const fetchProduct = async () => {
     try {
       const token = localStorage.getItem('admin_token');
-      const res = await fetch(`http://localhost:8000/api/v1/products/by-id/${productId}`, {
+      const res = await fetch(getApiEndpoint(`/api/v1/products/by-id/${productId}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.ok) {
@@ -224,7 +225,7 @@ function ProductEditorContent() {
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/v1/categories');
+      const res = await fetch(getApiEndpoint('/api/v1/categories'));
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
@@ -250,8 +251,8 @@ function ProductEditorContent() {
     try {
       const token = localStorage.getItem('admin_token');
       const url = productId
-        ? `http://localhost:8000/api/v1/products/${productId}`
-        : 'http://localhost:8000/api/v1/products';
+        ? getApiEndpoint(`/api/v1/products/${productId}`)
+        : getApiEndpoint('/api/v1/products');
 
       const method = productId ? 'PATCH' : 'POST';
 
@@ -405,7 +406,7 @@ function ProductEditorContent() {
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
-      const res = await fetch('http://localhost:8000/api/v1/upload/image', {
+      const res = await fetch(getApiEndpoint('/api/v1/upload/image'), {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
+import { getApiEndpoint } from '@/lib/api';
 
 const withdrawalContent: Record<string, any> = {
   UA: {
@@ -81,8 +82,7 @@ export default function OdstapieniePage() {
     setIsSubmitting(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      await fetch(`${apiUrl}/api/v1/contact`, {
+      await fetch(getApiEndpoint('/api/v1/contact'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

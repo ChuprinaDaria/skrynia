@@ -5,6 +5,7 @@ import Link from 'next/link';
 import AlatyrIcon from '@/components/ui/icons/AlatyrIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Instagram, Facebook, Twitter, Youtube, Linkedin, MessageCircle, Share2 } from 'lucide-react';
+import { getApiEndpoint } from '@/lib/api';
 
 interface SocialLink {
   id: number;
@@ -46,8 +47,7 @@ const Footer: React.FC = () => {
 
   const fetchSocialLinks = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/social-links/?is_active=true`);
+      const res = await fetch(getApiEndpoint('/api/v1/social-links/?is_active=true'));
       if (res.ok) {
         const data = await res.json();
         setSocialLinks(data);
@@ -59,8 +59,7 @@ const Footer: React.FC = () => {
 
   const fetchContactInfo = async () => {
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/contact-info/`);
+      const res = await fetch(getApiEndpoint('/api/v1/contact-info/'));
       if (res.ok) {
         const data = await res.json();
         setContactInfo(data);

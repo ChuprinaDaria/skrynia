@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getApiEndpoint, getApiUrl } from '@/lib/api';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -16,7 +17,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/auth/login', {
+      const response = await fetch(getApiEndpoint('/api/v1/auth/login'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -41,7 +42,8 @@ export default function AdminLogin() {
       router.push('/admin');
     } catch (err) {
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        setError('Не вдалося підключитися до сервера. Перевірте, чи запущений бекенд на http://localhost:8000');
+        const apiUrl = getApiUrl();
+        setError(`Не вдалося підключитися до сервера. Перевірте, чи запущений бекенд на ${apiUrl}`);
       } else {
         setError(err instanceof Error ? err.message : 'Помилка авторизації');
       }
@@ -74,7 +76,7 @@ export default function AdminLogin() {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 rounded-sm text-ivory placeholder-sage/50 focus:outline-none focus:ring-2 focus:ring-oxblood focus:border-transparent transition-all"
-              placeholder="admin@skrynia.com"
+              placeholder="email@example.com"
             />
           </div>
 
@@ -107,10 +109,6 @@ export default function AdminLogin() {
             {loading ? 'Вхід...' : 'Увійти'}
           </button>
         </form>
-
-        <div className="mt-6 text-center text-sage text-xs">
-          <p>Тестові дані: admin@skrynia.com / admin123</p>
-        </div>
       </div>
     </div>
   );

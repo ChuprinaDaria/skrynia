@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AdminNav from '@/components/admin/AdminNav';
 import { useRouter } from 'next/navigation';
 import { Save, Mail, Phone, MapPin } from 'lucide-react';
+import { getApiEndpoint } from '@/lib/api';
 
 interface ContactInfo {
   id: number;
@@ -30,8 +31,7 @@ export default function ContactInfoPage() {
   const fetchContactInfo = async () => {
     try {
       setLoading(true);
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/contact-info/`);
+      const res = await fetch(getApiEndpoint('/api/v1/contact-info/'));
 
       if (res.ok) {
         const data = await res.json();
@@ -60,8 +60,7 @@ export default function ContactInfoPage() {
         return;
       }
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-      const res = await fetch(`${apiUrl}/api/v1/contact-info/`, {
+      const res = await fetch(getApiEndpoint('/api/v1/contact-info/'), {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

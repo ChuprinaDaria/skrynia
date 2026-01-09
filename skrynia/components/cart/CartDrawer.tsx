@@ -326,6 +326,11 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               fullWidth 
               className="mb-3"
               disabled={!agreedToTerms || !agreedToPrivacy}
+              onClick={() => {
+                if (agreedToTerms && agreedToPrivacy) {
+                  window.location.href = '/checkout';
+                }
+              }}
             >
               {t.cart.checkout}
             </Button>

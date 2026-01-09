@@ -1,28 +1,64 @@
 import { MetadataRoute } from 'next';
+import { getApiEndpoint } from '@/lib/api';
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://skrynia.com';
-
-// В реальному проекті це буде з бази даних
-const products = [
-  { slug: 'coral-necklace-alatyr', lastModified: '2024-01-08' },
-  { slug: 'solar-sign-earrings', lastModified: '2024-01-08' },
-  { slug: 'protection-bracelet', lastModified: '2024-01-08' },
-  { slug: 'viking-pendant-mjolnir', lastModified: '2024-01-08' },
-  { slug: 'viking-bracelet-runes', lastModified: '2024-01-08' },
-  { slug: 'celtic-amulet-triquetra', lastModified: '2024-01-08' },
-  { slug: 'celtic-bracelet-knots', lastModified: '2024-01-08' },
-];
-
-const collections = [
-  { slug: 'ukrainian', lastModified: '2024-01-08' },
-  { slug: 'viking', lastModified: '2024-01-08' },
-  { slug: 'celtic', lastModified: '2024-01-08' },
-];
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 const languages = ['', '/en', '/de', '/pl'];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+// Fetch products from API
+async function getProducts() {
+  try {
+    const response = await fetch(getApiEndpoint('/api/v1/products?is_active=true&limit=1000'), {
+      next: { revalidate: 3600 } // Revalidate every hour
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch products for sitemap');
+      return [];
+    }
+    
+    const products = await response.json();
+    return products.map((product: any) => ({
+      slug: product.slug,
+      lastModified: product.updated_at || new Date().toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error fetching products for sitemap:', error);
+    return [];
+  }
+}
+
+// Fetch categories/collections from API
+async function getCollections() {
+  try {
+    const response = await fetch(getApiEndpoint('/api/v1/categories'), {
+      next: { revalidate: 3600 } // Revalidate every hour
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch categories for sitemap');
+      return [];
+    }
+    
+    const categories = await response.json();
+    return categories.map((category: any) => ({
+      slug: category.slug,
+      lastModified: category.updated_at || new Date().toISOString(),
+    }));
+  } catch (error) {
+    console.error('Error fetching categories for sitemap:', error);
+    return [];
+  }
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const currentDate = new Date().toISOString();
+  
+  // Fetch dynamic data
+  const [products, collections] = await Promise.all([
+    getProducts(),
+    getCollections(),
+  ]);
   
   // Статичні сторінки
   const staticPages = [

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getApiEndpoint } from '@/lib/api';
 
 interface ContactInfo {
   id: number;
@@ -18,8 +19,7 @@ export default function ContactPage() {
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-        const res = await fetch(`${apiUrl}/api/v1/contact-info/`);
+        const res = await fetch(getApiEndpoint('/api/v1/contact-info/'));
         if (res.ok) {
           const data = await res.json();
           setContactInfo(data);

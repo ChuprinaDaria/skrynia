@@ -43,26 +43,30 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const addItem = (item: Omit<CartItem, 'id'>) => {
     CartManager.addItem(item);
+    setItems(CartManager.getItems()); // Update state
     setIsCartOpen(true); // Auto-open cart when item added
   };
 
   const removeItem = (itemId: string) => {
     CartManager.removeItem(itemId);
+    setItems(CartManager.getItems()); // Update state
   };
 
   const updateQuantity = (itemId: string, quantity: number) => {
     CartManager.updateQuantity(itemId, quantity);
+    setItems(CartManager.getItems()); // Update state
   };
 
   const clearCart = () => {
     CartManager.clearCart();
+    setItems([]); // Update state
   };
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
-  // Calculate totals
-  const totals = CartManager.getTotals();
+  // Calculate totals - recalculate when items change
+  const totals = React.useMemo(() => CartManager.getTotals(), [items]);
 
   return (
     <CartContext.Provider
