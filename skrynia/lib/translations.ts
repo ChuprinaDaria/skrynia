@@ -219,6 +219,9 @@ export interface Translations {
         description: string;
         descriptionPlaceholder: string;
         submit: string;
+        submitting: string;
+        cancel: string;
+        success: string;
       };
     };
   cart: {
