@@ -234,6 +234,7 @@ jobs:
           fi
 
       - name: Run Trivy vulnerability scanner (backend)
+        if: success()
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
         env:
@@ -247,6 +248,7 @@ jobs:
           exit-code: '0'
 
       - name: Run Trivy vulnerability scanner (frontend)
+        if: success()
         uses: aquasecurity/trivy-action@master
         continue-on-error: true
         env:
