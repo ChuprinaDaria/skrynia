@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -133,7 +133,7 @@ interface ProductFormData {
   }>;
 }
 
-export default function ProductEditor() {
+function ProductEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const productId = searchParams.get('id');
@@ -1354,6 +1354,23 @@ export default function ProductEditor() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function ProductEditor() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-deep-black">
+        <AdminNav />
+        <div className="ml-64 pt-20 pb-20">
+          <div className="container mx-auto px-4 md:px-6 max-w-7xl">
+            <div className="text-ivory">Завантаження...</div>
+          </div>
+        </div>
+      </div>
+    }>
+      <ProductEditorContent />
+    </Suspense>
   );
 }
 
