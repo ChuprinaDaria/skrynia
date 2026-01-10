@@ -13,6 +13,8 @@ import {
   LogOut,
   Share2,
   Mail,
+  Circle,
+  FileQuestion,
 } from 'lucide-react';
 
 const navItems = [
@@ -35,6 +37,16 @@ const navItems = [
     href: '/admin/made-to-order',
     label: 'Під Замовлення',
     icon: FileText,
+  },
+  {
+    href: '/admin/beads',
+    label: 'Бусини',
+    icon: Circle,
+  },
+  {
+    href: '/admin/quotes',
+    label: 'Запити на Прорахунок',
+    icon: FileQuestion,
   },
   {
     href: '/admin/customers',
