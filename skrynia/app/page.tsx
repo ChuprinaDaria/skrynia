@@ -7,6 +7,7 @@ import Hero from '@/components/layout/Hero';
 import CollectionsPreview from '@/components/layout/CollectionsPreview';
 import Newsletter from '@/components/layout/Newsletter';
 import BonusSystem from '@/components/layout/BonusSystem';
+import BlogSection from '@/components/home/BlogSection';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -166,6 +167,9 @@ export default function HomePage() {
 
       {/* Bonus System Section */}
       <BonusSystem />
+
+      {/* Blog Section */}
+      <BlogSection />
 
       {/* About Section */}
       <section className="py-20 md:py-32 px-4 bg-deep-black relative overflow-hidden" aria-labelledby="about-section-title">

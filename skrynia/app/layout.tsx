@@ -346,6 +346,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           as="image"
           type="image/png"
         />
+
+        {/* RSS Feed */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Skrynia Blog RSS Feed"
+          href={`${siteUrl}/api/v1/blog/rss.xml`}
+        />
       </head>
       <body className="min-h-screen flex flex-col">
         {/* Google Tag Manager (noscript) */}

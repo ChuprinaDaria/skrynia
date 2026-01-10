@@ -20,7 +20,7 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const languages = ['UA', 'EN', 'DE', 'PL'] as const;
+  const languages = ['UA', 'EN', 'DE', 'PL', 'SE', 'NO', 'DK', 'FR'] as const;
 
   const navLinks = [
     { href: '/collections', label: t.nav.collections },

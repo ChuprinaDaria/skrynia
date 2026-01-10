@@ -10,6 +10,31 @@ from app.core.config import settings
 # Email translations
 EMAIL_TRANSLATIONS = {
     "UA": {
+        "email_verification": {
+            "subject": "Підтвердження електронної адреси - Skrynia",
+            "title": "Ласкаво просимо до Skrynia!",
+            "greeting": "Вітаємо",
+            "verification_text": "Дякуємо за реєстрацію. Будь ласка, підтвердіть вашу електронну адресу, натиснувши на кнопку нижче:",
+            "verify_button": "Підтвердити email",
+            "or_copy_link": "Або скопіюйте та вставте це посилання у ваш браузер:",
+            "important": "Важливо:",
+            "expires_in": "Це посилання дійсне протягом 24 годин.",
+            "ignore_if_not_you": "Якщо ви не реєструвалися на нашому сайті, просто проігноруйте цей лист.",
+            "footer": "© {year} Skrynia. Всі права захищені."
+        },
+        "password_reset": {
+            "subject": "Код для скидання пароля - Skrynia",
+            "title": "Скидання пароля",
+            "greeting": "Вітаємо",
+            "reset_text": "Ми отримали запит на скидання пароля для вашого облікового запису.",
+            "use_code": "Використайте цей код для підтвердження:",
+            "important": "Важливо:",
+            "expires_in": "Цей код дійсний протягом 15 хвилин",
+            "dont_share": "Не надавайте цей код нікому",
+            "ignore_if_not_you": "Якщо ви не запитували скидання пароля, проігноруйте цей лист",
+            "enter_code": "Введіть цей код на сторінці скидання пароля для встановлення нового пароля.",
+            "footer": "© {year} Skrynia. Всі права захищені."
+        },
         "order_received": {
             "subject": "Ваше замовлення прийнято - Skrynia",
             "title": "Дякуємо за ваше замовлення!",
@@ -66,6 +91,31 @@ EMAIL_TRANSLATIONS = {
         }
     },
     "EN": {
+        "email_verification": {
+            "subject": "Email Verification - Skrynia",
+            "title": "Welcome to Skrynia!",
+            "greeting": "Hello",
+            "verification_text": "Thank you for registering. Please confirm your email address by clicking the button below:",
+            "verify_button": "Verify Email",
+            "or_copy_link": "Or copy and paste this link into your browser:",
+            "important": "Important:",
+            "expires_in": "This link is valid for 24 hours.",
+            "ignore_if_not_you": "If you didn't register on our website, please ignore this email.",
+            "footer": "© {year} Skrynia. All rights reserved."
+        },
+        "password_reset": {
+            "subject": "Password Reset Code - Skrynia",
+            "title": "Password Reset",
+            "greeting": "Hello",
+            "reset_text": "We received a password reset request for your account.",
+            "use_code": "Use this code to verify:",
+            "important": "Important:",
+            "expires_in": "This code is valid for 15 minutes",
+            "dont_share": "Do not share this code with anyone",
+            "ignore_if_not_you": "If you didn't request a password reset, please ignore this email",
+            "enter_code": "Enter this code on the password reset page to set a new password.",
+            "footer": "© {year} Skrynia. All rights reserved."
+        },
         "order_received": {
             "subject": "Your order has been received - Skrynia",
             "title": "Thank you for your order!",
@@ -122,6 +172,31 @@ EMAIL_TRANSLATIONS = {
         }
     },
     "DE": {
+        "email_verification": {
+            "subject": "E-Mail-Bestätigung - Skrynia",
+            "title": "Willkommen bei Skrynia!",
+            "greeting": "Hallo",
+            "verification_text": "Vielen Dank für Ihre Registrierung. Bitte bestätigen Sie Ihre E-Mail-Adresse, indem Sie auf die Schaltfläche unten klicken:",
+            "verify_button": "E-Mail bestätigen",
+            "or_copy_link": "Oder kopieren Sie diesen Link und fügen Sie ihn in Ihren Browser ein:",
+            "important": "Wichtig:",
+            "expires_in": "Dieser Link ist 24 Stunden gültig.",
+            "ignore_if_not_you": "Wenn Sie sich nicht auf unserer Website registriert haben, ignorieren Sie diese E-Mail bitte.",
+            "footer": "© {year} Skrynia. Alle Rechte vorbehalten."
+        },
+        "password_reset": {
+            "subject": "Passwort-Wiederherstellungscode - Skrynia",
+            "title": "Passwort zurücksetzen",
+            "greeting": "Hallo",
+            "reset_text": "Wir haben eine Anfrage zum Zurücksetzen des Passworts für Ihr Konto erhalten.",
+            "use_code": "Verwenden Sie diesen Code zur Bestätigung:",
+            "important": "Wichtig:",
+            "expires_in": "Dieser Code ist 15 Minuten gültig",
+            "dont_share": "Teilen Sie diesen Code mit niemandem",
+            "ignore_if_not_you": "Wenn Sie keine Passwortzurücksetzung angefordert haben, ignorieren Sie diese E-Mail",
+            "enter_code": "Geben Sie diesen Code auf der Seite zum Zurücksetzen des Passworts ein, um ein neues Passwort festzulegen.",
+            "footer": "© {year} Skrynia. Alle Rechte vorbehalten."
+        },
         "order_received": {
             "subject": "Ihre Bestellung wurde erhalten - Skrynia",
             "title": "Vielen Dank für Ihre Bestellung!",
@@ -178,6 +253,31 @@ EMAIL_TRANSLATIONS = {
         }
     },
     "PL": {
+        "email_verification": {
+            "subject": "Weryfikacja adresu e-mail - Skrynia",
+            "title": "Witamy w Skrynia!",
+            "greeting": "Witaj",
+            "verification_text": "Dziękujemy za rejestrację. Proszę potwierdzić swój adres e-mail, klikając przycisk poniżej:",
+            "verify_button": "Potwierdź e-mail",
+            "or_copy_link": "Lub skopiuj i wklej ten link do przeglądarki:",
+            "important": "Ważne:",
+            "expires_in": "Ten link jest ważny przez 24 godziny.",
+            "ignore_if_not_you": "Jeśli nie rejestrowałeś się na naszej stronie, zignoruj tę wiadomość.",
+            "footer": "© {year} Skrynia. Wszelkie prawa zastrzeżone."
+        },
+        "password_reset": {
+            "subject": "Kod resetowania hasła - Skrynia",
+            "title": "Resetowanie hasła",
+            "greeting": "Witaj",
+            "reset_text": "Otrzymaliśmy prośbę o zresetowanie hasła do Twojego konta.",
+            "use_code": "Użyj tego kodu do weryfikacji:",
+            "important": "Ważne:",
+            "expires_in": "Ten kod jest ważny przez 15 minut",
+            "dont_share": "Nie udostępniaj tego kodu nikomu",
+            "ignore_if_not_you": "Jeśli nie prosiłeś o resetowanie hasła, zignoruj tę wiadomość",
+            "enter_code": "Wprowadź ten kod na stronie resetowania hasła, aby ustawić nowe hasło.",
+            "footer": "© {year} Skrynia. Wszelkie prawa zastrzeżone."
+        },
         "order_received": {
             "subject": "Twoje zamówienie zostało przyjęte - Skrynia",
             "title": "Dziękujemy za zamówienie!",
@@ -584,3 +684,263 @@ def generate_cart_reminder_html(
     
     return html
 
+
+def generate_verification_email_html(
+    language: str,
+    full_name: str,
+    verification_url: str
+) -> str:
+    """Generate HTML email for email verification with brand styling."""
+    t = get_email_translation(language, "email_verification")
+    name = full_name or t.get('greeting', 'Вітаємо')
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #FFFFF0;
+                margin: 0;
+                padding: 0;
+                background-color: #0A0A0A;
+            }}
+            .email-container {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #1a1a1a;
+            }}
+            .header {{
+                background: linear-gradient(135deg, #800020 0%, #600018 100%);
+                padding: 40px 20px;
+                text-align: center;
+                color: #FFFFF0;
+                border-bottom: 2px solid #9CAF88;
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 32px;
+                font-weight: 300;
+                font-family: 'Georgia', serif;
+            }}
+            .content {{
+                padding: 40px 30px;
+                background-color: #1a1a1a;
+                color: #FFFFF0;
+            }}
+            .button {{
+                display: inline-block;
+                padding: 16px 40px;
+                background-color: #800020;
+                color: #FFFFF0;
+                text-decoration: none;
+                border-radius: 4px;
+                margin: 20px 0;
+                font-weight: bold;
+                text-align: center;
+                transition: background-color 0.3s;
+            }}
+            .button:hover {{
+                background-color: #600018;
+            }}
+            .info-box {{
+                background-color: rgba(156, 175, 136, 0.1);
+                border-left: 4px solid #9CAF88;
+                padding: 15px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }}
+            .footer {{
+                background-color: #0A0A0A;
+                padding: 30px;
+                text-align: center;
+                color: #9CAF88;
+                font-size: 12px;
+                border-top: 1px solid rgba(156, 175, 136, 0.2);
+            }}
+            .link-text {{
+                color: #9CAF88;
+                word-break: break-all;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="header">
+                <h1>{t.get('title', 'Ласкаво просимо до Skrynia!')}</h1>
+            </div>
+            <div class="content">
+                <p style="font-size: 18px; color: #FFFFF0;">
+                    {t.get('greeting', 'Вітаємо')}, {name}!
+                </p>
+                <p style="font-size: 16px; color: #9CAF88;">
+                    {t.get('verification_text', 'Дякуємо за реєстрацію.')}
+                </p>
+
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{verification_url}" class="button">
+                        {t.get('verify_button', 'Підтвердити email')}
+                    </a>
+                </div>
+
+                <p style="font-size: 14px; color: #9CAF88;">
+                    {t.get('or_copy_link', 'Або скопіюйте та вставте це посилання у ваш браузер:')}
+                </p>
+                <p class="link-text" style="font-size: 12px;">
+                    {verification_url}
+                </p>
+
+                <div class="info-box">
+                    <p style="margin: 0; font-weight: bold; color: #FFFFF0;">
+                        {t.get('important', 'Важливо:')}
+                    </p>
+                    <p style="margin: 10px 0 0 0; color: #9CAF88; font-size: 14px;">
+                        {t.get('expires_in', 'Це посилання дійсне протягом 24 годин.')}
+                    </p>
+                </div>
+
+                <p style="font-size: 14px; color: #9CAF88;">
+                    {t.get('ignore_if_not_you', 'Якщо ви не реєструвалися, проігноруйте цей лист.')}
+                </p>
+            </div>
+            <div class="footer">
+                <p>{t.get('footer', '© {year} Skrynia. Всі права захищені.').format(year=datetime.now().year)}</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    return html
+
+
+def generate_password_reset_email_html(
+    language: str,
+    full_name: str,
+    reset_code: str
+) -> str:
+    """Generate HTML email for password reset code with brand styling."""
+    t = get_email_translation(language, "password_reset")
+    name = full_name or t.get('greeting', 'Вітаємо')
+
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {{
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                line-height: 1.6;
+                color: #FFFFF0;
+                margin: 0;
+                padding: 0;
+                background-color: #0A0A0A;
+            }}
+            .email-container {{
+                max-width: 600px;
+                margin: 0 auto;
+                background-color: #1a1a1a;
+            }}
+            .header {{
+                background: linear-gradient(135deg, #800020 0%, #600018 100%);
+                padding: 40px 20px;
+                text-align: center;
+                color: #FFFFF0;
+                border-bottom: 2px solid #9CAF88;
+            }}
+            .header h1 {{
+                margin: 0;
+                font-size: 32px;
+                font-weight: 300;
+                font-family: 'Georgia', serif;
+            }}
+            .content {{
+                padding: 40px 30px;
+                background-color: #1a1a1a;
+                color: #FFFFF0;
+            }}
+            .code-box {{
+                background: linear-gradient(135deg, rgba(128, 0, 32, 0.2) 0%, rgba(96, 0, 24, 0.2) 100%);
+                border: 2px solid #800020;
+                border-radius: 8px;
+                padding: 30px;
+                text-align: center;
+                margin: 30px 0;
+                font-size: 42px;
+                font-weight: bold;
+                letter-spacing: 12px;
+                color: #FFFFF0;
+                font-family: 'Courier New', monospace;
+            }}
+            .warning-box {{
+                background-color: rgba(156, 175, 136, 0.1);
+                border-left: 4px solid #9CAF88;
+                padding: 20px;
+                margin: 20px 0;
+                border-radius: 4px;
+            }}
+            .warning-box ul {{
+                margin: 10px 0;
+                padding-left: 20px;
+                color: #9CAF88;
+            }}
+            .footer {{
+                background-color: #0A0A0A;
+                padding: 30px;
+                text-align: center;
+                color: #9CAF88;
+                font-size: 12px;
+                border-top: 1px solid rgba(156, 175, 136, 0.2);
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="email-container">
+            <div class="header">
+                <h1>{t.get('title', 'Скидання пароля')}</h1>
+            </div>
+            <div class="content">
+                <p style="font-size: 18px; color: #FFFFF0;">
+                    {t.get('greeting', 'Вітаємо')}, {name}!
+                </p>
+                <p style="font-size: 16px; color: #9CAF88;">
+                    {t.get('reset_text', 'Ми отримали запит на скидання пароля.')}
+                </p>
+                <p style="font-size: 16px; color: #FFFFF0;">
+                    {t.get('use_code', 'Використайте цей код для підтвердження:')}
+                </p>
+
+                <div class="code-box">
+                    {reset_code}
+                </div>
+
+                <div class="warning-box">
+                    <p style="margin: 0 0 10px 0; font-weight: bold; color: #FFFFF0;">
+                        {t.get('important', 'Важливо:')}
+                    </p>
+                    <ul style="margin: 0;">
+                        <li>{t.get('expires_in', 'Цей код дійсний протягом 15 хвилин')}</li>
+                        <li>{t.get('dont_share', 'Не надавайте цей код нікому')}</li>
+                        <li>{t.get('ignore_if_not_you', 'Якщо ви не запитували скидання пароля, проігноруйте цей лист')}</li>
+                    </ul>
+                </div>
+
+                <p style="font-size: 14px; color: #9CAF88;">
+                    {t.get('enter_code', 'Введіть цей код на сторінці скидання пароля.')}
+                </p>
+            </div>
+            <div class="footer">
+                <p>{t.get('footer', '© {year} Skrynia. Всі права захищені.').format(year=datetime.now().year)}</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    return html

@@ -7,6 +7,9 @@ interface CartContextType {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
+  subtotalBeforeDiscount: number;
+  discountPercent: number;
+  discountAmount: number;
   shipping: number;
   total: number;
   addItem: (item: Omit<CartItem, 'id'>) => void;
@@ -74,6 +77,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
         items,
         itemCount: totals.itemCount,
         subtotal: totals.subtotal,
+        subtotalBeforeDiscount: totals.subtotalBeforeDiscount,
+        discountPercent: totals.discountPercent,
+        discountAmount: totals.discountAmount,
         shipping: totals.shipping,
         total: totals.total,
         addItem,

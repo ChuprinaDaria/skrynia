@@ -157,12 +157,14 @@ async def register(
             detail=f"Failed to create user: {str(e)}",
         )
 
-    # Send verification email in background
+    # Send verification email in background (in user's preferred language)
+    language = user_in.language if hasattr(user_in, 'language') else "UA"
     background_tasks.add_task(
         send_verification_email,
         email=new_user.email,
         token=verification_token,
-        full_name=new_user.full_name
+        full_name=new_user.full_name,
+        language=language
     )
 
     return new_user
