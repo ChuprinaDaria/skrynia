@@ -10,13 +10,71 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint } from '@/lib/api';
 
 type PaymentMethod = 'stripe' | 'przelewy24' | 'blik' | 'bank_transfer';
+type DeliveryMethod = 'inpost' | 'novaposhta' | 'poczta' | 'courier';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, shipping, total, clearCart } = useCart();
+  const { items, subtotal, clearCart } = useCart();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('inpost');
+  const [selectedPickupPoint, setSelectedPickupPoint] = useState('');
+
+  // Calculate package size based on cart items (simplified)
+  const calculatePackageSize = () => {
+    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    if (itemCount <= 2) return 'small'; // A
+    if (itemCount <= 5) return 'medium'; // B
+    return 'large'; // C
+  };
+
+  // Calculate shipping cost based on method, destination, and package size
+  const calculateShippingCost = () => {
+    const packageSize = calculatePackageSize();
+    const country = formData.shipping_country;
+
+    // Free shipping for orders over 1000 PLN
+    if (subtotal >= 1000) return 0;
+
+    switch (deliveryMethod) {
+      case 'inpost':
+        // InPost Paczkomat prices (Poland)
+        if (country === 'PL') {
+          if (packageSize === 'small') return 13.99;
+          if (packageSize === 'medium') return 15.99;
+          return 18.99;
+        }
+        return 25; // InPost international
+
+      case 'novaposhta':
+        // Nova Poshta (Ukraine)
+        if (country === 'UA') {
+          if (packageSize === 'small') return 45;
+          if (packageSize === 'medium') return 55;
+          return 70;
+        }
+        return 0; // Not available for other countries
+
+      case 'poczta':
+        // Poczta Polska
+        if (country === 'PL') return 14.99;
+        if (country === 'UA') return 35;
+        return 25; // EU countries
+
+      case 'courier':
+        // Courier delivery
+        if (country === 'PL') return 20;
+        if (country === 'UA') return 50;
+        return 35; // EU countries
+
+      default:
+        return 50;
+    }
+  };
+
+  const shipping = calculateShippingCost();
+  const total = subtotal + shipping;
 
   // Form state
   const [formData, setFormData] = useState({
@@ -187,57 +245,11 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              {/* Shipping Address */}
+              {/* Delivery Method & Address */}
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
-                <h2 className="font-rutenia text-2xl text-ivory mb-6">Адреса доставки</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-ivory font-inter mb-2">
-                      Адреса <span className="text-oxblood">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={formData.shipping_address_line1}
-                      onChange={(e) => setFormData({ ...formData, shipping_address_line1: e.target.value })}
-                      className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-ivory font-inter mb-2">Адреса (додатково)</label>
-                    <input
-                      type="text"
-                      value={formData.shipping_address_line2}
-                      onChange={(e) => setFormData({ ...formData, shipping_address_line2: e.target.value })}
-                      className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-ivory font-inter mb-2">
-                        Місто <span className="text-oxblood">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.shipping_city}
-                        onChange={(e) => setFormData({ ...formData, shipping_city: e.target.value })}
-                        className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-ivory font-inter mb-2">
-                        Поштовий індекс <span className="text-oxblood">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.shipping_postal_code}
-                        onChange={(e) => setFormData({ ...formData, shipping_postal_code: e.target.value })}
-                        className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                      />
-                    </div>
-                  </div>
+                <h2 className="font-rutenia text-2xl text-ivory mb-6">Доставка</h2>
+                <div className="space-y-6">
+                  {/* Country Selection */}
                   <div>
                     <label className="block text-ivory font-inter mb-2">
                       Країна <span className="text-oxblood">*</span>
@@ -245,7 +257,16 @@ export default function CheckoutPage() {
                     <select
                       required
                       value={formData.shipping_country}
-                      onChange={(e) => setFormData({ ...formData, shipping_country: e.target.value })}
+                      onChange={(e) => {
+                        const newCountry = e.target.value;
+                        setFormData({ ...formData, shipping_country: newCountry });
+                        // Auto-select appropriate delivery method for country
+                        if (newCountry === 'PL' && deliveryMethod !== 'inpost' && deliveryMethod !== 'poczta' && deliveryMethod !== 'courier') {
+                          setDeliveryMethod('inpost');
+                        } else if (newCountry === 'UA' && deliveryMethod !== 'novaposhta' && deliveryMethod !== 'courier') {
+                          setDeliveryMethod('novaposhta');
+                        }
+                      }}
                       className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                     >
                       <option value="PL">Польща</option>
@@ -255,6 +276,247 @@ export default function CheckoutPage() {
                       <option value="US">США</option>
                     </select>
                   </div>
+
+                  {/* Delivery Method Selection */}
+                  <div>
+                    <label className="block text-ivory font-inter mb-3">
+                      Спосіб доставки <span className="text-oxblood">*</span>
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {/* InPost Paczkomat */}
+                      {formData.shipping_country === 'PL' && (
+                        <button
+                          type="button"
+                          onClick={() => setDeliveryMethod('inpost')}
+                          className={`p-4 border-2 rounded-sm text-left transition-all ${
+                            deliveryMethod === 'inpost'
+                              ? 'border-oxblood bg-oxblood/10'
+                              : 'border-sage/30 hover:border-sage/50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
+                              deliveryMethod === 'inpost' ? 'border-oxblood bg-oxblood' : 'border-sage/50'
+                            }`}>
+                              {deliveryMethod === 'inpost' && (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <div className="w-2 h-2 rounded-full bg-ivory"></div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-ivory font-semibold mb-1">InPost Paczkomat</p>
+                              <p className="text-sage text-xs">
+                                Odbiór z paczkomatu • {calculatePackageSize() === 'small' ? '13.99' : calculatePackageSize() === 'medium' ? '15.99' : '18.99'} zł
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      {/* Nova Poshta */}
+                      {formData.shipping_country === 'UA' && (
+                        <button
+                          type="button"
+                          onClick={() => setDeliveryMethod('novaposhta')}
+                          className={`p-4 border-2 rounded-sm text-left transition-all ${
+                            deliveryMethod === 'novaposhta'
+                              ? 'border-oxblood bg-oxblood/10'
+                              : 'border-sage/30 hover:border-sage/50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
+                              deliveryMethod === 'novaposhta' ? 'border-oxblood bg-oxblood' : 'border-sage/50'
+                            }`}>
+                              {deliveryMethod === 'novaposhta' && (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <div className="w-2 h-2 rounded-full bg-ivory"></div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-ivory font-semibold mb-1">Нова Пошта</p>
+                              <p className="text-sage text-xs">
+                                Відділення Нової Пошти • {calculatePackageSize() === 'small' ? '45' : calculatePackageSize() === 'medium' ? '55' : '70'} грн
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      {/* Poczta Polska */}
+                      {formData.shipping_country === 'PL' && (
+                        <button
+                          type="button"
+                          onClick={() => setDeliveryMethod('poczta')}
+                          className={`p-4 border-2 rounded-sm text-left transition-all ${
+                            deliveryMethod === 'poczta'
+                              ? 'border-oxblood bg-oxblood/10'
+                              : 'border-sage/30 hover:border-sage/50'
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
+                              deliveryMethod === 'poczta' ? 'border-oxblood bg-oxblood' : 'border-sage/50'
+                            }`}>
+                              {deliveryMethod === 'poczta' && (
+                                <div className="w-full h-full flex items-center justify-center">
+                                  <div className="w-2 h-2 rounded-full bg-ivory"></div>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-ivory font-semibold mb-1">Poczta Polska</p>
+                              <p className="text-sage text-xs">Dostawa do domu • 14.99 zł</p>
+                            </div>
+                          </div>
+                        </button>
+                      )}
+
+                      {/* Courier */}
+                      <button
+                        type="button"
+                        onClick={() => setDeliveryMethod('courier')}
+                        className={`p-4 border-2 rounded-sm text-left transition-all ${
+                          deliveryMethod === 'courier'
+                            ? 'border-oxblood bg-oxblood/10'
+                            : 'border-sage/30 hover:border-sage/50'
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
+                            deliveryMethod === 'courier' ? 'border-oxblood bg-oxblood' : 'border-sage/50'
+                          }`}>
+                            {deliveryMethod === 'courier' && (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <div className="w-2 h-2 rounded-full bg-ivory"></div>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-ivory font-semibold mb-1">
+                              {formData.shipping_country === 'UA' ? 'Кур\'єр' : 'Kurier'}
+                            </p>
+                            <p className="text-sage text-xs">
+                              {formData.shipping_country === 'PL' && 'Dostawa kurierem • 20 zł'}
+                              {formData.shipping_country === 'UA' && 'Кур\'єрська доставка • 50 грн'}
+                              {formData.shipping_country !== 'PL' && formData.shipping_country !== 'UA' && 'Courier delivery • 35 zł'}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* InPost / Nova Poshta Pickup Point Selection */}
+                  {(deliveryMethod === 'inpost' || deliveryMethod === 'novaposhta') && (
+                    <div>
+                      <label className="block text-ivory font-inter mb-2">
+                        {deliveryMethod === 'inpost' ? 'Paczkomat' : 'Відділення'} <span className="text-oxblood">*</span>
+                      </label>
+                      <div className="space-y-3">
+                        <input
+                          type="text"
+                          required
+                          value={selectedPickupPoint}
+                          onChange={(e) => setSelectedPickupPoint(e.target.value)}
+                          placeholder={
+                            deliveryMethod === 'inpost'
+                              ? 'Wpisz kod paczkomatu lub adres (np. WAW01M)'
+                              : 'Введіть номер відділення (напр. Відділення №1)'
+                          }
+                          className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                        />
+                        <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
+                          <p className="text-sage text-xs">
+                            {deliveryMethod === 'inpost' ? (
+                              <>
+                                💡 W przyszłości będziesz mógł wybrać paczkomat z mapy.
+                                Na razie wpisz kod paczkomatu ręcznie.
+                              </>
+                            ) : (
+                              <>
+                                💡 Незабаром ви зможете обрати відділення з карти.
+                                Поки що введіть адресу відділення вручну.
+                              </>
+                            )}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Full Address (for Courier and Poczta Polska) */}
+                  {(deliveryMethod === 'courier' || deliveryMethod === 'poczta') && (
+                    <>
+                      <div>
+                        <label className="block text-ivory font-inter mb-2">
+                          {formData.shipping_country === 'UA' ? 'Адреса' : 'Adres'} <span className="text-oxblood">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.shipping_address_line1}
+                          onChange={(e) => setFormData({ ...formData, shipping_address_line1: e.target.value })}
+                          placeholder={formData.shipping_country === 'UA' ? 'вул. Хрещатик, 1' : 'ul. Główna 1'}
+                          className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-ivory font-inter mb-2">
+                          {formData.shipping_country === 'UA' ? 'Адреса (додатково)' : 'Adres (dodatkowy)'}
+                        </label>
+                        <input
+                          type="text"
+                          value={formData.shipping_address_line2}
+                          onChange={(e) => setFormData({ ...formData, shipping_address_line2: e.target.value })}
+                          placeholder={formData.shipping_country === 'UA' ? 'Квартира, офіс' : 'Mieszkanie, biuro'}
+                          className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-ivory font-inter mb-2">
+                            {formData.shipping_country === 'UA' ? 'Місто' : 'Miasto'} <span className="text-oxblood">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.shipping_city}
+                            onChange={(e) => setFormData({ ...formData, shipping_city: e.target.value })}
+                            placeholder={formData.shipping_country === 'UA' ? 'Київ' : 'Warszawa'}
+                            className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-ivory font-inter mb-2">
+                            {formData.shipping_country === 'UA' ? 'Поштовий індекс' : 'Kod pocztowy'} <span className="text-oxblood">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.shipping_postal_code}
+                            onChange={(e) => setFormData({ ...formData, shipping_postal_code: e.target.value })}
+                            placeholder={formData.shipping_country === 'UA' ? '01001' : '00-001'}
+                            className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                          />
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* Shipping cost info */}
+                  {subtotal < 1000 && (
+                    <div className="p-4 bg-oxblood/10 border border-oxblood/30 rounded-sm">
+                      <p className="text-ivory text-sm font-semibold mb-1">
+                        💰 Безкоштовна доставка від 1000 zł!
+                      </p>
+                      <p className="text-sage text-xs">
+                        Додайте ще {(1000 - subtotal).toFixed(2)} zł для безкоштовної доставки
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
 
