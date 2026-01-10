@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Button from '@/components/ui/Button';
 
@@ -13,7 +14,7 @@ const BonusSystem: React.FC = () => {
       name: t.home.bonusSystem.levels.human.name,
       description: t.home.bonusSystem.levels.human.description,
       bonus: t.home.bonusSystem.levels.human.bonus,
-      icon: '👤',
+      image: '/images/bonus/human.jpg',
       gradient: 'from-sage/20 to-sage/10',
     },
     {
@@ -21,7 +22,7 @@ const BonusSystem: React.FC = () => {
       description: t.home.bonusSystem.levels.elf.description,
       bonus: t.home.bonusSystem.levels.elf.bonus,
       requirement: t.home.bonusSystem.levels.elf.requirement,
-      icon: '🧝',
+      image: '/images/bonus/elf.jpg',
       gradient: 'from-oxblood/30 to-oxblood/20',
     },
     {
@@ -29,7 +30,7 @@ const BonusSystem: React.FC = () => {
       description: t.home.bonusSystem.levels.dwarf.description,
       bonus: t.home.bonusSystem.levels.dwarf.bonus,
       requirement: t.home.bonusSystem.levels.dwarf.requirement,
-      icon: '🧙',
+      image: '/images/bonus/dwarf.jpg',
       gradient: 'from-ivory/20 to-ivory/10',
     },
   ];
@@ -86,9 +87,17 @@ const BonusSystem: React.FC = () => {
                 <div className={`absolute inset-0 bg-gradient-to-br ${level.gradient} opacity-30`} aria-hidden="true" />
                 
                 <div className="relative z-10">
-                  {/* Icon */}
-                  <div className="text-5xl mb-4 text-center" aria-hidden="true">
-                    {level.icon}
+                  {/* Image */}
+                  <div className="mb-4 text-center flex justify-center" aria-hidden="true">
+                    <div className="relative w-24 h-24 rounded-full overflow-hidden border-2 border-sage/30">
+                      <Image
+                        src={level.image}
+                        alt={level.name}
+                        fill
+                        className="object-cover"
+                        sizes="96px"
+                      />
+                    </div>
                   </div>
                   
                   {/* Level Name */}

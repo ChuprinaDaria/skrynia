@@ -51,8 +51,9 @@ async function getBlogPost(slug: string): Promise<BlogPost | null> {
   }
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const blog = await getBlogPost(params.slug);
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const blog = await getBlogPost(slug);
 
   if (!blog) {
     return {
@@ -132,8 +133,9 @@ const formatDate = (dateString: string) => {
   });
 };
 
-export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
-  const blog = await getBlogPost(params.slug);
+export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const blog = await getBlogPost(slug);
 
   if (!blog) {
     notFound();
