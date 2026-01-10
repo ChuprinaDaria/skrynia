@@ -56,26 +56,26 @@ export default function BlogSection() {
       <div className="container mx-auto relative z-10">
         <div className="text-center mb-12">
           <h2 className="font-rutenia text-4xl md:text-5xl text-ivory mb-4">
-            Блог Skrynia
+            {t.blog.title}
           </h2>
           <p className="font-inter text-sage text-lg max-w-2xl mx-auto">
-            Дізнайтеся більше про традиції, символи та майстерність етнічних прикрас
+            {t.blog.subtitle}
           </p>
         </div>
 
         {loading ? (
           <div className="text-center py-12">
             <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-oxblood"></div>
-            <p className="text-sage mt-4">Завантаження статей...</p>
+            <p className="text-sage mt-4">{t.blog.loading}</p>
           </div>
         ) : blogs.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-sage text-lg mb-6">Статті блогу з'являться найближчим часом</p>
+            <p className="text-sage text-lg mb-6">{t.blog.noPosts}</p>
             <Link
               href="/blog"
               className="inline-block px-8 py-4 border-2 border-oxblood text-oxblood rounded-sm font-inter font-semibold hover:bg-oxblood hover:text-ivory transition-all duration-300"
             >
-              Перейти до блогу
+              {t.blog.goToBlog}
             </Link>
           </div>
         ) : (
@@ -122,7 +122,7 @@ export default function BlogSection() {
                   )}
 
                   <div className="flex items-center gap-2 text-oxblood font-inter text-sm">
-                    Читати далі
+                    {t.blog.readMore}
                     <svg
                       className="w-4 h-4 group-hover:translate-x-1 transition-transform"
                       fill="none"
@@ -148,7 +148,7 @@ export default function BlogSection() {
                 href="/blog"
                 className="inline-block px-8 py-4 border-2 border-oxblood text-oxblood rounded-sm font-inter font-semibold hover:bg-oxblood hover:text-ivory transition-all duration-300"
               >
-                Всі Статті Блогу
+                {t.blog.viewAllPosts}
               </Link>
             </div>
           </>

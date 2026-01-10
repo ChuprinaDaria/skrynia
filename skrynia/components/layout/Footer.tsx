@@ -83,10 +83,14 @@ const Footer: React.FC = () => {
   ];
 
   const languages = [
-    { code: 'UA', flag: '🇺🇦' },
-    { code: 'EN', flag: '🇬🇧' },
-    { code: 'DE', flag: '🇩🇪' },
-    { code: 'PL', flag: '🇵🇱' },
+    { code: 'UA' as const, flag: '🇺🇦', name: 'Українська' },
+    { code: 'EN' as const, flag: '🇬🇧', name: 'English' },
+    { code: 'DE' as const, flag: '🇩🇪', name: 'Deutsch' },
+    { code: 'PL' as const, flag: '🇵🇱', name: 'Polski' },
+    { code: 'SE' as const, flag: '🇸🇪', name: 'Svenska' },
+    { code: 'NO' as const, flag: '🇳🇴', name: 'Norsk' },
+    { code: 'DK' as const, flag: '🇩🇰', name: 'Dansk' },
+    { code: 'FR' as const, flag: '🇫🇷', name: 'Français' },
   ];
 
   return (
@@ -205,16 +209,16 @@ const Footer: React.FC = () => {
           {/* Languages & Social Column */}
           <div>
             <h4 className="font-rutenia text-ivory text-lg mb-4">{t.footer.languages}</h4>
-            <div className="flex gap-3 mb-6">
+            <div className="flex flex-wrap gap-2 mb-6">
               {languages.map((lang) => (
                 <button
                   key={lang.code}
-                  onClick={() => setLanguage(lang.code as typeof language)}
+                  onClick={() => setLanguage(lang.code)}
                   className={`text-2xl transition-all duration-200 hover:scale-110 ${
-                    language === lang.code ? 'grayscale-0' : 'grayscale hover:grayscale-0'
+                    language === lang.code ? 'grayscale-0 opacity-100' : 'grayscale opacity-60 hover:opacity-100 hover:grayscale-0'
                   }`}
-                  aria-label={`Switch to ${lang.code}`}
-                  title={lang.code}
+                  aria-label={`Switch to ${lang.name}`}
+                  title={lang.name}
                 >
                   {lang.flag}
                 </button>

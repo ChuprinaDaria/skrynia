@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { language, setLanguage, t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const { itemCount, openCart } = useCart();
 
   useEffect(() => {
@@ -21,16 +21,7 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const languages = [
-    { code: 'UA' as const, flag: '🇺🇦', name: 'Українська' },
-    { code: 'EN' as const, flag: '🇬🇧', name: 'English' },
-    { code: 'DE' as const, flag: '🇩🇪', name: 'Deutsch' },
-    { code: 'PL' as const, flag: '🇵🇱', name: 'Polski' },
-    { code: 'SE' as const, flag: '🇸🇪', name: 'Svenska' },
-    { code: 'NO' as const, flag: '🇳🇴', name: 'Norsk' },
-    { code: 'DK' as const, flag: '🇩🇰', name: 'Dansk' },
-    { code: 'FR' as const, flag: '🇫🇷', name: 'Français' },
-  ];
+  const languages = ['UA', 'EN', 'DE', 'PL', 'SE', 'NO', 'DK', 'FR'] as const;
 
   const navLinks = [
     { href: '/collections', label: t.nav.collections },
@@ -76,21 +67,19 @@ const Header: React.FC = () => {
           {/* Right Side Icons */}
           <div className="flex items-center gap-4 md:gap-6">
             {/* Language Switcher */}
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden md:flex items-center gap-2">
               {languages.map((lang) => (
                 <button
-                  key={lang.code}
-                  onClick={() => setLanguage(lang.code)}
-                  className={`flex items-center gap-1.5 px-2 py-1.5 rounded-sm text-sm font-inter transition-all duration-200 ${
-                    language === lang.code
-                      ? 'bg-oxblood/20 text-oxblood font-semibold border border-oxblood/50'
-                      : 'text-ivory hover:text-sage hover:bg-sage/10'
+                  key={lang}
+                  onClick={() => setLanguage(lang)}
+                  className={`text-sm font-inter transition-colors duration-200 ${
+                    language === lang
+                      ? 'text-oxblood font-semibold'
+                      : 'text-ivory hover:text-sage'
                   }`}
-                  aria-label={`Switch to ${lang.name}`}
-                  title={lang.name}
+                  aria-label={`Switch to ${lang}`}
                 >
-                  <span className="text-base">{lang.flag}</span>
-                  <span className="hidden xl:inline">{lang.code}</span>
+                  {lang}
                 </button>
               ))}
             </div>
@@ -218,23 +207,21 @@ const Header: React.FC = () => {
             </Link>
 
             {/* Mobile Language Switcher */}
-            <div className="grid grid-cols-4 gap-2 pt-4 border-t border-sage/20">
+            <div className="flex items-center gap-4 pt-4 border-t border-sage/20">
               {languages.map((lang) => (
                 <button
-                  key={lang.code}
+                  key={lang}
                   onClick={() => {
-                    setLanguage(lang.code);
+                    setLanguage(lang);
                     setIsMobileMenuOpen(false);
                   }}
-                  className={`flex flex-col items-center gap-1 px-3 py-2 rounded-sm transition-all duration-200 ${
-                    language === lang.code
-                      ? 'bg-oxblood/20 text-oxblood font-semibold border border-oxblood/50'
-                      : 'text-ivory hover:text-sage hover:bg-sage/10 border border-transparent'
+                  className={`text-base font-inter transition-colors duration-200 ${
+                    language === lang
+                      ? 'text-oxblood font-semibold'
+                      : 'text-ivory hover:text-sage'
                   }`}
-                  title={lang.name}
                 >
-                  <span className="text-2xl">{lang.flag}</span>
-                  <span className="text-xs font-inter">{lang.code}</span>
+                  {lang}
                 </button>
               ))}
             </div>
