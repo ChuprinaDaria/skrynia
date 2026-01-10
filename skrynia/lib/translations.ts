@@ -3,6 +3,7 @@ export type Language = 'UA' | 'EN' | 'DE' | 'PL' | 'SE' | 'NO' | 'DK' | 'FR';
 export interface Translations {
   nav: {
     collections: string;
+    constructor: string;
     about: string;
     contact: string;
   };
@@ -306,6 +307,7 @@ const translations: Record<Language, Translations> = {
   UA: {
     nav: {
       collections: 'Колекції',
+      constructor: 'Конструктор Намиста',
       about: 'Про нас',
       contact: 'Контакт',
     },
@@ -607,6 +609,7 @@ const translations: Record<Language, Translations> = {
   EN: {
     nav: {
       collections: 'Collections',
+      constructor: 'Necklace Constructor',
       about: 'About',
       contact: 'Contact',
     },
@@ -891,6 +894,7 @@ const translations: Record<Language, Translations> = {
   DE: {
     nav: {
       collections: 'Kollektionen',
+      constructor: 'Halsketten-Konstruktor',
       about: 'Über uns',
       contact: 'Kontakt',
     },
@@ -1175,6 +1179,7 @@ const translations: Record<Language, Translations> = {
   PL: {
     nav: {
       collections: 'Kolekcje',
+      constructor: 'Konstruktor Naszyjników',
       about: 'O nas',
       contact: 'Kontakt',
     },
