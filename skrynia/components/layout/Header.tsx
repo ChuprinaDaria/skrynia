@@ -4,12 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import AlatyrIcon from '@/components/ui/icons/AlatyrIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { language, setLanguage, t } = useLanguage();
-  const [cartItemsCount, setCartItemsCount] = useState(0);
+  const { itemCount, openCart } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,6 +84,26 @@ const Header: React.FC = () => {
               ))}
             </div>
 
+            {/* Constructor Button */}
+            <Link
+              href="/constructor"
+              className="hidden md:flex items-center gap-2 px-4 py-2 bg-oxblood/20 hover:bg-oxblood/30 border border-oxblood/50 rounded-sm text-ivory hover:text-oxblood transition-colors duration-200 font-inter text-sm"
+              aria-label="Necklace Constructor"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path d="M12 4v16m8-8H4" />
+              </svg>
+              <span className="hidden lg:inline">{t.nav['constructor']}</span>
+            </Link>
+
             {/* Search Icon */}
             <button
               className="text-ivory hover:text-oxblood transition-colors duration-200"
@@ -101,9 +122,9 @@ const Header: React.FC = () => {
               </svg>
             </button>
 
-            {/* Cart Icon */}
-            <Link
-              href="/cart"
+            {/* Cart Icon - opens drawer instead of navigating */}
+            <button
+              onClick={openCart}
               className="relative text-ivory hover:text-oxblood transition-colors duration-200"
               aria-label="Shopping cart"
             >
@@ -118,12 +139,12 @@ const Header: React.FC = () => {
               >
                 <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
-              {cartItemsCount > 0 && (
+              {itemCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-oxblood text-ivory text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
-                  {cartItemsCount}
+                  {itemCount}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* Mobile Menu Toggle */}
             <button
@@ -175,6 +196,15 @@ const Header: React.FC = () => {
                 {link.label}
               </Link>
             ))}
+
+            {/* Mobile Constructor Button */}
+            <Link
+              href="/constructor"
+              className="mt-2 px-4 py-3 bg-oxblood/20 hover:bg-oxblood/30 border border-oxblood/50 rounded-sm text-ivory hover:text-oxblood transition-colors duration-200 font-inter text-center"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              {t.nav['constructor']}
+            </Link>
 
             {/* Mobile Language Switcher */}
             <div className="flex items-center gap-4 pt-4 border-t border-sage/20">
