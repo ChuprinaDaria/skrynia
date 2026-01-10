@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Canvas, Circle, Image } from 'fabric';
 import {
   ZoomIn,
@@ -77,9 +77,6 @@ export default function NecklaceConstructor() {
 
     fabricCanvasRef.current = canvas;
 
-    // Draw initial necklace arc
-    drawNecklaceArc(canvas);
-
     return () => {
       canvas.dispose();
     };
@@ -93,9 +90,9 @@ export default function NecklaceConstructor() {
   // Redraw when threads change
   useEffect(() => {
     if (fabricCanvasRef.current) {
-      drawNecklaceArc(fabricCanvasRef.current);
+      drawNecklaceArc(fabricCanvasRef.current).catch(console.error);
     }
-  }, [threads, zoom, threadLength, threadCount]);
+  }, [drawNecklaceArc]);
 
   const fetchBeads = async () => {
     try {
@@ -112,7 +109,7 @@ export default function NecklaceConstructor() {
     }
   };
 
-  const drawNecklaceArc = (canvas: Canvas) => {
+  const drawNecklaceArc = useCallback(async (canvas: Canvas) => {
     canvas.clear();
     canvas.backgroundColor = '#1a1a1a';
 
@@ -124,7 +121,7 @@ export default function NecklaceConstructor() {
     const arcRadius = (threadLength * 10 * zoom) / (Math.PI * 0.6); // Convert cm to pixels
 
     // Draw multiple thread arcs
-    threads.forEach((thread, threadIndex) => {
+    for (const [threadIndex, thread] of threads.entries()) {
       const threadRadius = arcRadius - threadIndex * 30; // Offset for multiple threads
       const isSelected = threadIndex === selectedThreadIndex;
 
@@ -145,9 +142,9 @@ export default function NecklaceConstructor() {
       canvas.add(arc);
 
       // Draw beads on the arc
-      thread.beads.forEach((placedBead, beadIndex) => {
+      for (const [beadIndex, placedBead] of thread.beads.entries()) {
         const bead = beads.find(b => b.id === placedBead.bead_id);
-        if (!bead) return;
+        if (!bead) continue;
 
         // Calculate position on arc
         const totalBeads = thread.beads.length;
@@ -157,51 +154,48 @@ export default function NecklaceConstructor() {
         const beadX = centerX + threadRadius * Math.cos(Math.PI - angle);
         const beadY = centerY + threadRadius * Math.sin(Math.PI - angle);
 
-        // Load and place bead image
-        Image.fromURL(
-          bead.image_url,
-          (img) => {
-            if (!img) return;
+        // Load and place bead image (fabric.js v7 uses Promise)
+        try {
+          const img = await Image.fromURL(bead.image_url, { crossOrigin: 'anonymous' });
+          if (!img) continue;
 
-            // Auto-scale based on size_mm (realistic scaling)
-            const scaleFactor = (bead.size_mm / 10) * zoom * 0.8;
+          // Auto-scale based on size_mm (realistic scaling)
+          const scaleFactor = (bead.size_mm / 10) * zoom * 0.8;
 
-            img.set({
-              left: beadX,
-              top: beadY,
-              scaleX: scaleFactor,
-              scaleY: scaleFactor,
-              angle: placedBead.rotation,
-              originX: 'center',
-              originY: 'center',
-              selectable: true,
-              hasControls: true,
-              hasBorders: true,
-              lockMovementX: false,
-              lockMovementY: false,
-            });
+          img.set({
+            left: beadX,
+            top: beadY,
+            scaleX: scaleFactor,
+            scaleY: scaleFactor,
+            angle: placedBead.rotation,
+            originX: 'center',
+            originY: 'center',
+            selectable: true,
+            hasControls: true,
+            hasBorders: true,
+            lockMovementX: false,
+            lockMovementY: false,
+          });
 
-            // Add rotation and delete controls
-            img.on('selected', () => {
-              setSelectedBead(bead);
-            });
+          // Add rotation and delete controls
+          img.on('selected', () => {
+            setSelectedBead(bead);
+          });
 
-            canvas.add(img);
-            placedBead.fabricObject = img;
-          },
-          { crossOrigin: 'anonymous' }
-        );
-      });
+          canvas.add(img);
+          placedBead.fabricObject = img;
+        } catch (error) {
+          console.error('Failed to load bead image:', error);
+        }
+      }
 
       // Draw clasp if set
       if (clasp && threadIndex === 0) {
         const claspBead = beads.find(b => b.id === clasp.bead_id);
         if (claspBead) {
-          Image.fromURL(
-            claspBead.image_url,
-            (img) => {
-              if (!img) return;
-
+          try {
+            const img = await Image.fromURL(claspBead.image_url, { crossOrigin: 'anonymous' });
+            if (img) {
               const scaleFactor = (claspBead.size_mm / 10) * zoom;
               img.set({
                 left: centerX,
@@ -214,15 +208,16 @@ export default function NecklaceConstructor() {
               });
 
               canvas.add(img);
-            },
-            { crossOrigin: 'anonymous' }
-          );
+            }
+          } catch (error) {
+            console.error('Failed to load clasp image:', error);
+          }
         }
       }
-    });
+    }
 
     canvas.renderAll();
-  };
+  }, [threads, zoom, threadLength, beads, selectedThreadIndex, clasp]);
 
   const handleAddBeadToThread = (bead: Bead) => {
     const updatedThreads = [...threads];
