@@ -1464,6 +1464,7 @@ const translations: Record<Language, Translations> = {
   SE: {
     nav: {
       collections: 'Kollektioner',
+      constructor: 'Halsbandskonstruktör',
       about: 'Om oss',
       contact: 'Kontakt',
     },
@@ -1748,6 +1749,7 @@ const translations: Record<Language, Translations> = {
   NO: {
     nav: {
       collections: 'Kolleksjoner',
+      constructor: 'Halsbandkonstruktør',
       about: 'Om oss',
       contact: 'Kontakt',
     },
@@ -2032,6 +2034,7 @@ const translations: Record<Language, Translations> = {
   DK: {
     nav: {
       collections: 'Kollektioner',
+      constructor: 'Halsbåndskonstruktør',
       about: 'Om os',
       contact: 'Kontakt',
     },
@@ -2316,6 +2319,7 @@ const translations: Record<Language, Translations> = {
   FR: {
     nav: {
       collections: 'Collections',
+      constructor: 'Constructeur de colliers',
       about: 'À propos',
       contact: 'Contact',
     },
