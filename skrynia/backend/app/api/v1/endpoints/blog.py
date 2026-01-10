@@ -1,7 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Response
+from fastapi.responses import Response as FastAPIResponse
 from sqlalchemy.orm import Session
 from typing import List
 from datetime import datetime
+import xml.etree.ElementTree as ET
 
 from app.db.session import get_db
 from app.models.blog import Blog
@@ -9,6 +11,7 @@ from app.models.product import Product
 from app.models.user import User
 from app.schemas.blog import Blog as BlogSchema, BlogCreate, BlogUpdate, BlogListItem
 from app.api.v1.endpoints.auth import get_current_user
+from app.core.config import settings
 
 router = APIRouter()
 
@@ -179,3 +182,78 @@ def get_all_blogs_admin(
 
     blogs = db.query(Blog).order_by(Blog.created_at.desc()).offset(skip).limit(limit).all()
     return blogs
+
+
+@router.get("/rss.xml", response_class=FastAPIResponse)
+def get_blog_rss(db: Session = Depends(get_db)):
+    """Generate RSS feed for blog posts."""
+    
+    # Fetch published blog posts
+    blogs = db.query(Blog).filter(
+        Blog.published == True
+    ).order_by(Blog.published_at.desc()).limit(50).all()
+    
+    # Create RSS feed
+    rss = ET.Element("rss", version="2.0")
+    rss.set("xmlns:atom", "http://www.w3.org/2005/Atom")
+    rss.set("xmlns:content", "http://purl.org/rss/1.0/modules/content/")
+    rss.set("xmlns:dc", "http://purl.org/dc/elements/1.1/")
+    
+    channel = ET.SubElement(rss, "channel")
+    
+    # Channel info
+    ET.SubElement(channel, "title").text = "Skrynia Blog"
+    ET.SubElement(channel, "link").text = f"{settings.FRONTEND_URL}/blog"
+    ET.SubElement(channel, "description").text = "Історії, традиції та майстерність етнічних прикрас"
+    ET.SubElement(channel, "language").text = "uk"
+    ET.SubElement(channel, "lastBuildDate").text = datetime.utcnow().strftime("%a, %d %b %Y %H:%M:%S GMT")
+    
+    # Atom self link
+    atom_link = ET.SubElement(channel, "atom:link")
+    atom_link.set("href", f"{settings.FRONTEND_URL}/api/v1/blog/rss.xml")
+    atom_link.set("rel", "self")
+    atom_link.set("type", "application/rss+xml")
+    
+    # Add blog posts as items
+    for blog in blogs:
+        item = ET.SubElement(channel, "item")
+        
+        ET.SubElement(item, "title").text = blog.title
+        ET.SubElement(item, "link").text = f"{settings.FRONTEND_URL}/blog/{blog.slug}"
+        ET.SubElement(item, "guid", isPermaLink="true").text = f"{settings.FRONTEND_URL}/blog/{blog.slug}"
+        
+        if blog.excerpt:
+            ET.SubElement(item, "description").text = blog.excerpt
+        
+        # Content (full markdown)
+        if blog.content:
+            content_elem = ET.SubElement(item, "content:encoded")
+            content_elem.text = blog.content
+        
+        # Author
+        if blog.author:
+            ET.SubElement(item, "dc:creator").text = blog.author
+        
+        # Publication date
+        pub_date = blog.published_at or blog.created_at
+        ET.SubElement(item, "pubDate").text = pub_date.strftime("%a, %d %b %Y %H:%M:%S GMT")
+        
+        # Categories (tags)
+        if blog.tags:
+            for tag in blog.tags.split(','):
+                ET.SubElement(item, "category").text = tag.strip()
+        
+        # Featured image
+        if blog.featured_image:
+            enclosure = ET.SubElement(item, "enclosure")
+            image_url = blog.featured_image
+            if not image_url.startswith('http'):
+                image_url = f"{settings.FRONTEND_URL}{image_url}"
+            enclosure.set("url", image_url)
+            enclosure.set("type", "image/jpeg")
+    
+    # Generate XML string
+    xml_string = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml_string += ET.tostring(rss, encoding='unicode', method='xml')
+    
+    return Response(content=xml_string, media_type="application/xml")

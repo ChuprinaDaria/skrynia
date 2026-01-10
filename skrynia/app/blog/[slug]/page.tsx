@@ -1,12 +1,12 @@
-'use client';
-
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import Head from 'next/head';
 import ReactMarkdown from 'react-markdown';
-import { getApiEndpoint } from '@/lib/api';
+import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
+import Script from 'next/script';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 interface LinkedProduct {
   id: number;
@@ -33,178 +33,230 @@ interface BlogPost {
   linked_products: LinkedProduct[];
 }
 
-export default function BlogDetailPage() {
-  const params = useParams();
-  const [blog, setBlog] = useState<BlogPost | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    if (params.slug) {
-      fetchBlog(params.slug as string);
-    }
-  }, [params.slug]);
-
-  const fetchBlog = async (slug: string) => {
-    try {
-      const response = await fetch(getApiEndpoint(`/api/v1/blog/${slug}`));
-      if (!response.ok) {
-        throw new Error('Blog post not found');
-      }
-      const data = await response.json();
-      setBlog(data);
-
-      // Set page title dynamically
-      if (typeof window !== 'undefined') {
-        document.title = data.meta_title || `${data.title} | Skrynia Blog`;
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load blog post');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uk-UA', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+async function getBlogPost(slug: string): Promise<BlogPost | null> {
+  try {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const response = await fetch(`${apiUrl}/api/v1/blog/${slug}`, {
+      next: { revalidate: 60 }, // Revalidate every 60 seconds
     });
-  };
 
-  const generateJsonLd = () => {
-    if (!blog) return null;
+    if (!response.ok) {
+      return null;
+    }
 
-    return {
-      '@context': 'https://schema.org',
-      '@type': 'BlogPosting',
-      headline: blog.title,
-      description: blog.meta_description || blog.excerpt || '',
-      image: blog.og_image || blog.featured_image || '',
-      datePublished: blog.published_at || blog.created_at,
-      dateModified: blog.created_at,
-      author: {
-        '@type': 'Organization',
-        name: blog.author || 'Skrynia Team',
-      },
-      publisher: {
-        '@type': 'Organization',
-        name: 'Skrynia',
-        logo: {
-          '@type': 'ImageObject',
-          url: 'https://runebox.eu/images/logo.png',
-        },
-      },
-      mainEntityOfPage: {
-        '@type': 'WebPage',
-        '@id': `https://runebox.eu/blog/${blog.slug}`,
-      },
-    };
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-deep-black pt-24 pb-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center text-sage">Завантаження...</div>
-        </div>
-      </div>
-    );
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch blog post:', error);
+    return null;
   }
+}
 
-  if (error || !blog) {
-    return (
-      <div className="min-h-screen bg-deep-black pt-24 pb-20">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="max-w-2xl mx-auto text-center">
-            <h1 className="font-rutenia text-4xl text-ivory mb-4">Статтю не знайдено</h1>
-            <p className="text-sage mb-6">{error}</p>
-            <Link
-              href="/blog"
-              className="inline-block px-6 py-3 bg-oxblood text-ivory rounded-sm hover:bg-oxblood/90 transition-colors"
-            >
-              Повернутися до блогу
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  const blog = await getBlogPost(params.slug);
+
+  if (!blog) {
+    return {
+      title: 'Статтю не знайдено | Skrynia Blog',
+    };
   }
 
   const metaTitle = blog.meta_title || `${blog.title} | Skrynia Blog`;
   const metaDescription = blog.meta_description || blog.excerpt || blog.title;
-  const ogImage = blog.og_image || blog.featured_image || '/images/og-default.jpg';
+  const ogImage = blog.og_image || blog.featured_image || `${siteUrl}/images/og/og-image.jpg`;
+  const pageUrl = `${siteUrl}/blog/${blog.slug}`;
+
+  return {
+    title: metaTitle,
+    description: metaDescription,
+
+    keywords: blog.tags ? blog.tags.split(',').map(tag => tag.trim()) : [],
+
+    authors: blog.author ? [{ name: blog.author }] : [{ name: 'Skrynia Team' }],
+
+    openGraph: {
+      type: 'article',
+      title: metaTitle,
+      description: metaDescription,
+      url: pageUrl,
+      siteName: 'Skrynia',
+      locale: 'uk_UA',
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: blog.title,
+        },
+      ],
+      publishedTime: blog.published_at || blog.created_at,
+      authors: blog.author ? [blog.author] : ['Skrynia Team'],
+      tags: blog.tags ? blog.tags.split(',').map(tag => tag.trim()) : [],
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title: metaTitle,
+      description: metaDescription,
+      images: [ogImage],
+      creator: '@skrynia',
+      site: '@skrynia',
+    },
+
+    alternates: {
+      canonical: pageUrl,
+    },
+
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    other: {
+      'article:published_time': blog.published_at || blog.created_at,
+      'article:author': blog.author || 'Skrynia Team',
+    },
+  };
+}
+
+const formatDate = (dateString: string) => {
+  return new Date(dateString).toLocaleDateString('uk-UA', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+};
+
+export default async function BlogDetailPage({ params }: { params: { slug: string } }) {
+  const blog = await getBlogPost(params.slug);
+
+  if (!blog) {
+    notFound();
+  }
+
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BlogPosting',
+    headline: blog.title,
+    description: blog.meta_description || blog.excerpt || '',
+    image: blog.og_image || blog.featured_image || '',
+    datePublished: blog.published_at || blog.created_at,
+    dateModified: blog.created_at,
+    author: {
+      '@type': blog.author ? 'Person' : 'Organization',
+      name: blog.author || 'Skrynia Team',
+    },
+    publisher: {
+      '@type': 'Organization',
+      name: 'Skrynia',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
+      },
+    },
+    mainEntityOfPage: {
+      '@type': 'WebPage',
+      '@id': `${siteUrl}/blog/${blog.slug}`,
+    },
+    articleSection: blog.tags || 'Blog',
+    keywords: blog.tags || '',
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Головна',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Блог',
+        item: `${siteUrl}/blog`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: blog.title,
+        item: `${siteUrl}/blog/${blog.slug}`,
+      },
+    ],
+  };
 
   return (
     <>
-      <Head>
-        <title>{metaTitle}</title>
-        <meta name="description" content={metaDescription} />
-        
-        {/* Open Graph */}
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={metaTitle} />
-        <meta property="og:description" content={metaDescription} />
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:url" content={`https://runebox.eu/blog/${blog.slug}`} />
-        <meta property="article:published_time" content={blog.published_at || blog.created_at} />
-        <meta property="article:author" content={blog.author || 'Skrynia Team'} />
-        {blog.tags && blog.tags.split(',').map((tag, idx) => (
-          <meta key={idx} property="article:tag" content={tag.trim()} />
-        ))}
-        
-        {/* Twitter Card */}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={metaTitle} />
-        <meta name="twitter:description" content={metaDescription} />
-        <meta name="twitter:image" content={ogImage} />
+      {/* JSON-LD Structured Data */}
+      <Script
+        id="blog-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        strategy="afterInteractive"
+      />
+      <Script
+        id="breadcrumb-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        strategy="afterInteractive"
+      />
 
-        {/* JSON-LD Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(generateJsonLd()) }}
-        />
-      </Head>
-
-      <article className="min-h-screen bg-deep-black pt-24 pb-20">
+      <article className="min-h-screen bg-deep-black pt-24 pb-20" itemScope itemType="https://schema.org/BlogPosting">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-4xl mx-auto">
             {/* Breadcrumbs */}
-            <nav className="mb-8 text-sm">
-              <ol className="flex items-center gap-2 text-sage">
-                <li>
-                  <Link href="/" className="hover:text-ivory">Головна</Link>
+            <nav className="mb-8 text-sm" aria-label="Breadcrumb">
+              <ol className="flex items-center gap-2 text-sage" itemScope itemType="https://schema.org/BreadcrumbList">
+                <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+                  <Link href="/" className="hover:text-ivory" itemProp="item">
+                    <span itemProp="name">Головна</span>
+                  </Link>
+                  <meta itemProp="position" content="1" />
                 </li>
                 <li>/</li>
-                <li>
-                  <Link href="/blog" className="hover:text-ivory">Блог</Link>
+                <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+                  <Link href="/blog" className="hover:text-ivory" itemProp="item">
+                    <span itemProp="name">Блог</span>
+                  </Link>
+                  <meta itemProp="position" content="2" />
                 </li>
                 <li>/</li>
-                <li className="text-ivory">{blog.title}</li>
+                <li itemProp="itemListElement" itemScope itemType="https://schema.org/ListItem">
+                  <span className="text-ivory" itemProp="name">{blog.title}</span>
+                  <meta itemProp="position" content="3" />
+                </li>
               </ol>
             </nav>
 
             {/* Article Header */}
             <header className="mb-8">
               <div className="flex items-center gap-3 text-sm text-sage mb-4">
-                <time dateTime={blog.published_at || blog.created_at}>
+                <time dateTime={blog.published_at || blog.created_at} itemProp="datePublished">
                   {formatDate(blog.published_at || blog.created_at)}
                 </time>
                 {blog.author && (
                   <>
                     <span>•</span>
-                    <span>{blog.author}</span>
+                    <span itemProp="author" itemScope itemType="https://schema.org/Person">
+                      <span itemProp="name">{blog.author}</span>
+                    </span>
                   </>
                 )}
               </div>
 
-              <h1 className="font-rutenia text-4xl md:text-5xl lg:text-6xl text-ivory mb-6 leading-tight">
+              <h1 className="font-rutenia text-4xl md:text-5xl lg:text-6xl text-ivory mb-6 leading-tight" itemProp="headline">
                 {blog.title}
               </h1>
 
               {blog.excerpt && (
-                <p className="font-inter text-xl text-sage leading-relaxed mb-6">
+                <p className="font-inter text-xl text-sage leading-relaxed mb-6" itemProp="description">
                   {blog.excerpt}
                 </p>
               )}
@@ -215,6 +267,7 @@ export default function BlogDetailPage() {
                     <span
                       key={idx}
                       className="px-3 py-1 bg-oxblood/20 text-oxblood text-sm rounded-full"
+                      itemProp="keywords"
                     >
                       #{tag.trim()}
                     </span>
@@ -225,19 +278,22 @@ export default function BlogDetailPage() {
 
             {/* Featured Image */}
             {blog.featured_image && (
-              <div className="relative w-full h-96 md:h-[500px] mb-12 rounded-sm overflow-hidden">
+              <div className="relative w-full h-96 md:h-[500px] mb-12 rounded-sm overflow-hidden" itemProp="image" itemScope itemType="https://schema.org/ImageObject">
                 <Image
                   src={blog.featured_image}
                   alt={blog.title}
                   fill
                   className="object-cover"
                   priority
+                  itemProp="url"
                 />
+                <meta itemProp="width" content="1200" />
+                <meta itemProp="height" content="630" />
               </div>
             )}
 
             {/* Article Content */}
-            <div className="prose prose-invert prose-lg max-w-none mb-12">
+            <div className="prose prose-invert prose-lg max-w-none mb-12" itemProp="articleBody">
               <ReactMarkdown
                 components={{
                   h1: ({ children }) => (
@@ -345,6 +401,15 @@ export default function BlogDetailPage() {
                 Повернутися до блогу
               </Link>
             </div>
+          </div>
+        </div>
+
+        {/* Hidden metadata for schema */}
+        <meta itemProp="dateModified" content={blog.created_at} />
+        <div itemProp="publisher" itemScope itemType="https://schema.org/Organization" style={{ display: 'none' }}>
+          <meta itemProp="name" content="Skrynia" />
+          <div itemProp="logo" itemScope itemType="https://schema.org/ImageObject">
+            <meta itemProp="url" content={`${siteUrl}/images/logo/logo-white-pink-1.png`} />
           </div>
         </div>
       </article>
