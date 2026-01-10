@@ -21,6 +21,27 @@ export default function CheckoutPage() {
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('inpost');
   const [selectedPickupPoint, setSelectedPickupPoint] = useState('');
 
+  // Form state - moved before functions that use it
+  const [formData, setFormData] = useState({
+    customer_email: '',
+    customer_name: '',
+    customer_phone: '',
+    shipping_address_line1: '',
+    shipping_address_line2: '',
+    shipping_city: '',
+    shipping_postal_code: '',
+    shipping_country: 'PL',
+    billing_same_as_shipping: true,
+    billing_address_line1: '',
+    billing_address_line2: '',
+    billing_city: '',
+    billing_postal_code: '',
+    billing_country: 'PL',
+    payment_method: 'przelewy24' as PaymentMethod,
+    customer_notes: '',
+    bonus_points_used: 0,
+  });
+
   // Calculate package size based on cart items (simplified)
   const calculatePackageSize = () => {
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -75,27 +96,6 @@ export default function CheckoutPage() {
 
   const shipping = calculateShippingCost();
   const total = subtotal + shipping;
-
-  // Form state
-  const [formData, setFormData] = useState({
-    customer_email: '',
-    customer_name: '',
-    customer_phone: '',
-    shipping_address_line1: '',
-    shipping_address_line2: '',
-    shipping_city: '',
-    shipping_postal_code: '',
-    shipping_country: 'PL',
-    billing_same_as_shipping: true,
-    billing_address_line1: '',
-    billing_address_line2: '',
-    billing_city: '',
-    billing_postal_code: '',
-    billing_country: 'PL',
-    payment_method: 'przelewy24' as PaymentMethod,
-    customer_notes: '',
-    bonus_points_used: 0,
-  });
 
   // Redirect if cart is empty
   useEffect(() => {

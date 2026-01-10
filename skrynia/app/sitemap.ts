@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { getApiEndpoint } from '@/lib/api';
 
+export const dynamic = 'force-dynamic';
+
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 const languages = ['', '/en', '/de', '/pl'];
@@ -54,11 +56,19 @@ async function getCollections() {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const currentDate = new Date().toISOString();
   
-  // Fetch dynamic data
-  const [products, collections] = await Promise.all([
-    getProducts(),
-    getCollections(),
-  ]);
+  // Fetch dynamic data with error handling
+  let products: { slug: string; lastModified: string }[] = [];
+  let collections: { slug: string; lastModified: string }[] = [];
+  
+  try {
+    [products, collections] = await Promise.all([
+      getProducts(),
+      getCollections(),
+    ]);
+  } catch (error) {
+    console.error('Error fetching sitemap data:', error);
+    // Continue with empty arrays if fetch fails
+  }
   
   // Статичні сторінки
   const staticPages = [
