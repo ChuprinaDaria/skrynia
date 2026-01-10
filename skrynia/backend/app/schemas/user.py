@@ -10,6 +10,7 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+    language: Optional[str] = "UA"  # User's preferred language for emails (UA, EN, DE, PL)
 
 
 class UserUpdate(BaseModel):

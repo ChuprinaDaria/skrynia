@@ -9,7 +9,7 @@ import { getApiEndpoint } from '@/lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -48,6 +48,7 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
           full_name: formData.full_name || null,
+          language: language.toUpperCase(), // Send user's preferred language
         }),
       });
 

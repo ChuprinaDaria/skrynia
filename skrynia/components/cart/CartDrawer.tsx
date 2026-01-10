@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import type { CartItem } from '@/lib/cart';
@@ -22,6 +23,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   onUpdateQuantity,
   onRemoveItem,
 }) => {
+  const router = useRouter();
   const { t } = useLanguage();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
@@ -332,14 +334,19 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
             </div>
 
             {/* Checkout Button */}
-            <Button 
-              size="lg" 
-              fullWidth 
+            <Button
+              size="lg"
+              fullWidth
               className="mb-3"
               disabled={!agreedToTerms || !agreedToPrivacy}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 if (agreedToTerms && agreedToPrivacy) {
-                  window.location.href = '/checkout';
+                  onClose(); // Close drawer first
+                  setTimeout(() => {
+                    router.push('/checkout');
+                  }, 100); // Small delay to allow drawer to close
                 }
               }}
             >
