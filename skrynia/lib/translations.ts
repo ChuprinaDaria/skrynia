@@ -3,7 +3,7 @@ export type Language = 'UA' | 'EN' | 'DE' | 'PL' | 'SE' | 'NO' | 'DK' | 'FR';
 export interface Translations {
   nav: {
     collections: string;
-    constructor: string;
+    'constructor': string;
     about: string;
     contact: string;
   };

@@ -24,7 +24,7 @@ const Header: React.FC = () => {
 
   const navLinks = [
     { href: '/collections', label: t.nav.collections },
-    { href: '/constructor', label: t.nav.constructor },
+    { href: '/constructor', label: t.nav['constructor'] },
     { href: '/about', label: t.nav.about },
     { href: '/contact', label: t.nav.contact },
   ];
