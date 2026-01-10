@@ -133,6 +133,9 @@ async def register(
     # Generate verification token
     verification_token = generate_verification_token()
     
+    # Get user's preferred language (default to English)
+    user_language = user_in.language if hasattr(user_in, 'language') and user_in.language else "EN"
+    
     # Create new user (inactive until email verified)
     hashed_password = get_password_hash(user_in.password)
     new_user = User(
@@ -143,7 +146,8 @@ async def register(
         is_admin=False,
         email_verified=False,
         email_verification_token=verification_token,
-        email_verification_sent_at=datetime.now(timezone.utc)
+        email_verification_sent_at=datetime.now(timezone.utc),
+        language=user_language
     )
 
     try:
@@ -158,13 +162,12 @@ async def register(
         )
 
     # Send verification email in background (in user's preferred language)
-    language = user_in.language if hasattr(user_in, 'language') and user_in.language else "EN"
     background_tasks.add_task(
         send_verification_email,
         email=new_user.email,
         token=verification_token,
         full_name=new_user.full_name,
-        language=language
+        language=user_language
     )
 
     return new_user
@@ -229,8 +232,8 @@ async def resend_verification(
     
     db.commit()
     
-    # Send verification email in background (default to English if user language not set)
-    user_language = getattr(user, 'preferred_language', None) or "EN"
+    # Send verification email in background (use user's language preference or default to English)
+    user_language = getattr(user, 'language', None) or "EN"
     background_tasks.add_task(
         send_verification_email,
         email=user.email,

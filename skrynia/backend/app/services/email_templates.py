@@ -11,8 +11,8 @@ from app.core.config import settings
 EMAIL_TRANSLATIONS = {
     "UA": {
         "email_verification": {
-            "subject": "Підтвердження електронної адреси - Skrynia",
-            "title": "Ласкаво просимо до Skrynia!",
+            "subject": "Підтвердження електронної адреси - Rune Box",
+            "title": "Ласкаво просимо до Rune Box!",
             "greeting": "Вітаємо",
             "verification_text": "Дякуємо за реєстрацію. Будь ласка, підтвердіть вашу електронну адресу, натиснувши на кнопку нижче:",
             "verify_button": "Підтвердити email",
@@ -20,10 +20,10 @@ EMAIL_TRANSLATIONS = {
             "important": "Важливо:",
             "expires_in": "Це посилання дійсне протягом 24 годин.",
             "ignore_if_not_you": "Якщо ви не реєструвалися на нашому сайті, просто проігноруйте цей лист.",
-            "footer": "© {year} Skrynia. Всі права захищені."
+            "footer": "© {year} Rune Box. Всі права захищені."
         },
         "password_reset": {
-            "subject": "Код для скидання пароля - Skrynia",
+            "subject": "Код для скидання пароля - Rune Box",
             "title": "Скидання пароля",
             "greeting": "Вітаємо",
             "reset_text": "Ми отримали запит на скидання пароля для вашого облікового запису.",
@@ -33,10 +33,10 @@ EMAIL_TRANSLATIONS = {
             "dont_share": "Не надавайте цей код нікому",
             "ignore_if_not_you": "Якщо ви не запитували скидання пароля, проігноруйте цей лист",
             "enter_code": "Введіть цей код на сторінці скидання пароля для встановлення нового пароля.",
-            "footer": "© {year} Skrynia. Всі права захищені."
+            "footer": "© {year} Rune Box. Всі права захищені."
         },
         "order_received": {
-            "subject": "Ваше замовлення прийнято - Skrynia",
+            "subject": "Ваше замовлення прийнято - Rune Box",
             "title": "Дякуємо за ваше замовлення!",
             "greeting": "Вітаємо",
             "order_received_text": "Ваше замовлення успішно прийнято і обробляється.",
@@ -47,10 +47,10 @@ EMAIL_TRANSLATIONS = {
             "next_steps": "Наступні кроки",
             "next_steps_text": "Ми підтвердимо ваше замовлення найближчим часом.",
             "view_order": "Переглянути замовлення",
-            "footer": "© {year} Skrynia. Всі права захищені."
+            "footer": "© {year} Rune Box. Всі права захищені."
         },
         "order_confirmed": {
-            "subject": "Ваше замовлення підтверджено - Skrynia",
+            "subject": "Ваше замовлення підтверджено - Rune Box",
             "title": "Замовлення підтверджено!",
             "greeting": "Вітаємо",
             "order_confirmed_text": "Ваше замовлення підтверджено і готується до відправки.",
@@ -61,7 +61,7 @@ EMAIL_TRANSLATIONS = {
             "view_order": "Переглянути замовлення"
         },
         "order_shipped": {
-            "subject": "Ваше замовлення відправлено - Skrynia",
+            "subject": "Ваше замовлення відправлено - Rune Box",
             "title": "Замовлення в дорозі!",
             "greeting": "Вітаємо",
             "order_shipped_text": "Ваше замовлення відправлено і вже в дорозі до вас.",
@@ -71,7 +71,7 @@ EMAIL_TRANSLATIONS = {
             "estimated_delivery": "Орієнтовна дата доставки"
         },
         "order_delivered": {
-            "subject": "Ваше замовлення доставлено - Skrynia",
+            "subject": "Ваше замовлення доставлено - Rune Box",
             "title": "Замовлення доставлено!",
             "greeting": "Вітаємо",
             "order_delivered_text": "Ваше замовлення успішно доставлено.",
@@ -81,7 +81,7 @@ EMAIL_TRANSLATIONS = {
             "shop_again": "Продовжити покупки"
         },
         "cart_reminder": {
-            "subject": "Не забудьте завершити покупку - Skrynia",
+            "subject": "Не забудьте завершити покупку - Rune Box",
             "title": "У вас є товари в корзині",
             "greeting": "Вітаємо",
             "cart_reminder_text": "Ми помітили, що у вас є товари в корзині, які ви ще не завершили.",
@@ -92,8 +92,8 @@ EMAIL_TRANSLATIONS = {
     },
     "EN": {
         "email_verification": {
-            "subject": "Email Verification - Skrynia",
-            "title": "Welcome to Skrynia!",
+            "subject": "Email Verification - Rune Box",
+            "title": "Welcome to Rune Box!",
             "greeting": "Hello",
             "verification_text": "Thank you for registering. Please confirm your email address by clicking the button below:",
             "verify_button": "Verify Email",
@@ -101,10 +101,10 @@ EMAIL_TRANSLATIONS = {
             "important": "Important:",
             "expires_in": "This link is valid for 24 hours.",
             "ignore_if_not_you": "If you didn't register on our website, please ignore this email.",
-            "footer": "© {year} Skrynia. All rights reserved."
+            "footer": "© {year} Rune Box. All rights reserved."
         },
         "password_reset": {
-            "subject": "Password Reset Code - Skrynia",
+            "subject": "Password Reset Code - Rune Box",
             "title": "Password Reset",
             "greeting": "Hello",
             "reset_text": "We received a password reset request for your account.",
@@ -114,10 +114,10 @@ EMAIL_TRANSLATIONS = {
             "dont_share": "Do not share this code with anyone",
             "ignore_if_not_you": "If you didn't request a password reset, please ignore this email",
             "enter_code": "Enter this code on the password reset page to set a new password.",
-            "footer": "© {year} Skrynia. All rights reserved."
+            "footer": "© {year} Rune Box. All rights reserved."
         },
         "order_received": {
-            "subject": "Your order has been received - Skrynia",
+            "subject": "Your order has been received - Rune Box",
             "title": "Thank you for your order!",
             "greeting": "Hello",
             "order_received_text": "Your order has been successfully received and is being processed.",
@@ -128,10 +128,10 @@ EMAIL_TRANSLATIONS = {
             "next_steps": "Next steps",
             "next_steps_text": "We will confirm your order shortly.",
             "view_order": "View order",
-            "footer": "© {year} Skrynia. All rights reserved."
+            "footer": "© {year} Rune Box. All rights reserved."
         },
         "order_confirmed": {
-            "subject": "Your order has been confirmed - Skrynia",
+            "subject": "Your order has been confirmed - Rune Box",
             "title": "Order confirmed!",
             "greeting": "Hello",
             "order_confirmed_text": "Your order has been confirmed and is being prepared for shipment.",
@@ -142,7 +142,7 @@ EMAIL_TRANSLATIONS = {
             "view_order": "View order"
         },
         "order_shipped": {
-            "subject": "Your order has been shipped - Skrynia",
+            "subject": "Your order has been shipped - Rune Box",
             "title": "Order on the way!",
             "greeting": "Hello",
             "order_shipped_text": "Your order has been shipped and is on its way to you.",
@@ -152,7 +152,7 @@ EMAIL_TRANSLATIONS = {
             "estimated_delivery": "Estimated delivery date"
         },
         "order_delivered": {
-            "subject": "Your order has been delivered - Skrynia",
+            "subject": "Your order has been delivered - Rune Box",
             "title": "Order delivered!",
             "greeting": "Hello",
             "order_delivered_text": "Your order has been successfully delivered.",
@@ -162,7 +162,7 @@ EMAIL_TRANSLATIONS = {
             "shop_again": "Continue shopping"
         },
         "cart_reminder": {
-            "subject": "Don't forget to complete your purchase - Skrynia",
+            "subject": "Don't forget to complete your purchase - Rune Box",
             "title": "You have items in your cart",
             "greeting": "Hello",
             "cart_reminder_text": "We noticed you have items in your cart that you haven't completed yet.",
@@ -532,7 +532,7 @@ def generate_order_email_html(
             <div class="footer">
                 <p>{t.get('footer', '').format(year=datetime.now().year)}</p>
                 <p style="margin-top: 10px;">
-                    <a href="{settings.FRONTEND_URL}" style="color: #667eea; text-decoration: none;">Skrynia</a>
+                    <a href="{settings.FRONTEND_URL}" style="color: #667eea; text-decoration: none;">Rune Box</a>
                 </p>
             </div>
         </div>
@@ -675,7 +675,7 @@ def generate_cart_reminder_html(
                 </div>
             </div>
             <div class="footer">
-                <p>© {datetime.now().year} Skrynia. {t.get('footer', 'All rights reserved.')}</p>
+                <p>© {datetime.now().year} Rune Box. {t.get('footer', 'All rights reserved.')}</p>
             </div>
         </div>
     </body>
@@ -771,7 +771,7 @@ def generate_verification_email_html(
     <body>
         <div class="email-container">
             <div class="header">
-                <h1>{t.get('title', 'Ласкаво просимо до Skrynia!')}</h1>
+                <h1>{t.get('title', 'Ласкаво просимо до Rune Box!')}</h1>
             </div>
             <div class="content">
                 <p style="font-size: 18px; color: #FFFFF0;">
@@ -808,7 +808,7 @@ def generate_verification_email_html(
                 </p>
             </div>
             <div class="footer">
-                <p>{t.get('footer', '© {year} Skrynia. Всі права захищені.').format(year=datetime.now().year)}</p>
+                <p>{t.get('footer', '© {year} Rune Box. Всі права захищені.').format(year=datetime.now().year)}</p>
             </div>
         </div>
     </body>
@@ -936,7 +936,7 @@ def generate_password_reset_email_html(
                 </p>
             </div>
             <div class="footer">
-                <p>{t.get('footer', '© {year} Skrynia. Всі права захищені.').format(year=datetime.now().year)}</p>
+                <p>{t.get('footer', '© {year} Rune Box. Всі права захищені.').format(year=datetime.now().year)}</p>
             </div>
         </div>
     </body>

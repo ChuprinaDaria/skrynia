@@ -36,7 +36,7 @@ class User(Base):
     bonus_points = Column(Float, default=0.0)  # Бонусні бали
     total_spent = Column(Float, default=0.0)  # Загальна сума покупок
     # Language preference
-    language = Column(String, default="UA")  # UA, EN, DE, PL
+    language = Column(String, default="EN")  # UA, EN, DE, PL, SE, NO, DK, FR
     # Email notifications
     email_notifications_enabled = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())

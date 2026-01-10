@@ -74,7 +74,7 @@ async def send_password_reset_code_email(email: str, code: str, full_name: str =
     )
 
     message = MessageSchema(
-        subject=t.get("subject", "Код для скидання пароля - Skrynia"),
+        subject=t.get("subject", "Password Reset Code - Rune Box"),
         recipients=[email],
         body=html_content,
         subtype="html"
@@ -234,7 +234,7 @@ async def send_quote_request_confirmation(
                 <p>{t["thanks"]}</p>
             </div>
             <div class="footer">
-                <p>© {datetime.now().year} Skrynia - {t["footer"]}</p>
+                <p>© {datetime.now().year} Rune Box - {t["footer"]}</p>
             </div>
         </div>
     </body>
