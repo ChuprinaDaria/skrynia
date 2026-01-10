@@ -28,10 +28,10 @@ export default function BlogSection() {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch(getApiEndpoint('/api/v1/blog/?published_only=true&limit=3'));
+      const response = await fetch(getApiEndpoint('/api/v1/blog?published_only=true&limit=3'));
       if (response.ok) {
         const data = await response.json();
-        setBlogs(data);
+        setBlogs(Array.isArray(data) ? data : []);
       }
     } catch (error) {
       console.error('Failed to fetch blogs:', error);
@@ -48,10 +48,6 @@ export default function BlogSection() {
     });
   };
 
-  if (loading || blogs.length === 0) {
-    return null;
-  }
-
   return (
     <section className="py-20 md:py-32 px-4 bg-footer-black relative overflow-hidden">
       {/* Decorative background */}
@@ -67,8 +63,25 @@ export default function BlogSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {blogs.map((blog) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-oxblood"></div>
+            <p className="text-sage mt-4">Завантаження статей...</p>
+          </div>
+        ) : blogs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-sage text-lg mb-6">Статті блогу з'являться найближчим часом</p>
+            <Link
+              href="/blog"
+              className="inline-block px-8 py-4 border-2 border-oxblood text-oxblood rounded-sm font-inter font-semibold hover:bg-oxblood hover:text-ivory transition-all duration-300"
+            >
+              Перейти до блогу
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+              {blogs.map((blog) => (
             <article
               key={blog.id}
               className="bg-deep-black border border-sage/20 rounded-sm overflow-hidden hover:border-oxblood transition-all group"
@@ -127,17 +140,19 @@ export default function BlogSection() {
                 </div>
               </Link>
             </article>
-          ))}
-        </div>
+              ))}
+            </div>
 
-        <div className="text-center">
-          <Link
-            href="/blog"
-            className="inline-block px-8 py-4 border-2 border-oxblood text-oxblood rounded-sm font-inter font-semibold hover:bg-oxblood hover:text-ivory transition-all duration-300"
-          >
-            Всі Статті Блогу
-          </Link>
-        </div>
+            <div className="text-center">
+              <Link
+                href="/blog"
+                className="inline-block px-8 py-4 border-2 border-oxblood text-oxblood rounded-sm font-inter font-semibold hover:bg-oxblood hover:text-ivory transition-all duration-300"
+              >
+                Всі Статті Блогу
+              </Link>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );
