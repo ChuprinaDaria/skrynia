@@ -208,6 +208,25 @@ export default function ProductDetailPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Social proof - viewing count
+  const [viewingNow, setViewingNow] = useState(0);
+
+  React.useEffect(() => {
+    // Generate random viewing count (5-25 people)
+    const count = Math.floor(Math.random() * 21) + 5;
+    setViewingNow(count);
+
+    // Update count occasionally to make it feel live
+    const interval = setInterval(() => {
+      setViewingNow(prev => {
+        const change = Math.random() > 0.5 ? 1 : -1;
+        return Math.max(3, Math.min(30, prev + change));
+      });
+    }, 15000); // Update every 15 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
   // TODO: Fetch product data from API to check if it's made-to-order
   // For now, using sample data
   // In production, fetch from: `/api/v1/products/${slug}`
@@ -361,6 +380,21 @@ export default function ProductDetailPage() {
                 <h1 className="font-rutenia text-3xl md:text-4xl lg:text-5xl text-ivory" itemProp="name">
                   {productData.title}
                 </h1>
+
+                {/* Social Proof - Viewing Now */}
+                {viewingNow > 0 && (
+                  <div className="flex items-center gap-2 text-sage/80 animate-fade-in">
+                    <div className="flex items-center gap-1.5">
+                      <svg className="w-4 h-4 text-oxblood animate-pulse" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                        <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                      </svg>
+                      <span className="font-inter text-sm">
+                        <span className="text-ivory font-semibold">{viewingNow}</span> {t.product.viewingNow || 'людей дивляться зараз'}
+                      </span>
+                    </div>
+                  </div>
+                )}
 
                 {/* Price */}
                 <div className="text-3xl font-semibold text-sage font-inter" itemProp="offers" itemScope itemType="https://schema.org/Offer">

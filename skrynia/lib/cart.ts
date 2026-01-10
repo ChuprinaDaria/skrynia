@@ -100,29 +100,70 @@ export class CartManager {
   }
 
   /**
-   * Get cart totals
+   * Calculate progressive discount
+   * 2 items = 10% off
+   * 3+ items = 15% off
+   */
+  static calculateDiscount(itemCount: number, subtotal: number): {
+    discountPercent: number;
+    discountAmount: number;
+  } {
+    let discountPercent = 0;
+
+    if (itemCount >= 3) {
+      discountPercent = 15;
+    } else if (itemCount >= 2) {
+      discountPercent = 10;
+    }
+
+    const discountAmount = (subtotal * discountPercent) / 100;
+
+    return { discountPercent, discountAmount };
+  }
+
+  /**
+   * Get cart totals with progressive discount
    */
   static getTotals(): {
     subtotal: number;
+    subtotalBeforeDiscount: number;
     itemCount: number;
+    discountPercent: number;
+    discountAmount: number;
     shipping: number;
     total: number;
   } {
     const items = this.getItems();
 
-    const subtotal = items.reduce(
+    const subtotalBeforeDiscount = items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0
     );
 
     const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
-    // Calculate shipping (free over 1000 PLN)
+    // Calculate progressive discount
+    const { discountPercent, discountAmount } = this.calculateDiscount(
+      itemCount,
+      subtotalBeforeDiscount
+    );
+
+    const subtotal = subtotalBeforeDiscount - discountAmount;
+
+    // Calculate shipping (free over 1000 PLN after discount)
     const shipping = subtotal >= 1000 ? 0 : 50;
 
     const total = subtotal + shipping;
 
-    return { subtotal, itemCount, shipping, total };
+    return {
+      subtotal,
+      subtotalBeforeDiscount,
+      itemCount,
+      discountPercent,
+      discountAmount,
+      shipping,
+      total,
+    };
   }
 
   /**
