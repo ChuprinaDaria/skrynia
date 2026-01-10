@@ -30,12 +30,23 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        let errorMessage = 'Помилка авторизації';
+        let errorMessage = t.auth.errors.defaultError;
         try {
           const data = await response.json();
-          errorMessage = data.detail || errorMessage;
+          const detail = data.detail || '';
+          
+          // Map API error messages to translated messages
+          if (detail.includes('Incorrect email or password') || detail.includes('Невірний email')) {
+            errorMessage = t.auth.errors.incorrectCredentials;
+          } else if (detail.includes('Account not activated') || detail.includes('not activated')) {
+            errorMessage = t.auth.errors.accountNotActivated;
+          } else if (detail.includes('Email not verified') || detail.includes('not verified')) {
+            errorMessage = t.auth.errors.emailNotVerified;
+          } else {
+            errorMessage = detail || errorMessage;
+          }
         } catch {
-          errorMessage = response.statusText || errorMessage;
+          errorMessage = t.auth.errors.defaultError;
         }
         throw new Error(errorMessage);
       }
@@ -48,9 +59,9 @@ export default function LoginPage() {
     } catch (err) {
       if (err instanceof TypeError && err.message.includes('fetch')) {
         const apiUrl = getApiUrl();
-        setError(`Не вдалося підключитися до сервера. Перевірте, чи запущений бекенд на ${apiUrl}`);
+        setError(`${t.auth.errors.networkError}. ${t.auth.errors.defaultError}`);
       } else {
-        setError(err instanceof Error ? err.message : 'Помилка авторизації');
+        setError(err instanceof Error ? err.message : t.auth.errors.defaultError);
       }
       console.error('Login error:', err);
     } finally {
@@ -64,10 +75,10 @@ export default function LoginPage() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <h1 className="font-rutenia text-4xl md:text-5xl text-ivory mb-4">
-              Вхід
+              {t.auth.loginTitle}
             </h1>
             <p className="font-inter text-sage text-lg">
-              Увійдіть до свого акаунту
+              {t.auth.loginSubtitle}
             </p>
           </div>
 
@@ -75,7 +86,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="email" className="block text-ivory font-inter mb-2">
-                  Email
+                  {t.auth.email}
                 </label>
                 <input
                   id="email"
@@ -90,7 +101,7 @@ export default function LoginPage() {
 
               <div>
                 <label htmlFor="password" className="block text-ivory font-inter mb-2">
-                  Пароль
+                  {t.auth.password}
                 </label>
                 <input
                   id="password"
@@ -116,14 +127,14 @@ export default function LoginPage() {
                 fullWidth
                 className="text-lg"
               >
-                {loading ? 'Вхід...' : 'Увійти'}
+                {loading ? t.auth.loggingIn : t.auth.loginButton}
               </Button>
 
               <div className="text-center text-sage text-sm">
                 <p>
-                  Немає акаунту?{' '}
+                  {t.auth.noAccount}{' '}
                   <Link href="/register" className="text-oxblood hover:text-oxblood/80 transition-colors">
-                    Зареєструватися
+                    {t.auth.registerLink}
                   </Link>
                 </p>
               </div>

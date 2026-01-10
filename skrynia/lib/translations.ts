@@ -347,6 +347,24 @@ export interface Translations {
     addBeadsFirst: string;
     selectClasp: string;
   };
+  auth: {
+    login: string;
+    loginTitle: string;
+    loginSubtitle: string;
+    email: string;
+    password: string;
+    loginButton: string;
+    loggingIn: string;
+    noAccount: string;
+    registerLink: string;
+    errors: {
+      incorrectCredentials: string;
+      accountNotActivated: string;
+      emailNotVerified: string;
+      networkError: string;
+      defaultError: string;
+    };
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -697,6 +715,24 @@ const translations: Record<Language, Translations> = {
       addBeadsFirst: 'Додайте бусини до намиста перед відправкою запиту!',
       selectClasp: 'Будь ласка, виберіть застібку!',
     },
+    auth: {
+      login: 'Увійти',
+      loginTitle: 'Вхід',
+      loginSubtitle: 'Увійдіть до свого акаунту',
+      email: 'Email',
+      password: 'Пароль',
+      loginButton: 'Увійти',
+      loggingIn: 'Вхід...',
+      noAccount: 'Немає акаунту?',
+      registerLink: 'Зареєструватися',
+      errors: {
+        incorrectCredentials: 'Невірний email або пароль',
+        accountNotActivated: 'Акаунт не активовано. Будь ласка, підтвердіть свою електронну пошту.',
+        emailNotVerified: 'Електронну пошту не підтверджено. Будь ласка, перевірте свою електронну пошту для посилання підтвердження.',
+        networkError: 'Не вдалося підключитися до сервера',
+        defaultError: 'Помилка авторизації',
+      },
+    },
   },
   EN: {
     nav: {
@@ -1027,6 +1063,24 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Please log in to save configuration',
       addBeadsFirst: 'Add beads to necklace before sending request!',
       selectClasp: 'Please select a clasp!',
+    },
+    auth: {
+      login: 'Log in',
+      loginTitle: 'Login',
+      loginSubtitle: 'Log in to your account',
+      email: 'Email',
+      password: 'Password',
+      loginButton: 'Log in',
+      loggingIn: 'Logging in...',
+      noAccount: 'No account?',
+      registerLink: 'Register',
+      errors: {
+        incorrectCredentials: 'Incorrect email or password',
+        accountNotActivated: 'Account not activated. Please verify your email.',
+        emailNotVerified: 'Email not verified. Please check your email for verification link.',
+        networkError: 'Failed to connect to server',
+        defaultError: 'Authentication error',
+      },
     },
   },
   DE: {
@@ -1359,6 +1413,24 @@ const translations: Record<Language, Translations> = {
       addBeadsFirst: 'Fügen Sie Perlen zur Halskette hinzu, bevor Sie eine Anfrage senden!',
       selectClasp: 'Bitte wählen Sie einen Verschluß!',
     },
+    auth: {
+      login: 'Anmelden',
+      loginTitle: 'Anmeldung',
+      loginSubtitle: 'Melden Sie sich in Ihrem Konto an',
+      email: 'E-Mail',
+      password: 'Passwort',
+      loginButton: 'Anmelden',
+      loggingIn: 'Anmeldung...',
+      noAccount: 'Kein Konto?',
+      registerLink: 'Registrieren',
+      errors: {
+        incorrectCredentials: 'Falsche E-Mail oder Passwort',
+        accountNotActivated: 'Konto nicht aktiviert. Bitte bestätigen Sie Ihre E-Mail.',
+        emailNotVerified: 'E-Mail nicht bestätigt. Bitte überprüfen Sie Ihre E-Mail auf den Bestätigungslink.',
+        networkError: 'Verbindung zum Server fehlgeschlagen',
+        defaultError: 'Authentifizierungsfehler',
+      },
+    },
   },
   PL: {
     nav: {
@@ -1689,6 +1761,24 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Proszę zalogować się, aby zapisać konfigurację',
       addBeadsFirst: 'Dodaj koraliki do naszyjnika przed wysłaniem zapytania!',
       selectClasp: 'Proszę wybrać zapięcie!',
+    },
+    auth: {
+      login: 'Zaloguj się',
+      loginTitle: 'Logowanie',
+      loginSubtitle: 'Zaloguj się do swojego konta',
+      email: 'Email',
+      password: 'Hasło',
+      loginButton: 'Zaloguj się',
+      loggingIn: 'Logowanie...',
+      noAccount: 'Nie masz konta?',
+      registerLink: 'Zarejestruj się',
+      errors: {
+        incorrectCredentials: 'Nieprawidłowy email lub hasło',
+        accountNotActivated: 'Konto nieaktywne. Proszę potwierdzić email.',
+        emailNotVerified: 'Email niezweryfikowany. Proszę sprawdzić email pod kątem linku weryfikacyjnego.',
+        networkError: 'Nie udało się połączyć z serwerem',
+        defaultError: 'Błąd uwierzytelniania',
+      },
     },
   },
   SE: {
@@ -2021,6 +2111,24 @@ const translations: Record<Language, Translations> = {
       addBeadsFirst: 'Lägg till pärlor till halsbandet innan du skickar begäran!',
       selectClasp: 'Vänligen välj ett lås!',
     },
+    auth: {
+      login: 'Logga in',
+      loginTitle: 'Inloggning',
+      loginSubtitle: 'Logga in på ditt konto',
+      email: 'E-post',
+      password: 'Lösenord',
+      loginButton: 'Logga in',
+      loggingIn: 'Loggar in...',
+      noAccount: 'Inget konto?',
+      registerLink: 'Registrera',
+      errors: {
+        incorrectCredentials: 'Felaktig e-post eller lösenord',
+        accountNotActivated: 'Kontot är inte aktiverat. Vänligen verifiera din e-post.',
+        emailNotVerified: 'E-posten är inte verifierad. Vänligen kontrollera din e-post för verifieringslänk.',
+        networkError: 'Kunde inte ansluta till servern',
+        defaultError: 'Autentiseringsfel',
+      },
+    },
   },
   NO: {
     nav: {
@@ -2351,6 +2459,24 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Vennligst logg inn for å lagre konfigurasjon',
       addBeadsFirst: 'Legg til perler til halsbåndet før du sender forespørsel!',
       selectClasp: 'Vennligst velg et lås!',
+    },
+    auth: {
+      login: 'Logg inn',
+      loginTitle: 'Innlogging',
+      loginSubtitle: 'Logg inn på din konto',
+      email: 'E-post',
+      password: 'Passord',
+      loginButton: 'Logg inn',
+      loggingIn: 'Logger inn...',
+      noAccount: 'Ingen konto?',
+      registerLink: 'Registrer',
+      errors: {
+        incorrectCredentials: 'Feil e-post eller passord',
+        accountNotActivated: 'Konto ikke aktivert. Vennligst bekreft e-posten din.',
+        emailNotVerified: 'E-post ikke bekreftet. Vennligst sjekk e-posten din for bekreftelseslenke.',
+        networkError: 'Kunne ikke koble til serveren',
+        defaultError: 'Autentiseringsfeil',
+      },
     },
   },
   DK: {
@@ -2683,6 +2809,24 @@ const translations: Record<Language, Translations> = {
       addBeadsFirst: 'Tilføj perler til halsbåndet før du sender anmodning!',
       selectClasp: 'Vælg venligst et lås!',
     },
+    auth: {
+      login: 'Log ind',
+      loginTitle: 'Login',
+      loginSubtitle: 'Log ind på din konto',
+      email: 'E-mail',
+      password: 'Adgangskode',
+      loginButton: 'Log ind',
+      loggingIn: 'Logger ind...',
+      noAccount: 'Ingen konto?',
+      registerLink: 'Registrer',
+      errors: {
+        incorrectCredentials: 'Forkert e-mail eller adgangskode',
+        accountNotActivated: 'Konto ikke aktiveret. Verificer venligst din e-mail.',
+        emailNotVerified: 'E-mail ikke verificeret. Tjek venligst din e-mail for bekræftelseslink.',
+        networkError: 'Kunne ikke forbinde til serveren',
+        defaultError: 'Godkendelsesfejl',
+      },
+    },
   },
   FR: {
     nav: {
@@ -3013,6 +3157,24 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Veuillez vous connecter pour enregistrer la configuration',
       addBeadsFirst: 'Ajoutez des perles au collier avant d\'envoyer la demande!',
       selectClasp: 'Veuillez sélectionner un fermoir!',
+    },
+    auth: {
+      login: 'Se connecter',
+      loginTitle: 'Connexion',
+      loginSubtitle: 'Connectez-vous à votre compte',
+      email: 'E-mail',
+      password: 'Mot de passe',
+      loginButton: 'Se connecter',
+      loggingIn: 'Connexion...',
+      noAccount: 'Pas de compte?',
+      registerLink: 'S\'inscrire',
+      errors: {
+        incorrectCredentials: 'Email ou mot de passe incorrect',
+        accountNotActivated: 'Compte non activé. Veuillez vérifier votre e-mail.',
+        emailNotVerified: 'E-mail non vérifié. Veuillez vérifier votre e-mail pour le lien de vérification.',
+        networkError: 'Échec de la connexion au serveur',
+        defaultError: 'Erreur d\'authentification',
+      },
     },
   },
 };

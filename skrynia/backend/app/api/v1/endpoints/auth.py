@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import OperationalError, ProgrammingError
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from pydantic import BaseModel
 
 from app.core.config import settings
@@ -143,7 +143,7 @@ async def register(
         is_admin=False,
         email_verified=False,
         email_verification_token=verification_token,
-        email_verification_sent_at=datetime.utcnow()
+        email_verification_sent_at=datetime.now(timezone.utc)
     )
 
     try:
@@ -183,7 +183,7 @@ async def verify_email(token: str, db: Session = Depends(get_db)):
     
     # Check if token is expired (24 hours)
     if user.email_verification_sent_at:
-        time_diff = datetime.utcnow() - user.email_verification_sent_at
+        time_diff = datetime.now(timezone.utc) - user.email_verification_sent_at
         if time_diff > timedelta(hours=24):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -225,7 +225,7 @@ async def resend_verification(
     # Generate new token
     verification_token = generate_verification_token()
     user.email_verification_token = verification_token
-    user.email_verification_sent_at = datetime.utcnow()
+    user.email_verification_sent_at = datetime.now(timezone.utc)
     
     db.commit()
     
@@ -349,7 +349,7 @@ async def forgot_password(
     
     # Check if code was sent recently (rate limiting)
     if user.password_reset_code_sent_at:
-        time_diff = datetime.utcnow() - user.password_reset_code_sent_at
+        time_diff = datetime.now(timezone.utc) - user.password_reset_code_sent_at
         if time_diff < timedelta(minutes=2):
             raise HTTPException(
                 status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -361,7 +361,7 @@ async def forgot_password(
     
     # Save code and timestamp
     user.password_reset_code = reset_code
-    user.password_reset_code_sent_at = datetime.utcnow()
+    user.password_reset_code_sent_at = datetime.now(timezone.utc)
     user.password_reset_code_attempts = 0  # Reset attempts counter
     
     db.commit()
@@ -400,7 +400,7 @@ async def reset_password(
     
     # Check if code is expired (15 minutes)
     if user.password_reset_code_sent_at:
-        time_diff = datetime.utcnow() - user.password_reset_code_sent_at
+        time_diff = datetime.now(timezone.utc) - user.password_reset_code_sent_at
         if time_diff > timedelta(minutes=15):
             # Clear expired code
             user.password_reset_code = None
