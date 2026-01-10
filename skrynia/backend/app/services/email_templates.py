@@ -338,10 +338,10 @@ EMAIL_TRANSLATIONS = {
 
 def get_email_translation(language: str, template_key: str) -> Dict[str, str]:
     """Get email translation for specific language and template."""
-    lang = language.upper() if language else "UA"
+    lang = language.upper() if language else "EN"
     if lang not in EMAIL_TRANSLATIONS:
-        lang = "UA"  # Default to Ukrainian
-    return EMAIL_TRANSLATIONS[lang].get(template_key, EMAIL_TRANSLATIONS["UA"][template_key])
+        lang = "EN"  # Default to English
+    return EMAIL_TRANSLATIONS[lang].get(template_key, EMAIL_TRANSLATIONS["EN"][template_key])
 
 
 def generate_order_email_html(

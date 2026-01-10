@@ -37,7 +37,7 @@ def generate_password_reset_code() -> str:
     return f"{random.randint(10000, 99999)}"
 
 
-async def send_verification_email(email: str, token: str, full_name: str = None, language: str = "UA") -> None:
+async def send_verification_email(email: str, token: str, full_name: str = None, language: str = "EN") -> None:
     """Send email verification link to user in their preferred language."""
     verification_url = f"{settings.FRONTEND_URL}/verify-email?token={token}"
 
@@ -61,7 +61,7 @@ async def send_verification_email(email: str, token: str, full_name: str = None,
     await fm.send_message(message)
 
 
-async def send_password_reset_code_email(email: str, code: str, full_name: str = None, language: str = "UA") -> None:
+async def send_password_reset_code_email(email: str, code: str, full_name: str = None, language: str = "EN") -> None:
     """Send 5-digit password reset code to user in their preferred language."""
     # Get translations for subject
     t = get_email_translation(language, "password_reset")

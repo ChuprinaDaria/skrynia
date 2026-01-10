@@ -346,6 +346,8 @@ export interface Translations {
     loginRequired: string;
     addBeadsFirst: string;
     selectClasp: string;
+    threadOf: string;
+    beadsOnThread: string;
   };
   auth: {
     login: string;
@@ -714,6 +716,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Будь ласка, увійдіть в систему для збереження конфігурації',
       addBeadsFirst: 'Додайте бусини до намиста перед відправкою запиту!',
       selectClasp: 'Будь ласка, виберіть застібку!',
+      threadOf: 'з',
+      beadsOnThread: 'на нитці',
     },
     auth: {
       login: 'Увійти',
@@ -1063,6 +1067,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Please log in to save configuration',
       addBeadsFirst: 'Add beads to necklace before sending request!',
       selectClasp: 'Please select a clasp!',
+      threadOf: 'of',
+      beadsOnThread: 'on thread',
     },
     auth: {
       login: 'Log in',
@@ -1412,6 +1418,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Bitte melden Sie sich an, um die Konfiguration zu speichern',
       addBeadsFirst: 'Fügen Sie Perlen zur Halskette hinzu, bevor Sie eine Anfrage senden!',
       selectClasp: 'Bitte wählen Sie einen Verschluß!',
+      threadOf: 'von',
+      beadsOnThread: 'auf Faden',
     },
     auth: {
       login: 'Anmelden',
@@ -1761,6 +1769,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Proszę zalogować się, aby zapisać konfigurację',
       addBeadsFirst: 'Dodaj koraliki do naszyjnika przed wysłaniem zapytania!',
       selectClasp: 'Proszę wybrać zapięcie!',
+      threadOf: 'z',
+      beadsOnThread: 'na nitce',
     },
     auth: {
       login: 'Zaloguj się',
@@ -2110,6 +2120,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Vänligen logga in för att spara konfiguration',
       addBeadsFirst: 'Lägg till pärlor till halsbandet innan du skickar begäran!',
       selectClasp: 'Vänligen välj ett lås!',
+      threadOf: 'av',
+      beadsOnThread: 'på tråd',
     },
     auth: {
       login: 'Logga in',
@@ -2459,6 +2471,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Vennligst logg inn for å lagre konfigurasjon',
       addBeadsFirst: 'Legg til perler til halsbåndet før du sender forespørsel!',
       selectClasp: 'Vennligst velg et lås!',
+      threadOf: 'av',
+      beadsOnThread: 'på tråd',
     },
     auth: {
       login: 'Logg inn',
@@ -2808,6 +2822,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Log venligst ind for at gemme konfiguration',
       addBeadsFirst: 'Tilføj perler til halsbåndet før du sender anmodning!',
       selectClasp: 'Vælg venligst et lås!',
+      threadOf: 'af',
+      beadsOnThread: 'på tråd',
     },
     auth: {
       login: 'Log ind',
@@ -3157,6 +3173,8 @@ const translations: Record<Language, Translations> = {
       loginRequired: 'Veuillez vous connecter pour enregistrer la configuration',
       addBeadsFirst: 'Ajoutez des perles au collier avant d\'envoyer la demande!',
       selectClasp: 'Veuillez sélectionner un fermoir!',
+      threadOf: 'de',
+      beadsOnThread: 'sur fil',
     },
     auth: {
       login: 'Se connecter',

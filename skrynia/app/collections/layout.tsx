@@ -24,17 +24,17 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: 'website',
-    title: 'Колекції Прикрас | Skrynia - Слов\'янські, Вікінгські, Кельтські',
+    title: 'Колекції Прикрас | Rune box - Слов\'янські, Вікінгські, Кельтські',
     description: 'Унікальні колекції прикрас ручної роботи: слов\'янські обереги, вікінгські руни, кельтські символи. Натуральний корал, срібло 925 проби.',
     url: `${siteUrl}/collections`,
-    siteName: 'Skrynia',
+    siteName: 'Rune box',
     locale: 'uk_UA',
     images: [
       {
         url: `${siteUrl}/images/og/og-collections.jpg`,
         width: 1200,
         height: 630,
-        alt: 'Колекції Прикрас Skrynia - Слов\'янські, Вікінгські, Кельтські',
+        alt: 'Колекції Прикрас Rune box - Слов\'янські, Вікінгські, Кельтські',
         type: 'image/jpeg',
       },
     ],
@@ -42,11 +42,11 @@ export const metadata: Metadata = {
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Колекції Прикрас | Skrynia',
+    title: 'Колекції Прикрас | Rune box',
     description: 'Унікальні колекції прикрас ручної роботи: слов\'янські обереги, вікінгські руни, кельтські символи.',
     images: [`${siteUrl}/images/og/og-collections.jpg`],
-    creator: '@skrynia',
-    site: '@skrynia',
+    creator: '@runebox',
+    site: '@runebox',
   },
 
   alternates: {

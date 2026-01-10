@@ -99,8 +99,8 @@ export const metadata: Metadata = {
     title: "Rune box | Автентичні Прикраси Ручної Роботи",
     description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури.",
     images: [`${siteUrl}/images/og/og-image.jpg`],
-    creator: "@skrynia",
-    site: "@skrynia",
+    creator: "@runebox",
+    site: "@runebox",
   },
   
   // Роботи
@@ -166,7 +166,7 @@ export const metadata: Metadata = {
   other: {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
-    "apple-mobile-web-app-title": "Скриня",
+    "apple-mobile-web-app-title": "Rune box",
     "mobile-web-app-capable": "yes",
     "msapplication-TileColor": "#660000",
     "msapplication-config": "/browserconfig.xml",
@@ -215,9 +215,9 @@ const jsonLd = {
       },
       "image": { "@id": `${siteUrl}/#logo` },
       "sameAs": [
-        "https://www.instagram.com/skrynia_pani_darii",
-        "https://www.facebook.com/skrynia",
-        "https://www.pinterest.com/skrynia"
+        "https://www.instagram.com/runebox",
+        "https://www.facebook.com/runebox",
+        "https://www.pinterest.com/runebox"
       ],
       "contactPoint": [
         {
@@ -351,7 +351,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         <link
           rel="alternate"
           type="application/rss+xml"
-          title="Skrynia Blog RSS Feed"
+          title="Rune box Blog RSS Feed"
           href={`${siteUrl}/api/v1/blog/rss.xml`}
         />
       </head>

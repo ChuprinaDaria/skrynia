@@ -158,7 +158,7 @@ async def register(
         )
 
     # Send verification email in background (in user's preferred language)
-    language = user_in.language if hasattr(user_in, 'language') else "UA"
+    language = user_in.language if hasattr(user_in, 'language') and user_in.language else "EN"
     background_tasks.add_task(
         send_verification_email,
         email=new_user.email,
@@ -229,12 +229,14 @@ async def resend_verification(
     
     db.commit()
     
-    # Send verification email in background
+    # Send verification email in background (default to English if user language not set)
+    user_language = getattr(user, 'preferred_language', None) or "EN"
     background_tasks.add_task(
         send_verification_email,
         email=user.email,
         token=verification_token,
-        full_name=user.full_name
+        full_name=user.full_name,
+        language=user_language
     )
     
     return {"message": "Verification email sent"}

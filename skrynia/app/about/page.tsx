@@ -14,7 +14,7 @@ const aboutJsonLd = {
   url: 'https://runebox.eu/about',
   mainEntity: {
     '@type': 'Organization',
-    name: 'Скриня Пані Дарії',
+    name: 'Rune box',
     foundingDate: '2020',
     founder: {
       '@type': 'Person',

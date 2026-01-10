@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { getApiEndpoint } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface BlogPost {
   id: number;
@@ -18,6 +19,7 @@ interface BlogPost {
 }
 
 export default function BlogPage() {
+  const { t } = useLanguage();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +42,18 @@ export default function BlogPage() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('uk-UA', {
+    const langMap: Record<string, string> = {
+      'UA': 'uk-UA',
+      'EN': 'en-US',
+      'DE': 'de-DE',
+      'PL': 'pl-PL',
+      'SE': 'sv-SE',
+      'NO': 'no-NO',
+      'DK': 'da-DK',
+      'FR': 'fr-FR',
+    };
+    const locale = langMap[t?.language || 'UA'] || 'uk-UA';
+    return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -51,7 +64,7 @@ export default function BlogPage() {
     return (
       <div className="min-h-screen bg-deep-black pt-24 pb-20">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="text-center text-sage">Завантаження...</div>
+          <div className="text-center text-sage">{t.blog.loading}</div>
         </div>
       </div>
     );
@@ -63,16 +76,16 @@ export default function BlogPage() {
         <div className="max-w-4xl mx-auto">
           <header className="mb-12 text-center">
             <h1 className="font-rutenia text-5xl md:text-6xl text-ivory mb-4">
-              Блог Skrynia
+              {t.blog.title}
             </h1>
             <p className="font-inter text-sage text-lg">
-              Історії, традиції та майстерність етнічних прикрас
+              {t.blog.subtitle}
             </p>
           </header>
 
           {blogs.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-sage text-lg">Статей поки що немає</p>
+              <p className="text-sage text-lg">{t.blog.noPosts}</p>
             </div>
           ) : (
             <div className="space-y-8">
@@ -130,7 +143,7 @@ export default function BlogPage() {
                         )}
 
                         <div className="flex items-center gap-2 text-oxblood font-inter text-sm">
-                          Читати далі
+                          {t.blog.readMore}
                           <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                           </svg>

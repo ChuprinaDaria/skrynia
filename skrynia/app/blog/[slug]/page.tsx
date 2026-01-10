@@ -57,11 +57,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   if (!blog) {
     return {
-      title: 'Статтю не знайдено | Skrynia Blog',
+      title: 'Статтю не знайдено | Rune box Blog',
     };
   }
 
-  const metaTitle = blog.meta_title || `${blog.title} | Skrynia Blog`;
+  const metaTitle = blog.meta_title || `${blog.title} | Rune box Blog`;
   const metaDescription = blog.meta_description || blog.excerpt || blog.title;
   const ogImage = blog.og_image || blog.featured_image || `${siteUrl}/images/og/og-image.jpg`;
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
@@ -72,14 +72,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     keywords: blog.tags ? blog.tags.split(',').map(tag => tag.trim()) : [],
 
-    authors: blog.author ? [{ name: blog.author }] : [{ name: 'Skrynia Team' }],
+    authors: blog.author ? [{ name: blog.author }] : [{ name: 'Rune box Team' }],
 
     openGraph: {
       type: 'article',
       title: metaTitle,
       description: metaDescription,
       url: pageUrl,
-      siteName: 'Skrynia',
+      siteName: 'Rune box',
       locale: 'uk_UA',
       images: [
         {
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         },
       ],
       publishedTime: blog.published_at || blog.created_at,
-      authors: blog.author ? [blog.author] : ['Skrynia Team'],
+      authors: blog.author ? [blog.author] : ['Rune box Team'],
       tags: blog.tags ? blog.tags.split(',').map(tag => tag.trim()) : [],
     },
 
@@ -99,8 +99,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: metaTitle,
       description: metaDescription,
       images: [ogImage],
-      creator: '@skrynia',
-      site: '@skrynia',
+      creator: '@runebox',
+      site: '@runebox',
     },
 
     alternates: {
@@ -151,11 +151,11 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
     dateModified: blog.created_at,
     author: {
       '@type': blog.author ? 'Person' : 'Organization',
-      name: blog.author || 'Skrynia Team',
+      name: blog.author || 'Rune box Team',
     },
     publisher: {
       '@type': 'Organization',
-      name: 'Skrynia',
+      name: 'Rune box',
       logo: {
         '@type': 'ImageObject',
         url: `${siteUrl}/images/logo/logo-white-pink-1.png`,

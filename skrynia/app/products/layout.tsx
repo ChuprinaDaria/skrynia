@@ -10,19 +10,19 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 // 4. Extract interactive parts (cart, quantity selector) into client components
 
 export const metadata: Metadata = {
-  title: 'Прикраси Ручної Роботи | Skrynia',
+  title: 'Прикраси Ручної Роботи | Rune box',
   description: 'Унікальні прикраси ручної роботи за мотивами слов\'янської, вікінгської та кельтської культури. Натуральний корал, срібло 925 проби.',
 
   openGraph: {
     type: 'website',
-    siteName: 'Skrynia',
+    siteName: 'Rune box',
     locale: 'uk_UA',
   },
 
   twitter: {
     card: 'summary_large_image',
-    creator: '@skrynia',
-    site: '@skrynia',
+    creator: '@runebox',
+    site: '@runebox',
   },
 
   robots: {

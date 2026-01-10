@@ -59,7 +59,7 @@ const homePageJsonLd = {
   '@type': 'WebPage',
   '@id': `${siteUrl}/#webpage`,
   url: siteUrl,
-  name: 'Скриня Пані Дарії - Автентичні Прикраси Ручної Роботи',
+  name: 'Rune box - Автентичні Прикраси Ручної Роботи',
   description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури",
   isPartOf: {
     '@id': `${siteUrl}/#website`,

@@ -82,7 +82,7 @@ const generateProductJsonLd = () => ({
   mpn: productData.id,
   brand: {
     '@type': 'Brand',
-    name: 'Скриня Пані Дарії',
+    name: 'Rune box',
   },
   category: 'Jewelry > Necklaces',
   material: productData.materials.join(', '),
@@ -97,7 +97,7 @@ const generateProductJsonLd = () => ({
     itemCondition: 'https://schema.org/NewCondition',
     seller: {
       '@type': 'Organization',
-      name: 'Скриня Пані Дарії',
+      name: 'Rune box',
     },
     shippingDetails: {
       '@type': 'OfferShippingDetails',

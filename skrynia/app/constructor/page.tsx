@@ -16,6 +16,7 @@ import {
 import { getApiEndpoint } from '@/lib/api';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Bead {
   id: number;
@@ -44,6 +45,7 @@ interface NecklaceThread {
 }
 
 export default function NecklaceConstructor() {
+  const { t } = useLanguage();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
 
@@ -297,7 +299,7 @@ export default function NecklaceConstructor() {
   const handleSaveConfiguration = async () => {
     const token = localStorage.getItem('admin_token');
     if (!token) {
-      alert('Будь ласка, увійдіть в систему для збереження конфігурації');
+      alert(t.constructor.loginRequired);
       return;
     }
 
@@ -321,19 +323,19 @@ export default function NecklaceConstructor() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          name: `Намисто ${new Date().toLocaleDateString('uk-UA')}`,
+          name: `${t.constructor.title} ${new Date().toLocaleDateString()}`,
           necklace_data: necklaceData,
         }),
       });
 
       if (res.ok) {
-        alert('Конфігурацію збережено!');
+        alert(t.constructor.saveSuccess);
       } else {
-        alert('Помилка збереження. Перевірте авторизацію.');
+        alert(t.constructor.saveError);
       }
     } catch (error) {
       console.error('Failed to save configuration:', error);
-      alert('Помилка збереження конфігурації');
+      alert(t.constructor.saveError);
     }
   };
 
@@ -341,12 +343,12 @@ export default function NecklaceConstructor() {
     // Check if necklace has beads
     const hasBeads = threads.some(t => t.beads.length > 0);
     if (!hasBeads) {
-      alert('Додайте бусини до намиста перед відправкою запиту!');
+      alert(t.constructor.addBeadsFirst);
       return;
     }
 
     if (!clasp) {
-      alert('Будь ласка, виберіть застібку!');
+      alert(t.constructor.selectClasp);
       return;
     }
 
@@ -377,18 +379,18 @@ export default function NecklaceConstructor() {
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 text-ivory hover:text-sage transition-colors">
               <Home className="w-5 h-5" />
-              <span className="font-inter">Головна</span>
+              <span className="font-inter">{t.constructor.home}</span>
             </Link>
-            <h1 className="font-cinzel text-2xl text-ivory">Конструктор Намиста</h1>
+            <h1 className="font-cinzel text-2xl text-ivory">{t.constructor.title}</h1>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="secondary" onClick={handleSaveConfiguration}>
               <Save className="w-4 h-4 mr-2" />
-              Зберегти
+              {t.constructor.save}
             </Button>
             <Button onClick={handleRequestQuote}>
               <Send className="w-4 h-4 mr-2" />
-              Запит на Прорахунок
+              {t.constructor.quoteRequest}
             </Button>
           </div>
         </div>
@@ -399,7 +401,7 @@ export default function NecklaceConstructor() {
           <div className="grid grid-cols-12 gap-6">
             {/* Left Panel - Beads Selection */}
             <div className="col-span-3 bg-footer-black rounded-sm p-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
-              <h2 className="font-cinzel text-xl text-ivory mb-4">Бусини</h2>
+              <h2 className="font-cinzel text-xl text-ivory mb-4">{t.constructor.beads}</h2>
 
               {/* Category Tabs */}
               <div className="flex flex-col gap-2 mb-4">
@@ -411,7 +413,7 @@ export default function NecklaceConstructor() {
                       : 'bg-deep-black text-sage hover:bg-deep-black/70'
                   }`}
                 >
-                  Камінь
+                  {t.constructor.stone}
                 </button>
                 <button
                   onClick={() => setSelectedCategory('hardware')}
@@ -421,7 +423,7 @@ export default function NecklaceConstructor() {
                       : 'bg-deep-black text-sage hover:bg-deep-black/70'
                   }`}
                 >
-                  Фурнітура
+                  {t.constructor.hardware}
                 </button>
                 <button
                   onClick={() => setSelectedCategory('extra')}
@@ -431,16 +433,16 @@ export default function NecklaceConstructor() {
                       : 'bg-deep-black text-sage hover:bg-deep-black/70'
                   }`}
                 >
-                  Додатково
+                  {t.constructor.extra}
                 </button>
               </div>
 
               {/* Beads Grid */}
               <div className="grid grid-cols-2 gap-3">
                 {loading ? (
-                  <p className="col-span-2 text-sage/70 text-center py-4">Завантаження...</p>
+                  <p className="col-span-2 text-sage/70 text-center py-4">{t.constructor.loading}</p>
                 ) : filteredBeads.length === 0 ? (
-                  <p className="col-span-2 text-sage/70 text-center py-4">Бусини не знайдено</p>
+                  <p className="col-span-2 text-sage/70 text-center py-4">{t.constructor.noBeads}</p>
                 ) : (
                   filteredBeads.map((bead) => (
                     <button
@@ -454,7 +456,7 @@ export default function NecklaceConstructor() {
                         className="w-full h-20 object-contain mb-2"
                       />
                       <p className="text-xs text-ivory truncate">{bead.name}</p>
-                      <p className="text-xs text-sage/70">{bead.size_mm} мм</p>
+                      <p className="text-xs text-sage/70">{bead.size_mm} mm</p>
                     </button>
                   ))
                 )}
@@ -462,7 +464,7 @@ export default function NecklaceConstructor() {
 
               {/* Clasp Selection */}
               <div className="mt-6 pt-6 border-t border-sage/20">
-                <h3 className="font-cinzel text-lg text-ivory mb-3">Застібка</h3>
+                <h3 className="font-cinzel text-lg text-ivory mb-3">{t.constructor.clasp}</h3>
                 <div className="grid grid-cols-2 gap-3">
                   {beads
                     .filter(b => b.category === 'hardware' && b.subcategory?.toLowerCase().includes('застібка'))
@@ -491,14 +493,14 @@ export default function NecklaceConstructor() {
             {/* Center - Canvas */}
             <div className="col-span-6 bg-footer-black rounded-sm p-4">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="font-cinzel text-xl text-ivory">Візуальний Редактор</h2>
+                <h2 className="font-cinzel text-xl text-ivory">{t.constructor.visualEditor}</h2>
 
                 {/* Zoom Controls */}
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleZoomOut}
                     className="p-2 bg-deep-black text-sage hover:bg-sage/20 rounded-sm transition-colors"
-                    title="Віддалити"
+                    title={t.constructor.instruction2}
                   >
                     <ZoomOut className="w-5 h-5" />
                   </button>
@@ -506,21 +508,21 @@ export default function NecklaceConstructor() {
                   <button
                     onClick={handleZoomIn}
                     className="p-2 bg-deep-black text-sage hover:bg-sage/20 rounded-sm transition-colors"
-                    title="Приблизити"
+                    title={t.constructor.instruction2}
                   >
                     <ZoomIn className="w-5 h-5" />
                   </button>
                   <button
                     onClick={handleRotateSelectedBead}
                     className="p-2 bg-deep-black text-sage hover:bg-sage/20 rounded-sm transition-colors ml-2"
-                    title="Повернути вибрану бусину"
+                    title={t.constructor.instruction3}
                   >
                     <RotateCw className="w-5 h-5" />
                   </button>
                   <button
                     onClick={handleRemoveLastBead}
                     className="p-2 bg-deep-black text-oxblood hover:bg-oxblood/20 rounded-sm transition-colors"
-                    title="Видалити останню бусину"
+                    title={t.constructor.deleteThread}
                   >
                     <Trash2 className="w-5 h-5" />
                   </button>
@@ -535,18 +537,18 @@ export default function NecklaceConstructor() {
               {/* Thread Info */}
               <div className="mt-4 bg-sage/5 p-3 rounded-sm">
                 <p className="text-sm text-sage/70">
-                  Нитка {selectedThreadIndex + 1} з {threadCount} | Бусин на нитці: {threads[selectedThreadIndex]?.beads.length || 0}
+                  {t.constructor.thread} {selectedThreadIndex + 1} {t.constructor.threadOf} {threadCount} | {t.constructor.beads} {t.constructor.beadsOnThread}: {threads[selectedThreadIndex]?.beads.length || 0}
                 </p>
               </div>
             </div>
 
             {/* Right Panel - Settings */}
             <div className="col-span-3 bg-footer-black rounded-sm p-4">
-              <h2 className="font-cinzel text-xl text-ivory mb-4">Налаштування</h2>
+              <h2 className="font-cinzel text-xl text-ivory mb-4">{t.constructor.settings}</h2>
 
               {/* Thread Count */}
               <div className="mb-6">
-                <label className="block text-sm text-ivory mb-2">Кількість ниток</label>
+                <label className="block text-sm text-ivory mb-2">{t.constructor.threadCount}</label>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={handleRemoveThread}
@@ -566,13 +568,13 @@ export default function NecklaceConstructor() {
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
-                <p className="text-xs text-sage/50 mt-1">Максимум: 5 ниток</p>
+                <p className="text-xs text-sage/50 mt-1">{t.constructor.maxThreads}</p>
               </div>
 
               {/* Thread Length */}
               <div className="mb-6">
                 <label className="block text-sm text-ivory mb-2">
-                  Довжина нитки: {threadLength} см
+                  {t.constructor.threadLength}: {threadLength} cm
                 </label>
                 <input
                   type="range"
@@ -592,14 +594,14 @@ export default function NecklaceConstructor() {
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-sage/50 mt-1">
-                  <span>20 см</span>
-                  <span>80 см</span>
+                  <span>20 cm</span>
+                  <span>80 cm</span>
                 </div>
               </div>
 
               {/* Thread Selector */}
               <div className="mb-6">
-                <label className="block text-sm text-ivory mb-2">Активна нитка</label>
+                <label className="block text-sm text-ivory mb-2">{t.constructor.activeThread}</label>
                 <div className="flex flex-col gap-2">
                   {threads.map((thread, index) => (
                     <button
@@ -611,7 +613,7 @@ export default function NecklaceConstructor() {
                           : 'bg-deep-black text-sage hover:bg-deep-black/70'
                       }`}
                     >
-                      Нитка {thread.thread_number} ({thread.beads.length} бусин)
+                      {t.constructor.thread} {thread.thread_number} ({thread.beads.length} {t.constructor.beads})
                     </button>
                   ))}
                 </div>
@@ -619,13 +621,13 @@ export default function NecklaceConstructor() {
 
               {/* Info */}
               <div className="bg-sage/5 p-3 rounded-sm">
-                <h3 className="text-sm font-medium text-ivory mb-2">Інструкція:</h3>
+                <h3 className="text-sm font-medium text-ivory mb-2">{t.constructor.instruction}</h3>
                 <ul className="text-xs text-sage/70 space-y-1">
-                  <li>• Клацніть на бусину зліва, щоб додати її</li>
-                  <li>• Використовуйте Zoom для приближення</li>
-                  <li>• Клацніть на бусину та натисніть Rotate</li>
-                  <li>• Оберіть застібку внизу панелі</li>
-                  <li>• Збережіть або надішліть запит</li>
+                  <li>• {t.constructor.instruction1}</li>
+                  <li>• {t.constructor.instruction2}</li>
+                  <li>• {t.constructor.instruction3}</li>
+                  <li>• {t.constructor.instruction4}</li>
+                  <li>• {t.constructor.instruction5}</li>
                 </ul>
               </div>
             </div>
