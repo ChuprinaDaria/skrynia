@@ -9,6 +9,7 @@ from app.models.shipping import Shipment
 from app.models.made_to_order import MadeToOrderRequest
 from app.models.social_link import SocialLink
 from app.models.contact_info import ContactInfo
+from app.models.blog import Blog
 
 __all__ = [
     "User",
@@ -25,5 +26,6 @@ __all__ = [
     "MadeToOrderRequest",
     "SocialLink",
     "ContactInfo",
+    "Blog",
 ]
 
