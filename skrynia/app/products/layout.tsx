@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   description: 'Унікальні прикраси ручної роботи за мотивами слов\'янської, вікінгської та кельтської культури. Натуральний корал, срібло 925 проби.',
 
   openGraph: {
-    type: 'product',
+    type: 'website',
     siteName: 'Skrynia',
     locale: 'uk_UA',
   },
