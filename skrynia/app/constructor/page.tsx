@@ -82,33 +82,6 @@ export default function NecklaceConstructor() {
     };
   }, []);
 
-  // Fetch beads from API
-  useEffect(() => {
-    fetchBeads();
-  }, []);
-
-  // Redraw when threads change
-  useEffect(() => {
-    if (fabricCanvasRef.current) {
-      drawNecklaceArc(fabricCanvasRef.current).catch(console.error);
-    }
-  }, [drawNecklaceArc]);
-
-  const fetchBeads = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch(getApiEndpoint('/api/v1/beads'));
-      if (res.ok) {
-        const data = await res.json();
-        setBeads(data.filter((b: Bead) => b.is_active));
-      }
-    } catch (error) {
-      console.error('Failed to fetch beads:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const drawNecklaceArc = useCallback(async (canvas: Canvas) => {
     canvas.clear();
     canvas.backgroundColor = '#1a1a1a';
@@ -218,6 +191,33 @@ export default function NecklaceConstructor() {
 
     canvas.renderAll();
   }, [threads, zoom, threadLength, beads, selectedThreadIndex, clasp]);
+
+  const fetchBeads = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(getApiEndpoint('/api/v1/beads'));
+      if (res.ok) {
+        const data = await res.json();
+        setBeads(data.filter((b: Bead) => b.is_active));
+      }
+    } catch (error) {
+      console.error('Failed to fetch beads:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch beads from API
+  useEffect(() => {
+    fetchBeads();
+  }, []);
+
+  // Redraw when threads change
+  useEffect(() => {
+    if (fabricCanvasRef.current) {
+      drawNecklaceArc(fabricCanvasRef.current).catch(console.error);
+    }
+  }, [drawNecklaceArc]);
 
   const handleAddBeadToThread = (bead: Bead) => {
     const updatedThreads = [...threads];
