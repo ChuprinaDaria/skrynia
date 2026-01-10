@@ -19,7 +19,7 @@ interface BlogPost {
 }
 
 export default function BlogPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [blogs, setBlogs] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -52,7 +52,7 @@ export default function BlogPage() {
       'DK': 'da-DK',
       'FR': 'fr-FR',
     };
-    const locale = langMap[t?.language || 'UA'] || 'uk-UA';
+    const locale = langMap[language || 'UA'] || 'uk-UA';
     return new Date(dateString).toLocaleDateString(locale, {
       year: 'numeric',
       month: 'long',
