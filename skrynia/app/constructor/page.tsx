@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { fabric } from 'fabric';
+import { Canvas, Circle, Image } from 'fabric';
 import {
   ZoomIn,
   ZoomOut,
@@ -34,7 +34,7 @@ interface PlacedBead {
   bead_id: number;
   position: number;
   rotation: number;
-  fabricObject?: fabric.Image;
+  fabricObject?: Image;
 }
 
 interface NecklaceThread {
@@ -45,7 +45,7 @@ interface NecklaceThread {
 
 export default function NecklaceConstructor() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fabricCanvasRef = useRef<fabric.Canvas | null>(null);
+  const fabricCanvasRef = useRef<Canvas | null>(null);
 
   const [beads, setBeads] = useState<Bead[]>([]);
   const [loading, setLoading] = useState(true);
@@ -68,7 +68,7 @@ export default function NecklaceConstructor() {
   useEffect(() => {
     if (!canvasRef.current) return;
 
-    const canvas = new fabric.Canvas(canvasRef.current, {
+    const canvas = new Canvas(canvasRef.current, {
       width: 800,
       height: 600,
       backgroundColor: '#1a1a1a',
@@ -112,7 +112,7 @@ export default function NecklaceConstructor() {
     }
   };
 
-  const drawNecklaceArc = (canvas: fabric.Canvas) => {
+  const drawNecklaceArc = (canvas: Canvas) => {
     canvas.clear();
     canvas.backgroundColor = '#1a1a1a';
 
@@ -129,7 +129,7 @@ export default function NecklaceConstructor() {
       const isSelected = threadIndex === selectedThreadIndex;
 
       // Draw thread arc (jewelry string)
-      const arc = new fabric.Circle({
+      const arc = new Circle({
         left: centerX - threadRadius,
         top: centerY - threadRadius / 2,
         radius: threadRadius,
@@ -158,7 +158,7 @@ export default function NecklaceConstructor() {
         const beadY = centerY + threadRadius * Math.sin(Math.PI - angle);
 
         // Load and place bead image
-        fabric.Image.fromURL(
+        Image.fromURL(
           bead.image_url,
           (img) => {
             if (!img) return;
@@ -197,7 +197,7 @@ export default function NecklaceConstructor() {
       if (clasp && threadIndex === 0) {
         const claspBead = beads.find(b => b.id === clasp.bead_id);
         if (claspBead) {
-          fabric.Image.fromURL(
+          Image.fromURL(
             claspBead.image_url,
             (img) => {
               if (!img) return;
