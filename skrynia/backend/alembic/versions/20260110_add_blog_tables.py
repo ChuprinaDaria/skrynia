@@ -1,7 +1,7 @@
 """add blog tables
 
 Revision ID: add_blog_tables
-Revises: 20260109_1809_5b6f84cbc5db
+Revises: add_beads_constructor
 Create Date: 2026-01-10
 
 """
@@ -11,7 +11,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = 'add_blog_tables'
-down_revision = '20260109_1809_5b6f84cbc5db'
+down_revision = 'add_beads_constructor'
 branch_labels = None
 depends_on = None
 
