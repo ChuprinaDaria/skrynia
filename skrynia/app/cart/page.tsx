@@ -8,7 +8,6 @@ import CartDrawer from '@/components/cart/CartDrawer';
 export default function CartPage() {
   const router = useRouter();
   const { items, updateQuantity, removeItem, isCartOpen, openCart, closeCart } = useCart();
-  const { t } = useLanguage();
 
   // Open cart drawer when page loads
   React.useEffect(() => {
