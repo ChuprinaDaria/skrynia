@@ -69,8 +69,8 @@ const Hero: React.FC = () => {
           className="absolute inset-0"
           style={{
             background: `
-              radial-gradient(ellipse at center, rgba(10, 10, 10, 0.02) 0%, rgba(10, 10, 10, 0.72) 68%, rgba(10, 10, 10, 0.96) 100%),
-              linear-gradient(to bottom, rgba(10, 10, 10, 0.62) 0%, rgba(10, 10, 10, 0.18) 30%, rgba(10, 10, 10, 0.62) 100%)
+              radial-gradient(ellipse at center, rgba(10, 10, 10, 0) 0%, rgba(10, 10, 10, 0.5) 50%, rgba(10, 10, 10, 0.85) 70%, rgba(10, 10, 10, 0.98) 100%),
+              linear-gradient(to bottom, rgba(10, 10, 10, 0.75) 0%, rgba(10, 10, 10, 0.1) 30%, rgba(10, 10, 10, 0.75) 100%)
             `,
           }}
         />
@@ -82,13 +82,13 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Subtle overlay for text readability - dark gradient from edges */}
-      <div 
+      <div
         className="absolute inset-0 z-10"
         style={{
           background: `
-            radial-gradient(ellipse at center, transparent 0%, rgba(10, 10, 10, 0.3) 40%, rgba(10, 10, 10, 0.7) 100%),
-            linear-gradient(to bottom, rgba(10, 10, 10, 0.4) 0%, transparent 20%, transparent 80%, rgba(10, 10, 10, 0.4) 100%),
-            linear-gradient(to right, rgba(10, 10, 10, 0.3) 0%, transparent 15%, transparent 85%, rgba(10, 10, 10, 0.3) 100%)
+            radial-gradient(ellipse at center, transparent 0%, rgba(10, 10, 10, 0.5) 35%, rgba(10, 10, 10, 0.85) 85%, rgba(10, 10, 10, 0.95) 100%),
+            linear-gradient(to bottom, rgba(10, 10, 10, 0.6) 0%, transparent 20%, transparent 80%, rgba(10, 10, 10, 0.6) 100%),
+            linear-gradient(to right, rgba(10, 10, 10, 0.5) 0%, transparent 12%, transparent 88%, rgba(10, 10, 10, 0.5) 100%)
           `,
         }}
         aria-hidden="true"
