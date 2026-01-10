@@ -209,6 +209,214 @@ async def send_password_reset_code_email(email: str, code: str, full_name: str =
         body=html_content,
         subtype="html"
     )
-    
+
+    await fm.send_message(message)
+
+
+async def send_quote_request_confirmation(
+    email: str,
+    quote_id: int,
+    customer_name: str = None,
+    necklace_summary: str = None
+) -> None:
+    """Send confirmation email to customer after submitting quote request."""
+    name = customer_name or "Шановний клієнте"
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }}
+            .container {{
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }}
+            .header {{
+                background-color: #f8f9fa;
+                padding: 20px;
+                text-align: center;
+                border-radius: 5px 5px 0 0;
+            }}
+            .content {{
+                background-color: #ffffff;
+                padding: 30px;
+                border: 1px solid #e0e0e0;
+            }}
+            .footer {{
+                text-align: center;
+                padding: 20px;
+                color: #666;
+                font-size: 12px;
+            }}
+            .info-box {{
+                background-color: #e7f3ff;
+                border-left: 4px solid #007bff;
+                padding: 15px;
+                margin: 20px 0;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>Запит на прорахунок намиста</h1>
+            </div>
+            <div class="content">
+                <p>Вітаємо, {name}!</p>
+                <p>Ми отримали ваш запит на прорахунок вартості намиста.</p>
+                <div class="info-box">
+                    <p><strong>Номер запиту:</strong> #{quote_id}</p>
+                    {f'<p><strong>Деталі:</strong> {necklace_summary}</p>' if necklace_summary else ''}
+                </div>
+                <p>Наш майстер розгляне ваш запит і надішле вам детальний прорахунок протягом <strong>24 годин</strong>.</p>
+                <p>Ви отримаєте email з:</p>
+                <ul>
+                    <li>Переліком усіх бусин та фурнітури</li>
+                    <li>Детальною калькуляцією вартості</li>
+                    <li>Інформацією про терміни виготовлення</li>
+                </ul>
+                <p>Якщо у вас виникли додаткові питання, не соромтеся звертатися до нас.</p>
+                <p>Дякуємо за ваш інтерес до наших виробів!</p>
+            </div>
+            <div class="footer">
+                <p>© {datetime.now().year} Skrynia - Конструктор намист. Всі права захищені.</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    message = MessageSchema(
+        subject=f"Запит на прорахунок #{quote_id} отримано - Skrynia",
+        recipients=[email],
+        body=html_content,
+        subtype="html"
+    )
+
+    await fm.send_message(message)
+
+
+async def send_new_quote_request_notification(
+    admin_email: str,
+    quote_id: int,
+    customer_email: str,
+    customer_name: str = None,
+    calculated_brutto: float = None
+) -> None:
+    """Send notification to admin about new quote request."""
+    customer = customer_name or customer_email
+
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{
+                font-family: Arial, sans-serif;
+                line-height: 1.6;
+                color: #333;
+            }}
+            .container {{
+                max-width: 600px;
+                margin: 0 auto;
+                padding: 20px;
+            }}
+            .header {{
+                background-color: #28a745;
+                color: white;
+                padding: 20px;
+                text-align: center;
+                border-radius: 5px 5px 0 0;
+            }}
+            .content {{
+                background-color: #ffffff;
+                padding: 30px;
+                border: 1px solid #e0e0e0;
+            }}
+            .button {{
+                display: inline-block;
+                padding: 12px 30px;
+                background-color: #007bff;
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 5px;
+                margin: 20px 0;
+            }}
+            .footer {{
+                text-align: center;
+                padding: 20px;
+                color: #666;
+                font-size: 12px;
+            }}
+            .info-table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin: 20px 0;
+            }}
+            .info-table td {{
+                padding: 10px;
+                border-bottom: 1px solid #e0e0e0;
+            }}
+            .info-table td:first-child {{
+                font-weight: bold;
+                width: 40%;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🔔 Новий запит на прорахунок</h1>
+            </div>
+            <div class="content">
+                <p>Надійшов новий запит на прорахунок вартості намиста!</p>
+                <table class="info-table">
+                    <tr>
+                        <td>Номер запиту:</td>
+                        <td><strong>#{quote_id}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Клієнт:</td>
+                        <td>{customer}</td>
+                    </tr>
+                    <tr>
+                        <td>Email:</td>
+                        <td>{customer_email}</td>
+                    </tr>
+                    {f'''<tr>
+                        <td>Орієнтовна вартість:</td>
+                        <td><strong>{calculated_brutto:.2f} PLN</strong> (автопідрахунок)</td>
+                    </tr>''' if calculated_brutto else ''}
+                </table>
+                <p style="text-align: center;">
+                    <a href="{settings.FRONTEND_URL}/admin/quotes/{quote_id}" class="button">
+                        Переглянути запит в адмінці
+                    </a>
+                </p>
+                <p><small>Не забудьте надіслати клієнту прорахунок протягом 24 годин!</small></p>
+            </div>
+            <div class="footer">
+                <p>© {datetime.now().year} Skrynia - Адмін система</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    message = MessageSchema(
+        subject=f"🔔 Новий запит на прорахунок #{quote_id}",
+        recipients=[admin_email],
+        body=html_content,
+        subtype="html"
+    )
+
     await fm.send_message(message)
 
