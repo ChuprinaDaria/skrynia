@@ -11,6 +11,7 @@ class QuoteRequestBase(BaseModel):
     customer_name: Optional[str] = Field(None, max_length=255, description="Ім'я клієнта")
     customer_phone: Optional[str] = Field(None, max_length=50, description="Телефон клієнта")
     comment: Optional[str] = Field(None, description="Коментар від клієнта")
+    language: str = Field(default="uk", description="Мова клієнта: uk, en, de, pl")
 
 
 class QuoteRequestCreate(QuoteRequestBase):

@@ -217,10 +217,88 @@ async def send_quote_request_confirmation(
     email: str,
     quote_id: int,
     customer_name: str = None,
-    necklace_summary: str = None
+    necklace_summary: str = None,
+    language: str = "uk"
 ) -> None:
     """Send confirmation email to customer after submitting quote request."""
-    name = customer_name or "Шановний клієнте"
+    # Translations
+    translations = {
+        "uk": {
+            "greeting": "Шановний клієнте",
+            "title": "Запит на прорахунок намиста",
+            "hello": "Вітаємо",
+            "received": "Ми отримали ваш запит на прорахунок вартості намиста.",
+            "quote_number": "Номер запиту",
+            "details": "Деталі",
+            "review_time": "Наш майстер розгляне ваш запит і надішле вам детальний прорахунок протягом",
+            "hours": "24 годин",
+            "will_receive": "Ви отримаєте email з:",
+            "list_beads": "Переліком усіх бусин та фурнітури",
+            "price_calc": "Детальною калькуляцією вартості",
+            "timing_info": "Інформацією про терміни виготовлення",
+            "questions": "Якщо у вас виникли додаткові питання, не соромтеся звертатися до нас.",
+            "thanks": "Дякуємо за ваш інтерес до наших виробів!",
+            "footer": "Конструктор намист. Всі права захищені.",
+            "subject": "Запит на прорахунок #{} отримано - Skrynia"
+        },
+        "en": {
+            "greeting": "Dear Customer",
+            "title": "Necklace Price Quote Request",
+            "hello": "Hello",
+            "received": "We have received your request for a necklace price quote.",
+            "quote_number": "Request Number",
+            "details": "Details",
+            "review_time": "Our craftsman will review your request and send you a detailed quote within",
+            "hours": "24 hours",
+            "will_receive": "You will receive an email with:",
+            "list_beads": "List of all beads and hardware",
+            "price_calc": "Detailed price calculation",
+            "timing_info": "Information about production time",
+            "questions": "If you have any questions, please feel free to contact us.",
+            "thanks": "Thank you for your interest in our products!",
+            "footer": "Necklace Constructor. All rights reserved.",
+            "subject": "Quote Request #{} Received - Skrynia"
+        },
+        "de": {
+            "greeting": "Sehr geehrter Kunde",
+            "title": "Anfrage für Halsketten-Preisangebot",
+            "hello": "Hallo",
+            "received": "Wir haben Ihre Anfrage für ein Halsketten-Preisangebot erhalten.",
+            "quote_number": "Anfrage-Nummer",
+            "details": "Details",
+            "review_time": "Unser Handwerker wird Ihre Anfrage prüfen und Ihnen innerhalb von",
+            "hours": "24 Stunden",
+            "will_receive": "Sie erhalten eine E-Mail mit:",
+            "list_beads": "Liste aller Perlen und Beschläge",
+            "price_calc": "Detaillierte Preiskalkulation",
+            "timing_info": "Informationen zur Produktionszeit",
+            "questions": "Bei Fragen können Sie sich gerne an uns wenden.",
+            "thanks": "Vielen Dank für Ihr Interesse an unseren Produkten!",
+            "footer": "Halsketten-Konstruktor. Alle Rechte vorbehalten.",
+            "subject": "Preisanfrage #{} Erhalten - Skrynia"
+        },
+        "pl": {
+            "greeting": "Szanowny Kliencie",
+            "title": "Zapytanie o Wycenę Naszyjnika",
+            "hello": "Witamy",
+            "received": "Otrzymaliśmy Twoje zapytanie o wycenę naszyjnika.",
+            "quote_number": "Numer Zapytania",
+            "details": "Szczegóły",
+            "review_time": "Nasz rzemieślnik przeanalizuje Twoje zapytanie i wyśle szczegółową wycenę w ciągu",
+            "hours": "24 godzin",
+            "will_receive": "Otrzymasz e-mail z:",
+            "list_beads": "Listą wszystkich koralików i okuć",
+            "price_calc": "Szczegółową kalkulacją ceny",
+            "timing_info": "Informacją o czasie realizacji",
+            "questions": "W razie pytań prosimy o kontakt.",
+            "thanks": "Dziękujemy za zainteresowanie naszymi produktami!",
+            "footer": "Konstruktor Naszyjników. Wszelkie prawa zastrzeżone.",
+            "subject": "Zapytanie o Wycenę #{} Otrzymane - Skrynia"
+        }
+    }
+
+    t = translations.get(language, translations["uk"])
+    name = customer_name or t["greeting"]
 
     html_content = f"""
     <!DOCTYPE html>
@@ -266,27 +344,27 @@ async def send_quote_request_confirmation(
     <body>
         <div class="container">
             <div class="header">
-                <h1>Запит на прорахунок намиста</h1>
+                <h1>{t["title"]}</h1>
             </div>
             <div class="content">
-                <p>Вітаємо, {name}!</p>
-                <p>Ми отримали ваш запит на прорахунок вартості намиста.</p>
+                <p>{t["hello"]}, {name}!</p>
+                <p>{t["received"]}</p>
                 <div class="info-box">
-                    <p><strong>Номер запиту:</strong> #{quote_id}</p>
-                    {f'<p><strong>Деталі:</strong> {necklace_summary}</p>' if necklace_summary else ''}
+                    <p><strong>{t["quote_number"]}:</strong> #{quote_id}</p>
+                    {f'<p><strong>{t["details"]}:</strong> {necklace_summary}</p>' if necklace_summary else ''}
                 </div>
-                <p>Наш майстер розгляне ваш запит і надішле вам детальний прорахунок протягом <strong>24 годин</strong>.</p>
-                <p>Ви отримаєте email з:</p>
+                <p>{t["review_time"]} <strong>{t["hours"]}</strong>.</p>
+                <p>{t["will_receive"]}</p>
                 <ul>
-                    <li>Переліком усіх бусин та фурнітури</li>
-                    <li>Детальною калькуляцією вартості</li>
-                    <li>Інформацією про терміни виготовлення</li>
+                    <li>{t["list_beads"]}</li>
+                    <li>{t["price_calc"]}</li>
+                    <li>{t["timing_info"]}</li>
                 </ul>
-                <p>Якщо у вас виникли додаткові питання, не соромтеся звертатися до нас.</p>
-                <p>Дякуємо за ваш інтерес до наших виробів!</p>
+                <p>{t["questions"]}</p>
+                <p>{t["thanks"]}</p>
             </div>
             <div class="footer">
-                <p>© {datetime.now().year} Skrynia - Конструктор намист. Всі права захищені.</p>
+                <p>© {datetime.now().year} Skrynia - {t["footer"]}</p>
             </div>
         </div>
     </body>
@@ -294,7 +372,7 @@ async def send_quote_request_confirmation(
     """
 
     message = MessageSchema(
-        subject=f"Запит на прорахунок #{quote_id} отримано - Skrynia",
+        subject=t["subject"].format(quote_id),
         recipients=[email],
         body=html_content,
         subtype="html"

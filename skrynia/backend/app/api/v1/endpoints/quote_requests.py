@@ -145,11 +145,22 @@ async def create_quote_request(
 
     # Send confirmation email to customer
     try:
+        # Multilingual necklace summary
+        thread_count = len(necklace_data_dict['threads'])
+        summary_translations = {
+            "uk": f"{thread_count} ниток" if thread_count > 1 else f"{thread_count} нитка",
+            "en": f"{thread_count} threads" if thread_count > 1 else f"{thread_count} thread",
+            "de": f"{thread_count} Fäden" if thread_count > 1 else f"{thread_count} Faden",
+            "pl": f"{thread_count} nici" if thread_count > 1 else f"{thread_count} nić"
+        }
+        necklace_summary = summary_translations.get(quote.language, summary_translations["uk"])
+
         await send_quote_request_confirmation(
             email=quote.email,
             quote_id=db_quote.id,
             customer_name=quote.customer_name,
-            necklace_summary=f"{len(necklace_data_dict['threads'])} ниток"
+            necklace_summary=necklace_summary,
+            language=quote.language
         )
     except Exception as e:
         print(f"Failed to send customer confirmation email: {e}")
