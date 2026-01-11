@@ -120,7 +120,6 @@ function OrderSuccessContent() {
 }
 
 export default function OrderSuccessPage() {
-export default function OrderSuccessPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-deep-black pt-24 pb-20 flex items-center justify-center">
@@ -130,6 +129,5 @@ export default function OrderSuccessPage() {
       <OrderSuccessContent />
     </Suspense>
   );
-}
 }
 
