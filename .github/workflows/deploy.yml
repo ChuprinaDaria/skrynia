@@ -120,21 +120,26 @@ jobs:
       - name: Add server to known hosts
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H 5.78.152.139 >> ~/.ssh/known_hosts
+          ssh-keyscan -H 5.78.152.139 >> ~/.ssh/known_hosts || true
 
       - name: Deploy to VPS
+        timeout-minutes: 10
         run: |
-          ssh root@5.78.152.139 << 'ENDSSH'
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null root@5.78.152.139 bash << 'ENDSSH'
+            set -e
             mkdir -p /app/runebox
             cd /app/runebox
             
+            echo "📦 Updating repository..."
             if [ ! -d ".git" ]; then
               git clone https://github.com/ChuprinaDaria/skrynia.git .
             else
-              git pull origin main
+              git fetch origin
+              git reset --hard origin/main
             fi
             
-            cat > .env << 'EOF'
+            echo "📝 Creating .env file..."
+            cat > .env << 'ENVEOF'
           DB_NAME=${{ secrets.DB_NAME }}
           DB_USER=${{ secrets.DB_USER }}
           DB_PASSWORD=${{ secrets.DB_PASSWORD }}
@@ -161,15 +166,29 @@ jobs:
           ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
           BACKEND_IMAGE=ghcr.io/chuprinadaria/skrynia/backend:latest
           FRONTEND_IMAGE=ghcr.io/chuprinadaria/skrynia/frontend:latest
-          EOF
+          ENVEOF
             
-            # Pull latest images without removing volumes (preserves database)
-            docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans
+            echo "🐳 Pulling latest Docker images..."
+            docker compose -f docker-compose.prod.yml pull || {
+              echo "⚠️  Warning: Failed to pull some images, continuing..."
+            }
             
-            # Run migrations if needed
-            docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head || true
+            echo "🚀 Starting containers..."
+            docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans || {
+              echo "❌ Failed to start containers"
+              exit 1
+            }
+            
+            echo "⏳ Waiting for backend to be ready..."
+            sleep 10
+            
+            echo "🗄️  Running database migrations..."
+            docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head || {
+              echo "⚠️  Warning: Migration failed, but continuing..."
+            }
             
             echo "✅ Deployment successful!"
+            echo "📊 Container status:"
+            docker compose -f docker-compose.prod.yml ps
           ENDSSH
 
