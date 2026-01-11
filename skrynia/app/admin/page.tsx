@@ -43,11 +43,13 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [chartData, setChartData] = useState<SalesChartData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [days, setDays] = useState(30);
 
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
+      setError(null);
 
       const token = localStorage.getItem('admin_token');
       if (!token) {
@@ -71,20 +73,41 @@ export default function AdminDashboard() {
         localStorage.removeItem('admin_token');
         window.location.href = '/admin/login';
         return;
+      } else {
+        // Handle other errors
+        const errorText = await statsRes.text();
+        let errorMessage = `Помилка завантаження даних: ${statsRes.status}`;
+        try {
+          const errorJson = JSON.parse(errorText);
+          errorMessage = errorJson.detail || errorJson.message || errorMessage;
+        } catch {
+          if (errorText) {
+            errorMessage = errorText;
+          }
+        }
+        setError(errorMessage);
+        console.error('Failed to fetch dashboard stats:', statsRes.status, errorText);
       }
 
-      // Fetch chart data
-      const chartRes = await fetch(getApiEndpoint(`/api/v1/admin/sales-chart?days=${days}`), {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('admin_token')}`,
-        },
-      });
+      // Fetch chart data (only if stats were loaded successfully)
+      if (statsRes.ok) {
+        const chartRes = await fetch(getApiEndpoint(`/api/v1/admin/sales-chart?days=${days}`), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('admin_token')}`,
+          },
+        });
 
-      if (chartRes.ok) {
-        const chartData = await chartRes.json();
-        setChartData(chartData);
+        if (chartRes.ok) {
+          const chartData = await chartRes.json();
+          setChartData(chartData);
+        } else if (chartRes.status !== 401) {
+          // Don't show error for chart data if it's not auth error, just log it
+          console.error('Failed to fetch chart data:', chartRes.status);
+        }
       }
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Невідома помилка';
+      setError(`Помилка підключення: ${errorMessage}`);
       console.error('Failed to fetch dashboard data:', error);
     } finally {
       setLoading(false);
@@ -137,9 +160,16 @@ export default function AdminDashboard() {
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-center max-w-md mx-auto">
               <div className="text-ivory text-xl font-cinzel mb-4">Не вдалося завантажити дані</div>
-              <p className="text-sage mb-6">
-                Спробуйте оновити сторінку або перевірте підключення до інтернету.
-              </p>
+              {error && (
+                <div className="bg-oxblood/20 border border-oxblood/50 rounded-sm p-4 mb-6 text-left">
+                  <p className="text-ivory text-sm font-inter">{error}</p>
+                </div>
+              )}
+              {!error && (
+                <p className="text-sage mb-6">
+                  Спробуйте оновити сторінку або перевірте підключення до інтернету.
+                </p>
+              )}
               <button
                 onClick={() => fetchDashboardData()}
                 className="inline-block font-inter font-semibold transition-all duration-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-oxblood focus:ring-offset-2 focus:ring-offset-deep-black bg-oxblood text-ivory hover:bg-oxblood/90 hover:shadow-oxblood-glow active:scale-[0.98] px-6 py-3 text-base"
@@ -180,6 +210,27 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between flex-wrap gap-4">
           <h1 className="font-cinzel text-4xl text-ivory">Admin Dashboard</h1>
+          
+          {/* Error Banner */}
+          {error && (
+            <div className="w-full mb-4 bg-oxblood/20 border border-oxblood/50 rounded-sm p-4">
+              <div className="flex items-center justify-between">
+                <p className="text-ivory text-sm font-inter">{error}</p>
+                <button
+                  onClick={() => {
+                    setError(null);
+                    fetchDashboardData();
+                  }}
+                  className="ml-4 text-oxblood hover:text-oxblood/80 transition-colors"
+                  aria-label="Закрити помилку"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
 
           <div className="flex items-center gap-4">
             {/* Quick Actions */}

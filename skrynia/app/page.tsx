@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Script from 'next/script';
 import Hero from '@/components/layout/Hero';
@@ -10,90 +10,120 @@ import BonusSystem from '@/components/layout/BonusSystem';
 import BlogSection from '@/components/home/BlogSection';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getApiEndpoint } from '@/lib/api';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
-// Sample featured products data
-const featuredProducts: Product[] = [
-  {
-    id: '1',
-    title: 'Намисто з натурального коралу "Алатир"',
-    titleEn: 'Natural Coral Necklace "Alatyr"',
-    price: 1200,
-    currency: 'zł',
-    image: '/images/products/coral-necklace-1.jpg',
-    category: 'ukrainian',
-    materials: ['Натуральний корал', 'Срібло 925'],
-    isHandmade: true,
-    slug: 'coral-necklace-alatyr',
-  },
-  {
-    id: '2',
-    title: 'Срібний кулон "Валькнут"',
-    titleEn: 'Silver Pendant "Valknut"',
-    price: 850,
-    currency: 'zł',
-    image: '/images/products/viking-pendant-1.jpg',
-    category: 'viking',
-    materials: ['Срібло 925', 'Оксидоване срібло'],
-    isHandmade: true,
-    slug: 'silver-pendant-valknut',
-  },
-  {
-    id: '3',
-    title: 'Браслет "Трикветр" з бурштином',
-    titleEn: 'Triquetra Bracelet with Amber',
-    price: 950,
-    currency: 'zł',
-    image: '/images/products/celtic-bracelet-1.jpg',
-    category: 'celtic',
-    materials: ['Бурштин', 'Срібло 925', 'Шкіра'],
-    isHandmade: true,
-    slug: 'triquetra-bracelet-amber',
-  },
-];
-
-// JSON-LD для головної сторінки
-const homePageJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'WebPage',
-  '@id': `${siteUrl}/#webpage`,
-  url: siteUrl,
-  name: 'Rune box - Автентичні Прикраси Ручної Роботи',
-  description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури",
-  isPartOf: {
-    '@id': `${siteUrl}/#website`,
-  },
-  about: {
-    '@id': `${siteUrl}/#organization`,
-  },
-  primaryImageOfPage: {
-    '@type': 'ImageObject',
-    url: `${siteUrl}/images/og/og-image.jpg`,
-  },
-  mainEntity: {
-    '@type': 'ItemList',
-    itemListElement: featuredProducts.map((product, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      item: {
-        '@type': 'Product',
-        name: product.title,
-        url: `${siteUrl}/products/${product.slug}`,
-        image: `${siteUrl}${product.image}`,
-        offers: {
-          '@type': 'Offer',
-          price: product.price,
-          priceCurrency: 'PLN',
-          availability: 'https://schema.org/InStock',
-        },
-      },
-    })),
-  },
-};
+interface ApiProduct {
+  id: number;
+  title_uk: string;
+  title_en?: string;
+  title_de?: string;
+  title_pl?: string;
+  slug: string;
+  price: number;
+  currency: string;
+  primary_image?: string;
+  category_id?: number;
+  is_handmade?: boolean;
+  materials?: string[];
+}
 
 export default function HomePage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, [language]); // Re-fetch when language changes
+
+  const getProductTitle = (product: ApiProduct): string => {
+    switch (language) {
+      case 'EN':
+        return product.title_en || product.title_uk;
+      case 'DE':
+        return product.title_de || product.title_en || product.title_uk;
+      case 'PL':
+        return product.title_pl || product.title_en || product.title_uk;
+      case 'SE':
+      case 'NO':
+      case 'DK':
+        return product.title_en || product.title_uk;
+      case 'FR':
+        return product.title_en || product.title_uk;
+      default:
+        return product.title_uk;
+    }
+  };
+
+  const fetchFeaturedProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(getApiEndpoint('/api/v1/products?is_active=true&is_featured=true&limit=3'));
+
+      if (res.ok) {
+        const data: ApiProduct[] = await res.json();
+        // Transform API products to frontend Product format with correct language
+        const transformedProducts: Product[] = data.map((product) => ({
+          id: product.id.toString(),
+          title: getProductTitle(product),
+          titleEn: product.title_en,
+          price: product.price,
+          currency: product.currency,
+          image: product.primary_image || '/images/products/placeholder.jpg',
+          category: 'ukrainian' as const, // TODO: Map from category_id
+          materials: product.materials || [],
+          isHandmade: product.is_handmade ?? true,
+          slug: product.slug,
+        }));
+        setFeaturedProducts(transformedProducts);
+      }
+    } catch (error) {
+      console.error('Failed to fetch featured products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Generate JSON-LD with actual products
+  const homePageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${siteUrl}/#webpage`,
+    url: siteUrl,
+    name: 'Rune box - Автентичні Прикраси Ручної Роботи',
+    description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури",
+    isPartOf: {
+      '@id': `${siteUrl}/#website`,
+    },
+    about: {
+      '@id': `${siteUrl}/#organization`,
+    },
+    primaryImageOfPage: {
+      '@type': 'ImageObject',
+      url: `${siteUrl}/images/og/og-image.jpg`,
+    },
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: featuredProducts.map((product, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        item: {
+          '@type': 'Product',
+          name: product.title,
+          url: `${siteUrl}/products/${product.slug}`,
+          image: `${siteUrl}${product.image}`,
+          offers: {
+            '@type': 'Offer',
+            price: product.price,
+            priceCurrency: 'PLN',
+            availability: 'https://schema.org/InStock',
+          },
+        },
+      })),
+    },
+  };
   
   return (
     <>
@@ -124,21 +154,44 @@ export default function HomePage() {
           </header>
 
           {/* Products Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12" role="list" aria-label="Обрані товари">
-            {featuredProducts.map((product, index) => (
-              <div
-                key={product.id}
-                className="animate-fade-up"
-                role="listitem"
-                style={{
-                  animationDelay: `${index * 0.2}s`,
-                  animationFillMode: 'both',
-                }}
-              >
-                <ProductCard product={product} priority={index < 3} />
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="mb-6">
+                <svg
+                  className="w-24 h-24 mx-auto text-sage/30 animate-spin"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
               </div>
-            ))}
-          </div>
+              <p className="text-sage font-inter">{t.common.loading}</p>
+            </div>
+          ) : featuredProducts.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-12" role="list" aria-label="Обрані товари">
+              {featuredProducts.map((product, index) => (
+                <div
+                  key={product.id}
+                  className="animate-fade-up"
+                  role="listitem"
+                  style={{
+                    animationDelay: `${index * 0.2}s`,
+                    animationFillMode: 'both',
+                  }}
+                >
+                  <ProductCard product={product} priority={index < 3} />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20">
+              <p className="text-sage font-inter">{t.home.featuredProducts.noProducts || 'Немає рекомендованих товарів на даний момент'}</p>
+            </div>
+          )}
 
           {/* View All Products Link */}
           <div className="text-center mt-12">

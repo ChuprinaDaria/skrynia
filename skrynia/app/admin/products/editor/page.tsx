@@ -432,9 +432,30 @@ function ProductEditorContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
+    if (!validTypes.includes(file.type)) {
+      alert(`Невірний тип файлу. Дозволені: JPEG, PNG, WebP, AVIF`);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      alert(`Файл занадто великий. Максимальний розмір: ${maxSize / 1024 / 1024}MB`);
+      e.target.value = ''; // Reset input
+      return;
+    }
+
     setUploadingImage(true);
     try {
       const token = localStorage.getItem('admin_token');
+      if (!token) {
+        alert('Помилка: Не знайдено токен авторизації. Будь ласка, увійдіть знову.');
+        return;
+      }
+
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
@@ -442,32 +463,50 @@ function ProductEditorContent() {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
+          // Don't set Content-Type header - browser will set it with boundary for FormData
         },
         body: uploadFormData,
       });
 
       if (res.ok) {
         const data = await res.json();
-        setFormData((prev) => {
-          const newImage = {
-            image_url: data.url,
-            alt_text: '',
-            position: prev.images.length,
-            is_primary: prev.images.length === 0,
-          };
-          return {
-            ...prev,
-            images: [...prev.images, newImage],
-          };
-        });
+        if (data.url) {
+          setFormData((prev) => {
+            const newImage = {
+              image_url: data.url,
+              alt_text: '',
+              position: prev.images.length,
+              is_primary: prev.images.length === 0,
+            };
+            return {
+              ...prev,
+              images: [...prev.images, newImage],
+            };
+          });
+          // Reset input to allow uploading the same file again
+          e.target.value = '';
+        } else {
+          throw new Error('Сервер не повернув URL зображення');
+        }
       } else {
-        alert('Помилка завантаження зображення');
+        // Try to get error message from response
+        let errorMessage = 'Помилка завантаження зображення';
+        try {
+          const errorData = await res.json();
+          errorMessage = errorData.detail || errorData.message || errorMessage;
+        } catch {
+          errorMessage = `Помилка ${res.status}: ${res.statusText}`;
+        }
+        alert(`Помилка завантаження: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Failed to upload image:', error);
-      alert('Не вдалося завантажити зображення');
+      const errorMessage = error instanceof Error ? error.message : 'Невідома помилка';
+      alert(`Не вдалося завантажити зображення: ${errorMessage}`);
     } finally {
       setUploadingImage(false);
+      // Reset input
+      e.target.value = '';
     }
   };
 
@@ -504,26 +543,48 @@ function ProductEditorContent() {
       return;
     }
 
+    // Check file size (max 500MB for high quality videos)
+    const maxSize = 500 * 1024 * 1024; // 500MB
+    if (file.size > maxSize) {
+      alert(`Файл занадто великий. Максимальний розмір: ${maxSize / 1024 / 1024}MB`);
+      return;
+    }
+
     setUploadingVideo(true);
     try {
-      // For local files, create object URL for preview
-      // In production, upload to server and get URL
-      const objectUrl = URL.createObjectURL(file);
-      setFormData((prev) => {
-        const newVideo = {
-          video_url: objectUrl,
-          thumbnail_url: '',
-          alt_text: file.name,
-          position: prev.videos.length,
-        };
-        return {
-          ...prev,
-          videos: [...prev.videos, newVideo],
-        };
+      const token = localStorage.getItem('admin_token');
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const res = await fetch(getApiEndpoint('/api/v1/upload/video'), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: uploadFormData,
       });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData((prev) => {
+          const newVideo = {
+            video_url: data.url,
+            thumbnail_url: data.thumbnail_url || '',
+            alt_text: file.name,
+            position: prev.videos.length,
+          };
+          return {
+            ...prev,
+            videos: [...prev.videos, newVideo],
+          };
+        });
+      } else {
+        const error = await res.json().catch(() => ({ detail: 'Помилка завантаження відео' }));
+        alert(`Помилка завантаження відео: ${error.detail || 'Невідома помилка'}`);
+      }
     } catch (error) {
-      console.error('Failed to handle video:', error);
-      alert('Не вдалося додати відео');
+      console.error('Failed to upload video:', error);
+      alert('Не вдалося завантажити відео. Спробуйте додати через URL.');
     } finally {
       setUploadingVideo(false);
       // Reset input
@@ -630,15 +691,22 @@ function ProductEditorContent() {
               </label>
               <input
                 type="text"
-                value={formData[`title_${activeLang}` as keyof ProductFormData] as string}
+                value={formData[`title_${activeLang}` as keyof ProductFormData] as string || ''}
                 onChange={(e) => {
-                  setFormData({ ...formData, [`title_${activeLang}`]: e.target.value });
+                  const newValue = e.target.value;
+                  const updates: any = { [`title_${activeLang}`]: newValue };
                   if (activeLang === 'uk' && !productId) {
-                    setFormData({ ...formData, slug: generateSlug(e.target.value) });
+                    updates.slug = generateSlug(newValue);
                   }
+                  setFormData({ ...formData, ...updates });
+                }}
+                onInput={(e) => {
+                  // Ensure input is not blocked
+                  e.currentTarget.value = e.currentTarget.value;
                 }}
                 className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                 required={activeLang === 'uk'}
+                autoComplete="off"
               />
             </div>
 
@@ -740,7 +808,7 @@ function ProductEditorContent() {
               )}
 
               {/* Visual Markdown Editor */}
-              <div data-color-mode="dark">
+              <div data-color-mode="dark" suppressHydrationWarning>
                 <MDEditor
                   value={formData[`description_${activeLang}` as keyof ProductFormData] as string || ''}
                   onChange={(value) => {
@@ -796,9 +864,16 @@ function ProductEditorContent() {
                   type="number"
                   step="0.01"
                   value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                  onChange={(e) => {
+                    const value = e.target.value.trim();
+                    setFormData({ 
+                      ...formData, 
+                      price: value && !isNaN(parseFloat(value)) ? parseFloat(value) : 0 
+                    });
+                  }}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                   required
+                  min="0"
                 />
               </div>
               <div>
@@ -819,13 +894,14 @@ function ProductEditorContent() {
                 <input
                   type="number"
                   step="0.01"
-                  value={formData.compare_at_price || ''}
-                  onChange={(e) =>
+                  value={formData.compare_at_price ?? ''}
+                  onChange={(e) => {
+                    const value = e.target.value.trim();
                     setFormData({
                       ...formData,
-                      compare_at_price: e.target.value ? parseFloat(e.target.value) : null,
-                    })
-                  }
+                      compare_at_price: value && !isNaN(parseFloat(value)) ? parseFloat(value) : null,
+                    });
+                  }}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                 />
               </div>
@@ -834,11 +910,16 @@ function ProductEditorContent() {
                 <input
                   type="number"
                   value={formData.stock_quantity}
-                  onChange={(e) =>
-                    setFormData({ ...formData, stock_quantity: parseInt(e.target.value) })
-                  }
+                  onChange={(e) => {
+                    const value = e.target.value.trim();
+                    setFormData({ 
+                      ...formData, 
+                      stock_quantity: value && !isNaN(parseInt(value)) ? parseInt(value) : 0 
+                    });
+                  }}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                   required
+                  min="0"
                 />
               </div>
               <div>

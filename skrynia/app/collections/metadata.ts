@@ -18,23 +18,25 @@ export const metadata: Metadata = {
     'корал',
   ],
   openGraph: {
-    title: 'Колекції Прикрас | Rune box',
-    description: 'Унікальні колекції прикрас ручної роботи: українські, вікінгські та кельтські',
+    title: 'Collections | Rune Box',
+    description: 'Unique handmade jewelry collections: Ukrainian, Viking and Celtic designs',
     url: `${siteUrl}/collections`,
     type: 'website',
+    siteName: 'Rune Box',
     images: [
       {
-        url: `${siteUrl}/images/og/collections-og.jpg`,
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
         width: 1200,
         height: 630,
-        alt: 'Колекції прикрас Rune box',
+        alt: 'Collections | Rune Box',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Колекції Прикрас | Rune box',
-    description: 'Унікальні колекції прикрас ручної роботи',
+    title: 'Collections | Rune Box',
+    description: 'Unique handmade jewelry collections: Ukrainian, Viking and Celtic designs',
+    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
   },
   alternates: {
     canonical: `${siteUrl}/collections`,

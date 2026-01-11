@@ -5,6 +5,7 @@ import AdminNav from '@/components/admin/AdminNav';
 import { useRouter } from 'next/navigation';
 import { Search, Package, DollarSign, Calendar, User, Mail, MapPin, Edit } from 'lucide-react';
 import { getApiEndpoint } from '@/lib/api';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Order {
   id: number;
@@ -29,12 +30,45 @@ interface Order {
 
 export default function OrdersPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  
+  const getStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'pending':
+        return t.adminOrders?.statusPending || 'Очікує';
+      case 'paid':
+        return t.adminOrders?.statusPaid || 'Оплачено';
+      case 'shipped':
+        return t.adminOrders?.statusShipped || 'Відправлено';
+      case 'delivered':
+        return t.adminOrders?.statusDelivered || 'Доставлено';
+      case 'cancelled':
+        return t.adminOrders?.statusCancelled || 'Скасовано';
+      default:
+        return status;
+    }
+  };
+  
+  const getPaymentStatusLabel = (status: string): string => {
+    switch (status) {
+      case 'pending':
+        return t.adminOrders?.statusPending || 'Очікує';
+      case 'completed':
+        return t.adminOrders?.paymentCompleted || 'Оплачено';
+      case 'failed':
+        return t.adminOrders?.paymentFailed || 'Помилка';
+      case 'refunded':
+        return t.adminOrders?.paymentRefunded || 'Повернено';
+      default:
+        return status;
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -170,8 +204,8 @@ export default function OrdersPage() {
         <div className="container mx-auto px-4 md:px-6">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="font-cinzel text-4xl text-ivory mb-2">Замовлення</h1>
-            <p className="text-sage/70">Управління всіма замовленнями</p>
+            <h1 className="font-cinzel text-4xl text-ivory mb-2">{t.adminOrders?.title || 'Замовлення'}</h1>
+            <p className="text-sage/70">{t.adminOrders?.subtitle || 'Управління всіма замовленнями'}</p>
           </div>
 
           {/* Filters */}
@@ -180,7 +214,7 @@ export default function OrdersPage() {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-sage/50" />
               <input
                 type="text"
-                placeholder="Пошук за номером, ім'ям або email..."
+                placeholder={t.adminOrders?.searchPlaceholder || 'Пошук за номером, ім\'ям або email...'}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
@@ -191,34 +225,34 @@ export default function OrdersPage() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="px-4 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
             >
-              <option value="all">Всі статуси</option>
-              <option value="pending">Очікує</option>
-              <option value="paid">Оплачено</option>
-              <option value="shipped">Відправлено</option>
-              <option value="delivered">Доставлено</option>
-              <option value="cancelled">Скасовано</option>
+              <option value="all">{t.adminOrders?.allStatuses || 'Всі статуси'}</option>
+              <option value="pending">{t.adminOrders?.statusPending || 'Очікує'}</option>
+              <option value="paid">{t.adminOrders?.statusPaid || 'Оплачено'}</option>
+              <option value="shipped">{t.adminOrders?.statusShipped || 'Відправлено'}</option>
+              <option value="delivered">{t.adminOrders?.statusDelivered || 'Доставлено'}</option>
+              <option value="cancelled">{t.adminOrders?.statusCancelled || 'Скасовано'}</option>
             </select>
           </div>
 
           {/* Orders Table */}
           {loading ? (
-            <div className="text-center py-12 text-sage/70">Завантаження...</div>
+            <div className="text-center py-12 text-sage/70">{t.adminOrders?.loading || 'Завантаження...'}</div>
           ) : filteredOrders.length === 0 ? (
             <div className="text-center py-12 text-sage/70">
-              Замовлення не знайдено.
+              {t.adminOrders?.noOrders || 'Замовлення не знайдено.'}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="border-b border-sage/30">
                   <tr>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Номер</th>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Клієнт</th>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Сума</th>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Статус</th>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Оплата</th>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Дата</th>
-                    <th className="text-left py-4 px-4 text-ivory font-cinzel">Дії</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tableNumber || 'Номер'}</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tableClient || 'Клієнт'}</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tableAmount || 'Сума'}</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tableStatus || 'Статус'}</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tablePayment || 'Оплата'}</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tableDate || 'Дата'}</th>
+                    <th className="text-left py-4 px-4 text-ivory font-cinzel">{t.adminOrders?.tableActions || 'Дії'}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -245,12 +279,12 @@ export default function OrdersPage() {
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-sm text-xs border ${getStatusColor(order.status)}`}>
-                          {order.status}
+                          {getStatusLabel(order.status)}
                         </span>
                       </td>
                       <td className="py-3 px-4">
                         <span className={`px-2 py-1 rounded-sm text-xs border ${getPaymentStatusColor(order.payment_status)}`}>
-                          {order.payment_status}
+                          {getPaymentStatusLabel(order.payment_status)}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-sage/70 text-sm flex items-center gap-2">
@@ -263,7 +297,7 @@ export default function OrdersPage() {
                           className="text-sage hover:text-oxblood transition-colors flex items-center gap-1"
                         >
                           <Edit className="w-4 h-4" />
-                          Редагувати
+                          {t.adminOrders?.edit || 'Редагувати'}
                         </button>
                       </td>
                     </tr>
@@ -277,23 +311,23 @@ export default function OrdersPage() {
           {!loading && orders.length > 0 && (
             <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-footer-black border border-sage/20 rounded-sm p-4">
-                <div className="text-sage text-sm mb-2 font-inter">Всього замовлень</div>
+                <div className="text-sage text-sm mb-2 font-inter">{t.adminOrders?.totalOrders || 'Всього замовлень'}</div>
                 <div className="text-ivory text-2xl font-cinzel font-bold">{orders.length}</div>
               </div>
               <div className="bg-footer-black border border-sage/20 rounded-sm p-4">
-                <div className="text-sage text-sm mb-2 font-inter">Загальна сума</div>
+                <div className="text-sage text-sm mb-2 font-inter">{t.adminOrders?.totalAmount || 'Загальна сума'}</div>
                 <div className="text-ivory text-2xl font-cinzel font-bold">
                   {orders.reduce((sum, o) => sum + o.total, 0).toFixed(2)} PLN
                 </div>
               </div>
               <div className="bg-footer-black border border-sage/20 rounded-sm p-4">
-                <div className="text-sage text-sm mb-2 font-inter">Очікують</div>
+                <div className="text-sage text-sm mb-2 font-inter">{t.adminOrders?.pending || 'Очікують'}</div>
                 <div className="text-ivory text-2xl font-cinzel font-bold">
                   {orders.filter(o => o.status === 'pending').length}
                 </div>
               </div>
               <div className="bg-footer-black border border-sage/20 rounded-sm p-4">
-                <div className="text-sage text-sm mb-2 font-inter">Оплачено</div>
+                <div className="text-sage text-sm mb-2 font-inter">{t.adminOrders?.paid || 'Оплачено'}</div>
                 <div className="text-ivory text-2xl font-cinzel font-bold">
                   {orders.filter(o => o.payment_status === 'completed').length}
                 </div>
@@ -308,11 +342,12 @@ export default function OrdersPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
                     <h2 className="font-cinzel text-2xl text-ivory">
-                      Замовлення {selectedOrder.order_number}
+                      {t.adminOrders?.orderDetails || 'Замовлення'} {selectedOrder.order_number}
                     </h2>
                     <button
                       onClick={() => setSelectedOrder(null)}
                       className="text-sage hover:text-oxblood transition-colors"
+                      aria-label={t.adminOrders?.close || 'Закрити'}
                     >
                       ✕
                     </button>
@@ -321,7 +356,7 @@ export default function OrdersPage() {
                   <div className="space-y-4">
                     {/* Customer Info */}
                     <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">
-                      <h3 className="font-cinzel text-lg text-ivory mb-3">Інформація про клієнта</h3>
+                      <h3 className="font-cinzel text-lg text-ivory mb-3">{t.adminOrders?.customerInfo || 'Інформація про клієнта'}</h3>
                       <div className="space-y-2 text-sage">
                         <div className="flex items-center gap-2">
                           <User className="w-4 h-4" />
@@ -342,18 +377,18 @@ export default function OrdersPage() {
 
                     {/* Order Details */}
                     <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">
-                      <h3 className="font-cinzel text-lg text-ivory mb-3">Деталі замовлення</h3>
+                      <h3 className="font-cinzel text-lg text-ivory mb-3">{t.adminOrders?.orderInfo || 'Деталі замовлення'}</h3>
                       <div className="space-y-2 text-sage">
                         <div className="flex justify-between">
-                          <span>Підсумок:</span>
+                          <span>{t.adminOrders?.subtotal || 'Підсумок'}:</span>
                           <span className="text-ivory">{selectedOrder.subtotal.toFixed(2)} PLN</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Доставка:</span>
+                          <span>{t.adminOrders?.shipping || 'Доставка'}:</span>
                           <span className="text-ivory">{selectedOrder.shipping_cost.toFixed(2)} PLN</span>
                         </div>
                         <div className="flex justify-between border-t border-sage/20 pt-2">
-                          <span className="text-ivory font-semibold">Всього:</span>
+                          <span className="text-ivory font-semibold">{t.adminOrders?.total || 'Всього'}:</span>
                           <span className="text-oxblood font-semibold">{selectedOrder.total.toFixed(2)} PLN</span>
                         </div>
                       </div>
@@ -361,10 +396,10 @@ export default function OrdersPage() {
 
                     {/* Status Updates */}
                     <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">
-                      <h3 className="font-cinzel text-lg text-ivory mb-3">Оновити статус</h3>
+                      <h3 className="font-cinzel text-lg text-ivory mb-3">{t.adminOrders?.updateStatus || 'Оновити статус'}</h3>
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-sage text-sm mb-2">Статус замовлення</label>
+                          <label className="block text-sage text-sm mb-2">{t.adminOrders?.orderStatus || 'Статус замовлення'}</label>
                           <select
                             value={selectedOrder.status}
                             onChange={(e) => {
@@ -372,15 +407,15 @@ export default function OrdersPage() {
                             }}
                             className="w-full px-4 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
                           >
-                            <option value="pending">Очікує</option>
-                            <option value="paid">Оплачено</option>
-                            <option value="shipped">Відправлено</option>
-                            <option value="delivered">Доставлено</option>
-                            <option value="cancelled">Скасовано</option>
+                            <option value="pending">{t.adminOrders?.statusPending || 'Очікує'}</option>
+                            <option value="paid">{t.adminOrders?.statusPaid || 'Оплачено'}</option>
+                            <option value="shipped">{t.adminOrders?.statusShipped || 'Відправлено'}</option>
+                            <option value="delivered">{t.adminOrders?.statusDelivered || 'Доставлено'}</option>
+                            <option value="cancelled">{t.adminOrders?.statusCancelled || 'Скасовано'}</option>
                           </select>
                         </div>
                         <div>
-                          <label className="block text-sage text-sm mb-2">Статус оплати</label>
+                          <label className="block text-sage text-sm mb-2">{t.adminOrders?.paymentStatus || 'Статус оплати'}</label>
                           <select
                             value={selectedOrder.payment_status}
                             onChange={(e) => {
@@ -388,10 +423,10 @@ export default function OrdersPage() {
                             }}
                             className="w-full px-4 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
                           >
-                            <option value="pending">Очікує</option>
-                            <option value="completed">Оплачено</option>
-                            <option value="failed">Помилка</option>
-                            <option value="refunded">Повернено</option>
+                            <option value="pending">{t.adminOrders?.statusPending || 'Очікує'}</option>
+                            <option value="completed">{t.adminOrders?.paymentCompleted || 'Оплачено'}</option>
+                            <option value="failed">{t.adminOrders?.paymentFailed || 'Помилка'}</option>
+                            <option value="refunded">{t.adminOrders?.paymentRefunded || 'Повернено'}</option>
                           </select>
                         </div>
                       </div>

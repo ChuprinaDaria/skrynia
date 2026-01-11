@@ -16,15 +16,25 @@ export const metadata: Metadata = {
     'умови доставки',
   ],
   openGraph: {
-    title: 'Доставка та Оплата | Rune box',
-    description: 'Інформація про способи доставки, оплати та умови повернення',
+    title: 'Shipping & Payment | Rune Box',
+    description: 'Information about delivery methods, payment options and return conditions',
     url: `${siteUrl}/shipping`,
     type: 'website',
+    siteName: 'Rune Box',
+    images: [
+      {
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Shipping & Payment | Rune Box',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
-    title: 'Доставка та Оплата | Rune box',
-    description: 'Інформація про способи доставки, оплати та умови повернення',
+    card: 'summary_large_image',
+    title: 'Shipping & Payment | Rune Box',
+    description: 'Information about delivery methods, payment options and return conditions',
+    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
   },
   alternates: {
     canonical: `${siteUrl}/shipping`,

@@ -20,28 +20,33 @@ export function getApiUrl(): string {
     normalized = normalized.slice(0, -4);
   }
   
-  // Convert HTTP to HTTPS in production (works for both SSR and client)
-  // Only convert if URL is not localhost/127.0.0.1/192.x.x.x (local development)
-  const isProduction = process.env.NODE_ENV === 'production';
+  // Check if URL is localhost/127.0.0.1/192.x.x.x (local development)
   const isLocalhost = 
     normalized.includes('localhost') || 
     normalized.includes('127.0.0.1') || 
     normalized.startsWith('http://192.');
   
-  // Always use HTTPS in production for non-localhost URLs
-  // This ensures consistent behavior between SSR and client-side rendering
-  if (!isLocalhost && isProduction && normalized.startsWith('http://')) {
+  // Additional safety check FIRST: if domain is runebox.eu, always use HTTPS (unless localhost)
+  // This ensures production domains always use HTTPS regardless of other conditions
+  if (!isLocalhost && normalized.startsWith('http://') && (normalized.includes('runebox.eu') || normalized.includes('api.runebox.eu'))) {
     normalized = normalized.replace('http://', 'https://');
   }
   
-  // For client-side, also check if page is loaded over HTTPS (for staging/dev environments)
-  if (typeof window !== 'undefined' && !isLocalhost && !normalized.startsWith('https://') && window.location.protocol === 'https:') {
+  // Check if we're in production or if the page is loaded over HTTPS
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isPageHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  
+  // Convert HTTP to HTTPS if:
+  // 1. Not localhost AND (production OR page is loaded over HTTPS)
+  // This ensures HTTPS is always used in production and when the page is served over HTTPS
+  // (Note: runebox.eu domains are already handled above)
+  if (!isLocalhost && normalized.startsWith('http://') && (isProduction || isPageHttps)) {
     normalized = normalized.replace('http://', 'https://');
   }
   
   // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
-    console.debug('[API] Original URL:', apiUrl, 'Normalized:', normalized);
+    console.debug('[API] Original URL:', apiUrl, 'Normalized:', normalized, 'isProduction:', isProduction, 'isPageHttps:', isPageHttps);
   }
   
   return normalized;

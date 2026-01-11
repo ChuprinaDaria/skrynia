@@ -5,84 +5,32 @@ import { useParams } from 'next/navigation';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import FilterSidebar, { Filters } from '@/components/product/FilterSidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { getApiEndpoint } from '@/lib/api';
 
-// Sample products data (same as main collections page)
-const allProducts: Product[] = [
-  {
-    id: '1',
-    title: 'Намисто з натурального коралу "Алатир"',
-    price: 1200,
-    currency: 'zł',
-    image: '/images/products/coral-necklace-1.jpg',
-    category: 'ukrainian',
-    materials: ['Натуральний корал', 'Срібло 925'],
-    isHandmade: true,
-    slug: 'coral-necklace-alatyr',
-  },
-  {
-    id: '2',
-    title: 'Срібний кулон "Валькнут"',
-    price: 850,
-    currency: 'zł',
-    image: '/images/products/viking-pendant-1.jpg',
-    category: 'viking',
-    materials: ['Срібло 925', 'Оксидоване срібло'],
-    isHandmade: true,
-    slug: 'silver-pendant-valknut',
-  },
-  {
-    id: '3',
-    title: 'Браслет "Трикветр" з бурштином',
-    price: 950,
-    currency: 'zł',
-    image: '/images/products/celtic-bracelet-1.jpg',
-    category: 'celtic',
-    materials: ['Бурштин', 'Срібло 925', 'Шкіра'],
-    isHandmade: true,
-    slug: 'triquetra-bracelet-amber',
-  },
-  {
-    id: '4',
-    title: 'Сережки "Сонячний Знак"',
-    price: 680,
-    currency: 'zł',
-    image: '/images/products/ukrainian-earrings-1.jpg',
-    category: 'ukrainian',
-    materials: ['Срібло 925', 'Позолота'],
-    isHandmade: true,
-    slug: 'solar-sign-earrings',
-  },
-  {
-    id: '5',
-    title: 'Вікінгський браслет "Йормунганд"',
-    price: 1450,
-    currency: 'zł',
-    image: '/images/products/viking-bracelet-1.jpg',
-    category: 'viking',
-    materials: ['Срібло 925', 'Шкіра'],
-    isHandmade: true,
-    slug: 'jormungandr-bracelet',
-  },
-  {
-    id: '6',
-    title: 'Кельтський амулет "Древо Життя"',
-    price: 790,
-    currency: 'zł',
-    image: '/images/products/celtic-amulet-1.jpg',
-    category: 'celtic',
-    materials: ['Срібло 925', 'Емаль'],
-    isHandmade: true,
-    slug: 'tree-of-life-amulet',
-  },
-];
+interface ApiProduct {
+  id: number;
+  title_uk: string;
+  title_en?: string;
+  title_de?: string;
+  title_pl?: string;
+  slug: string;
+  price: number;
+  currency: string;
+  primary_image?: string;
+  category_id?: number;
+  is_handmade?: boolean;
+  materials?: string[];
+}
 
 const validCategories = ['ukrainian', 'viking', 'celtic'];
 
 const CategoryCollectionsPage: React.FC = () => {
   const params = useParams();
   const category = params?.category as string;
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
     symbols: [],
     materials: [],
@@ -92,7 +40,29 @@ const CategoryCollectionsPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('newest');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
-  // Update culture filter when category changes
+  const getProductTitle = (product: ApiProduct): string => {
+    switch (language) {
+      case 'EN':
+        return product.title_en || product.title_uk;
+      case 'DE':
+        return product.title_de || product.title_en || product.title_uk;
+      case 'PL':
+        return product.title_pl || product.title_en || product.title_uk;
+      case 'SE':
+      case 'NO':
+      case 'DK':
+        return product.title_en || product.title_uk;
+      case 'FR':
+        return product.title_en || product.title_uk;
+      default:
+        return product.title_uk;
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
+  }, [category, language]);
+
   useEffect(() => {
     if (category && validCategories.includes(category)) {
       setFilters((prev) => ({
@@ -101,6 +71,35 @@ const CategoryCollectionsPage: React.FC = () => {
       }));
     }
   }, [category]);
+
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(getApiEndpoint('/api/v1/products?is_active=true&limit=100'));
+
+      if (res.ok) {
+        const data: ApiProduct[] = await res.json();
+        // Transform API products to frontend Product format with correct language
+        const transformedProducts: Product[] = data.map((product) => ({
+          id: product.id.toString(),
+          title: getProductTitle(product),
+          titleEn: product.title_en,
+          price: product.price,
+          currency: product.currency,
+          image: product.primary_image || '/images/products/placeholder.jpg',
+          category: 'ukrainian' as const, // TODO: Map from category_id
+          materials: product.materials || [],
+          isHandmade: product.is_handmade ?? true,
+          slug: product.slug,
+        }));
+        setProducts(transformedProducts);
+      }
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const activeFilterCount =
     filters.symbols.length +
@@ -127,7 +126,7 @@ const CategoryCollectionsPage: React.FC = () => {
   }
 
   // Filter products based on active filters
-  const filteredProducts = allProducts.filter((product) => {
+  const filteredProducts = products.filter((product) => {
     // Culture filter (must match category from URL)
     if (product.category !== category) {
       return false;
@@ -257,7 +256,24 @@ const CategoryCollectionsPage: React.FC = () => {
 
           {/* Products Grid */}
           <div className="flex-grow">
-            {sortedProducts.length > 0 ? (
+            {loading ? (
+              <div className="text-center py-20">
+                <div className="mb-6">
+                  <svg
+                    className="w-24 h-24 mx-auto text-sage/30 animate-spin"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+                <p className="text-sage font-inter">{t.collectionsPage?.loading || 'Завантаження...'}</p>
+              </div>
+            ) : sortedProducts.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
                 {sortedProducts.map((product, index) => (
                   <div

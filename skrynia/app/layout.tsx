@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     default: "Rune Box - Unique Handmade Jewelry",
     template: "%s | Rune Box",
   },
-  description: "Unique handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral, 925 silver. Create your necklace in the constructor.",
+  description: "Create your unique necklace! Handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral and 925 silver.",
   
   // Ключові слова
   keywords: [
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
     description: "Create your unique necklace! Jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral and 925 silver.",
     images: [
       {
-        url: "/images/og/og-image.jpg",
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
         width: 1200,
         height: 630,
         alt: "Rune Box - Unique Handmade Jewelry",
@@ -91,7 +91,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Rune Box - Unique Handmade Jewelry",
     description: "Create your unique necklace! Jewelry inspired by Slavic, Viking and Celtic cultures.",
-    images: ["/images/og/og-image.jpg"],
+    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
     creator: "@runebox",
     site: "@runebox",
   },

@@ -53,7 +53,7 @@ function OrderSuccessContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-deep-black pt-24 pb-20 flex items-center justify-center">
-        <div className="text-ivory text-xl font-cinzel">Завантаження...</div>
+        <div className="text-ivory text-xl font-cinzel">{t.orderSuccess.loading}</div>
       </div>
     );
   }
@@ -77,29 +77,29 @@ function OrderSuccessContent() {
               </svg>
             </div>
             <h1 className="font-rutenia text-4xl md:text-5xl text-ivory mb-4">
-              Замовлення прийнято!
+              {t.orderSuccess.title}
             </h1>
             {orderNumber && (
               <p className="text-sage font-inter text-lg">
-                Номер замовлення: <span className="text-ivory font-semibold">{orderNumber}</span>
+                {t.orderSuccess.orderNumber}: <span className="text-ivory font-semibold">{orderNumber}</span>
               </p>
             )}
           </div>
 
           <div className="bg-footer-black border border-sage/20 rounded-sm p-8 mb-8 text-left">
             <p className="text-ivory font-inter mb-4">
-              Дякуємо за ваше замовлення! Ми надіслали підтвердження на вашу електронну пошту.
+              {t.orderSuccess.thankYou}
             </p>
             {order && (
               <div className="space-y-3 text-sage font-inter text-sm">
                 <p>
-                  <strong className="text-ivory">Статус:</strong> {order.status}
+                  <strong className="text-ivory">{t.orderSuccess.status}:</strong> {order.status}
                 </p>
                 <p>
-                  <strong className="text-ivory">Спосіб оплати:</strong> {order.payment_method}
+                  <strong className="text-ivory">{t.orderSuccess.paymentMethod}:</strong> {order.payment_method}
                 </p>
                 <p>
-                  <strong className="text-ivory">Всього:</strong> {order.total} {order.currency}
+                  <strong className="text-ivory">{t.orderSuccess.total}:</strong> {order.total} {order.currency}
                 </p>
               </div>
             )}
@@ -107,10 +107,10 @@ function OrderSuccessContent() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/">
-              <Button variant="primary">Повернутися на головну</Button>
+              <Button variant="primary">{t.orderSuccess.backToHome}</Button>
             </Link>
             <Link href="/collections">
-              <Button variant="secondary">Переглянути колекції</Button>
+              <Button variant="secondary">{t.orderSuccess.viewCollections}</Button>
             </Link>
           </div>
         </div>
@@ -119,6 +119,7 @@ function OrderSuccessContent() {
   );
 }
 
+export default function OrderSuccessPage() {
 export default function OrderSuccessPage() {
   return (
     <Suspense fallback={
@@ -129,5 +130,6 @@ export default function OrderSuccessPage() {
       <OrderSuccessContent />
     </Suspense>
   );
+}
 }
 

@@ -487,6 +487,55 @@ export interface Translations {
       defaultError: string;
     };
   };
+  orderSuccess: {
+    loading: string;
+    title: string;
+    orderNumber: string;
+    thankYou: string;
+    status: string;
+    paymentMethod: string;
+    total: string;
+    backToHome: string;
+    viewCollections: string;
+  };
+  adminOrders: {
+    title: string;
+    subtitle: string;
+    searchPlaceholder: string;
+    allStatuses: string;
+    statusPending: string;
+    statusPaid: string;
+    statusShipped: string;
+    statusDelivered: string;
+    statusCancelled: string;
+    loading: string;
+    noOrders: string;
+    tableNumber: string;
+    tableClient: string;
+    tableAmount: string;
+    tableStatus: string;
+    tablePayment: string;
+    tableDate: string;
+    tableActions: string;
+    edit: string;
+    totalOrders: string;
+    totalAmount: string;
+    pending: string;
+    paid: string;
+    orderDetails: string;
+    customerInfo: string;
+    orderInfo: string;
+    subtotal: string;
+    shipping: string;
+    total: string;
+    updateStatus: string;
+    orderStatus: string;
+    paymentStatus: string;
+    paymentCompleted: string;
+    paymentFailed: string;
+    paymentRefunded: string;
+    close: string;
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -977,6 +1026,55 @@ const translations: Record<Language, Translations> = {
         defaultError: 'Помилка оформлення замовлення',
       },
     },
+    orderSuccess: {
+      loading: 'Завантаження...',
+      title: 'Замовлення прийнято!',
+      orderNumber: 'Номер замовлення',
+      thankYou: 'Дякуємо за ваше замовлення! Ми надіслали підтвердження на вашу електронну пошту.',
+      status: 'Статус',
+      paymentMethod: 'Спосіб оплати',
+      total: 'Всього',
+      backToHome: 'Повернутися на головну',
+      viewCollections: 'Переглянути колекції',
+    },
+    adminOrders: {
+      title: 'Замовлення',
+      subtitle: 'Управління всіма замовленнями',
+      searchPlaceholder: 'Пошук за номером, ім\'ям або email...',
+      allStatuses: 'Всі статуси',
+      statusPending: 'Очікує',
+      statusPaid: 'Оплачено',
+      statusShipped: 'Відправлено',
+      statusDelivered: 'Доставлено',
+      statusCancelled: 'Скасовано',
+      loading: 'Завантаження...',
+      noOrders: 'Замовлення не знайдено.',
+      tableNumber: 'Номер',
+      tableClient: 'Клієнт',
+      tableAmount: 'Сума',
+      tableStatus: 'Статус',
+      tablePayment: 'Оплата',
+      tableDate: 'Дата',
+      tableActions: 'Дії',
+      edit: 'Редагувати',
+      totalOrders: 'Всього замовлень',
+      totalAmount: 'Загальна сума',
+      pending: 'Очікують',
+      paid: 'Оплачено',
+      orderDetails: 'Замовлення',
+      customerInfo: 'Інформація про клієнта',
+      orderInfo: 'Деталі замовлення',
+      subtotal: 'Підсумок',
+      shipping: 'Доставка',
+      total: 'Всього',
+      updateStatus: 'Оновити статус',
+      orderStatus: 'Статус замовлення',
+      paymentStatus: 'Статус оплати',
+      paymentCompleted: 'Оплачено',
+      paymentFailed: 'Помилка',
+      paymentRefunded: 'Повернено',
+      close: 'Закрити',
+    },
   },
   EN: {
     nav: {
@@ -1447,6 +1545,55 @@ const translations: Record<Language, Translations> = {
       errors: {
         defaultError: 'Order processing error',
       },
+    },
+    orderSuccess: {
+      loading: 'Loading...',
+      title: 'Order accepted!',
+      orderNumber: 'Order number',
+      thankYou: 'Thank you for your order! We have sent a confirmation to your email.',
+      status: 'Status',
+      paymentMethod: 'Payment method',
+      total: 'Total',
+      backToHome: 'Back to home',
+      viewCollections: 'View collections',
+    },
+    adminOrders: {
+      title: 'Orders',
+      subtitle: 'Manage all orders',
+      searchPlaceholder: 'Search by number, name or email...',
+      allStatuses: 'All statuses',
+      statusPending: 'Pending',
+      statusPaid: 'Paid',
+      statusShipped: 'Shipped',
+      statusDelivered: 'Delivered',
+      statusCancelled: 'Cancelled',
+      loading: 'Loading...',
+      noOrders: 'No orders found.',
+      tableNumber: 'Number',
+      tableClient: 'Client',
+      tableAmount: 'Amount',
+      tableStatus: 'Status',
+      tablePayment: 'Payment',
+      tableDate: 'Date',
+      tableActions: 'Actions',
+      edit: 'Edit',
+      totalOrders: 'Total orders',
+      totalAmount: 'Total amount',
+      pending: 'Pending',
+      paid: 'Paid',
+      orderDetails: 'Order',
+      customerInfo: 'Customer information',
+      orderInfo: 'Order details',
+      subtotal: 'Subtotal',
+      shipping: 'Shipping',
+      total: 'Total',
+      updateStatus: 'Update status',
+      orderStatus: 'Order status',
+      paymentStatus: 'Payment status',
+      paymentCompleted: 'Completed',
+      paymentFailed: 'Failed',
+      paymentRefunded: 'Refunded',
+      close: 'Close',
     },
   },
   DE: {
@@ -1919,6 +2066,55 @@ const translations: Record<Language, Translations> = {
         defaultError: 'Bestellverarbeitungsfehler',
       },
     },
+    orderSuccess: {
+      loading: 'Laden...',
+      title: 'Bestellung angenommen!',
+      orderNumber: 'Bestellnummer',
+      thankYou: 'Vielen Dank für Ihre Bestellung! Wir haben eine Bestätigung an Ihre E-Mail gesendet.',
+      status: 'Status',
+      paymentMethod: 'Zahlungsmethode',
+      total: 'Gesamt',
+      backToHome: 'Zurück zur Startseite',
+      viewCollections: 'Kollektionen anzeigen',
+    },
+    adminOrders: {
+      title: 'Bestellungen',
+      subtitle: 'Verwaltung aller Bestellungen',
+      searchPlaceholder: 'Suche nach Nummer, Name oder E-Mail...',
+      allStatuses: 'Alle Status',
+      statusPending: 'Ausstehend',
+      statusPaid: 'Bezahlt',
+      statusShipped: 'Versandt',
+      statusDelivered: 'Geliefert',
+      statusCancelled: 'Storniert',
+      loading: 'Laden...',
+      noOrders: 'Keine Bestellungen gefunden.',
+      tableNumber: 'Nummer',
+      tableClient: 'Kunde',
+      tableAmount: 'Betrag',
+      tableStatus: 'Status',
+      tablePayment: 'Zahlung',
+      tableDate: 'Datum',
+      tableActions: 'Aktionen',
+      edit: 'Bearbeiten',
+      totalOrders: 'Gesamtbestellungen',
+      totalAmount: 'Gesamtbetrag',
+      pending: 'Ausstehend',
+      paid: 'Bezahlt',
+      orderDetails: 'Bestellung',
+      customerInfo: 'Kundeninformationen',
+      orderInfo: 'Bestelldetails',
+      subtotal: 'Zwischensumme',
+      shipping: 'Versand',
+      total: 'Gesamt',
+      updateStatus: 'Status aktualisieren',
+      orderStatus: 'Bestellstatus',
+      paymentStatus: 'Zahlungsstatus',
+      paymentCompleted: 'Abgeschlossen',
+      paymentFailed: 'Fehlgeschlagen',
+      paymentRefunded: 'Erstattet',
+      close: 'Schließen',
+    },
   },
   PL: {
     nav: {
@@ -2389,6 +2585,55 @@ const translations: Record<Language, Translations> = {
       errors: {
         defaultError: 'Błąd przetwarzania zamówienia',
       },
+    },
+    orderSuccess: {
+      loading: 'Ładowanie...',
+      title: 'Zamówienie przyjęte!',
+      orderNumber: 'Numer zamówienia',
+      thankYou: 'Dziękujemy za zamówienie! Wysłaliśmy potwierdzenie na Twój adres e-mail.',
+      status: 'Status',
+      paymentMethod: 'Metoda płatności',
+      total: 'Razem',
+      backToHome: 'Powrót do strony głównej',
+      viewCollections: 'Przejrzyj kolekcje',
+    },
+    adminOrders: {
+      title: 'Zamówienia',
+      subtitle: 'Zarządzanie wszystkimi zamówieniami',
+      searchPlaceholder: 'Szukaj po numerze, imieniu lub e-mailu...',
+      allStatuses: 'Wszystkie statusy',
+      statusPending: 'Oczekujące',
+      statusPaid: 'Opłacone',
+      statusShipped: 'Wysłane',
+      statusDelivered: 'Dostarczone',
+      statusCancelled: 'Anulowane',
+      loading: 'Ładowanie...',
+      noOrders: 'Nie znaleziono zamówień.',
+      tableNumber: 'Numer',
+      tableClient: 'Klient',
+      tableAmount: 'Kwota',
+      tableStatus: 'Status',
+      tablePayment: 'Płatność',
+      tableDate: 'Data',
+      tableActions: 'Akcje',
+      edit: 'Edytuj',
+      totalOrders: 'Wszystkie zamówienia',
+      totalAmount: 'Łączna kwota',
+      pending: 'Oczekujące',
+      paid: 'Opłacone',
+      orderDetails: 'Zamówienie',
+      customerInfo: 'Informacje o kliencie',
+      orderInfo: 'Szczegóły zamówienia',
+      subtotal: 'Suma częściowa',
+      shipping: 'Dostawa',
+      total: 'Razem',
+      updateStatus: 'Aktualizuj status',
+      orderStatus: 'Status zamówienia',
+      paymentStatus: 'Status płatności',
+      paymentCompleted: 'Zakończone',
+      paymentFailed: 'Niepowodzenie',
+      paymentRefunded: 'Zwrócone',
+      close: 'Zamknij',
     },
   },
   SE: {

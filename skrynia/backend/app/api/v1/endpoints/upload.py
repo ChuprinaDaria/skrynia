@@ -78,50 +78,107 @@ async def upload_image(
     Upload a product image (admin only).
     Automatically optimizes and resizes images.
     """
-    # Ensure upload directory exists
-    ensure_upload_dir()
-    
-    # Validate file
-    validate_image(file)
-
-    # Check file size
-    contents = await file.read()
-    if len(contents) > settings.MAX_FILE_SIZE:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"File too large. Max size: {settings.MAX_FILE_SIZE / 1024 / 1024}MB"
-        )
-
-    # Generate unique filename
-    extension = file.filename.split(".")[-1].lower()
-    filename = f"{uuid.uuid4().hex}.{extension}"
-    file_path = UPLOAD_DIR / filename
-
-    # Save file
     try:
-        with open(file_path, "wb") as f:
-            f.write(contents)
+        # Ensure upload directory exists
+        ensure_upload_dir()
+        
+        # Validate file
+        if not file.filename:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No file provided"
+            )
+        
+        validate_image(file)
 
-        # Optimize image
-        optimize_image(file_path)
+        # Check file size
+        contents = await file.read()
+        if len(contents) == 0:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="File is empty"
+            )
+            
+        if len(contents) > settings.MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"File too large. Max size: {settings.MAX_FILE_SIZE / 1024 / 1024}MB"
+            )
 
-        # Return URL
-        file_url = f"/static/uploads/{filename}"
+        # Generate unique filename
+        extension = file.filename.split(".")[-1].lower() if "." in file.filename else "jpg"
+        if extension not in settings.ALLOWED_EXTENSIONS:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"Invalid file extension. Allowed: {', '.join(settings.ALLOWED_EXTENSIONS)}"
+            )
+            
+        filename = f"{uuid.uuid4().hex}.{extension}"
+        file_path = UPLOAD_DIR / filename
 
-        return {
-            "filename": filename,
-            "url": file_url,
-            "size": os.path.getsize(file_path)
-        }
+        # Save file
+        try:
+            with open(file_path, "wb") as f:
+                f.write(contents)
 
+            # Optimize image (this may fail for some formats, but we continue anyway)
+            try:
+                optimize_image(file_path)
+            except Exception as opt_error:
+                # Log but don't fail - file is already saved
+                print(f"Warning: Image optimization failed: {str(opt_error)}")
+                # Continue with unoptimized image
+
+            # Return URL
+            file_url = f"/static/uploads/{filename}"
+
+            return {
+                "filename": filename,
+                "url": file_url,
+                "size": os.path.getsize(file_path)
+            }
+
+        except PermissionError as e:
+            # Clean up file if error occurs
+            if file_path.exists():
+                try:
+                    os.remove(file_path)
+                except:
+                    pass
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Permission denied: Cannot write to upload directory. {str(e)}"
+            )
+        except OSError as e:
+            # Clean up file if error occurs
+            if file_path.exists():
+                try:
+                    os.remove(file_path)
+                except:
+                    pass
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"File system error: {str(e)}"
+            )
+        except Exception as e:
+            # Clean up file if error occurs
+            if file_path.exists():
+                try:
+                    os.remove(file_path)
+                except:
+                    pass
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"File upload failed: {str(e)}"
+            )
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
-        # Clean up file if error occurs
-        if file_path.exists():
-            os.remove(file_path)
-
+        # Catch any other unexpected errors
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"File upload failed: {str(e)}"
+            detail=f"Unexpected error during upload: {str(e)}"
         )
 
 
@@ -189,6 +246,75 @@ async def upload_multiple_images(
         "success": len(results),
         "failed": len(errors)
     }
+
+
+def validate_video(file: UploadFile) -> bool:
+    """Validate uploaded video file."""
+    # Check file extension
+    extension = file.filename.split(".")[-1].lower()
+    allowed_video_extensions = ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'flv', 'wmv']
+    if extension not in allowed_video_extensions:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid video file type. Allowed: {', '.join(allowed_video_extensions)}"
+        )
+    return True
+
+
+@router.post("/video")
+async def upload_video(
+    file: UploadFile = File(...),
+    current_user: User = Depends(get_current_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Upload a product video (admin only).
+    Supports high quality video files up to 500MB.
+    """
+    # Ensure upload directory exists
+    ensure_upload_dir()
+    
+    # Validate file
+    validate_video(file)
+
+    # Check file size (500MB max for high quality videos)
+    contents = await file.read()
+    max_video_size = 500 * 1024 * 1024  # 500MB
+    if len(contents) > max_video_size:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Video file too large. Max size: {max_video_size / 1024 / 1024}MB"
+        )
+
+    # Generate unique filename
+    extension = file.filename.split(".")[-1].lower()
+    filename = f"{uuid.uuid4().hex}.{extension}"
+    file_path = UPLOAD_DIR / filename
+
+    # Save file (videos are saved as-is without processing for quality preservation)
+    try:
+        with open(file_path, "wb") as f:
+            f.write(contents)
+
+        # Return URL
+        file_url = f"/static/uploads/{filename}"
+
+        return {
+            "filename": filename,
+            "url": file_url,
+            "size": os.path.getsize(file_path),
+            "thumbnail_url": None  # Can be added later for video thumbnails
+        }
+
+    except Exception as e:
+        # Clean up file if error occurs
+        if file_path.exists():
+            os.remove(file_path)
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Video upload failed: {str(e)}"
+        )
 
 
 @router.delete("/image/{filename}")
