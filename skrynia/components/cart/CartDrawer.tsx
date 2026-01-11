@@ -227,6 +227,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               ))}
             </div>
           )}
+        </div>
 
         {/* Footer - Totals & Checkout */}
         {items.length > 0 && (
