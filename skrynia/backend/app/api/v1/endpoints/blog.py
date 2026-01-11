@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Response
 from fastapi.responses import Response as FastAPIResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import desc, nullslast
 from typing import List
 from datetime import datetime
 import xml.etree.ElementTree as ET
@@ -29,7 +30,13 @@ def get_blogs(
     if published_only:
         query = query.filter(Blog.published == True)
 
-    blogs = query.order_by(Blog.published_at.desc()).offset(skip).limit(limit).all()
+    # Order by published_at if available, otherwise by created_at
+    # Use nullslast to handle cases where published_at might be None
+    try:
+        blogs = query.order_by(nullslast(desc(Blog.published_at))).offset(skip).limit(limit).all()
+    except:
+        # Fallback to created_at if published_at doesn't exist or causes issues
+        blogs = query.order_by(desc(Blog.created_at)).offset(skip).limit(limit).all()
     return blogs
 
 

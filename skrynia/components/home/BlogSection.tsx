@@ -32,6 +32,8 @@ export default function BlogSection() {
       if (response.ok) {
         const data = await response.json();
         setBlogs(Array.isArray(data) ? data : []);
+      } else {
+        console.error('Failed to fetch blogs:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch blogs:', error);

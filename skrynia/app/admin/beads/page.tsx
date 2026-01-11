@@ -102,15 +102,127 @@ export default function BeadsPage() {
     fetchBeads(category);
   };
 
+  // Compress image before upload
+  const compressImage = (file: File, maxWidth: number = 1920, quality: number = 0.85): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Resize if too large
+          if (width > maxWidth) {
+            height = (height * maxWidth) / width;
+            width = maxWidth;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Failed to compress image'));
+                return;
+              }
+              const compressedFile = new File([blob], file.name, {
+                type: file.type,
+                lastModified: Date.now(),
+              });
+              resolve(compressedFile);
+            },
+            file.type,
+            quality
+          );
+        };
+        img.onerror = reject;
+        img.src = event.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/avif'];
+    if (!validTypes.includes(file.type)) {
+      alert(`Невірний тип файлу. Дозволені: JPEG, PNG, WebP, AVIF`);
+      e.target.value = '';
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert(`Файл занадто великий. Максимальний розмір: ${maxSize / 1024 / 1024}MB`);
+      e.target.value = '';
+      return;
+    }
+
     setUploadingImage(true);
     try {
       const token = localStorage.getItem('admin_token');
+      if (!token) {
+        alert('Помилка: Не знайдено токен авторизації. Будь ласка, увійдіть знову.');
+        return;
+      }
+
+      // Compress image before upload if it's larger than 1MB (more aggressive)
+      let fileToUpload = file;
+      if (file.size > 1 * 1024 * 1024) {
+        try {
+          // Use more aggressive compression for larger files
+          const maxWidth = file.size > 5 * 1024 * 1024 ? 1280 : 1920;
+          const quality = file.size > 5 * 1024 * 1024 ? 0.75 : 0.85;
+          const compressedFile = await compressImage(file, maxWidth, quality);
+          
+          // Check if compressed file is still too large (8MB limit to be safe)
+          const safeLimit = 8 * 1024 * 1024; // 8MB to avoid 413 errors
+          if (compressedFile.size > safeLimit) {
+            // Try even more aggressive compression
+            const ultraCompressed = await compressImage(file, 1024, 0.7);
+            if (ultraCompressed.size > safeLimit) {
+              alert(`Файл занадто великий навіть після стиснення (${(ultraCompressed.size / 1024 / 1024).toFixed(2)}MB). Будь ласка, використайте менше зображення або зменшіть його розмір вручну.`);
+              setUploadingImage(false);
+              e.target.value = '';
+              return;
+            }
+            fileToUpload = ultraCompressed;
+            console.log(`Image ultra-compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB -> ${(ultraCompressed.size / 1024 / 1024).toFixed(2)}MB`);
+          } else {
+            fileToUpload = compressedFile;
+            console.log(`Image compressed: ${(file.size / 1024 / 1024).toFixed(2)}MB -> ${(compressedFile.size / 1024 / 1024).toFixed(2)}MB`);
+          }
+        } catch (compressError) {
+          console.warn('Failed to compress image, uploading original:', compressError);
+          // Check if original is too large
+          if (file.size > 8 * 1024 * 1024) {
+            alert(`Файл занадто великий (${(file.size / 1024 / 1024).toFixed(2)}MB) і не вдалося його стиснути. Будь ласка, зменшіть розмір зображення вручну.`);
+            setUploadingImage(false);
+            e.target.value = '';
+            return;
+          }
+          // Continue with original file if compression fails but file is small enough
+        }
+      }
+
       const uploadFormData = new FormData();
-      uploadFormData.append('file', file);
+      uploadFormData.append('file', fileToUpload);
 
       const res = await fetch(getApiEndpoint('/api/v1/upload/image'), {
         method: 'POST',
@@ -123,14 +235,28 @@ export default function BeadsPage() {
       if (res.ok) {
         const data = await res.json();
         setFormData({ ...formData, image_url: data.url });
+        e.target.value = '';
       } else {
-        alert('Помилка завантаження зображення');
+        let errorMessage = 'Помилка завантаження зображення';
+        if (res.status === 413) {
+          errorMessage = 'Файл занадто великий. Спробуйте зменшити розмір зображення або використати інший формат.';
+        } else {
+          try {
+            const errorData = await res.json();
+            errorMessage = errorData.detail || errorData.message || errorMessage;
+          } catch {
+            errorMessage = `Помилка ${res.status}: ${res.statusText}`;
+          }
+        }
+        alert(`Помилка завантаження: ${errorMessage}`);
       }
     } catch (error) {
       console.error('Failed to upload image:', error);
-      alert('Не вдалося завантажити зображення');
+      const errorMessage = error instanceof Error ? error.message : 'Невідома помилка';
+      alert(`Не вдалося завантажити зображення: ${errorMessage}`);
     } finally {
       setUploadingImage(false);
+      e.target.value = '';
     }
   };
 

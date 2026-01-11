@@ -78,6 +78,8 @@ export default function HomePage() {
           slug: product.slug,
         }));
         setFeaturedProducts(transformedProducts);
+      } else {
+        console.error('Failed to fetch featured products:', res.status, res.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch featured products:', error);

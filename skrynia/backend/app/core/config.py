@@ -64,7 +64,7 @@ class Settings(BaseSettings):
 
     # File Upload
     UPLOAD_DIR: str = "static/uploads"
-    MAX_FILE_SIZE: int = 5242880  # 5MB
+    MAX_FILE_SIZE: int = 10485760  # 10MB (increased from 5MB)
     ALLOWED_EXTENSIONS: List[str] = ["jpg", "jpeg", "png", "webp", "avif"]
 
     class Config:

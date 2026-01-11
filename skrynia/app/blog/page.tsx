@@ -29,10 +29,12 @@ export default function BlogPage() {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch(getApiEndpoint('/api/v1/blog/?published_only=true&limit=100'));
+      const response = await fetch(getApiEndpoint('/api/v1/blog?published_only=true&limit=100'));
       if (response.ok) {
         const data = await response.json();
         setBlogs(data);
+      } else {
+        console.error('Failed to fetch blogs:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('Failed to fetch blogs:', error);
