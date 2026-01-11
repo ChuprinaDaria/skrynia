@@ -6,6 +6,7 @@
 /**
  * Get the normalized API base URL
  * Removes trailing slashes and ensures it doesn't end with /api
+ * Automatically converts HTTP to HTTPS in production or when page is loaded over HTTPS
  */
 export function getApiUrl(): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -17,6 +18,23 @@ export function getApiUrl(): string {
   // This handles cases where NEXT_PUBLIC_API_URL is set to something like "https://runebox.eu/api"
   if (normalized.endsWith('/api')) {
     normalized = normalized.slice(0, -4);
+  }
+  
+  // Convert HTTP to HTTPS if:
+  // 1. We're in production (not localhost)
+  // 2. The page is loaded over HTTPS (if running in browser)
+  // 3. The URL is not localhost
+  const isProduction = process.env.NODE_ENV === 'production';
+  const isHttpsPage = typeof window !== 'undefined' && window.location.protocol === 'https:';
+  const isLocalhost = normalized.includes('localhost') || normalized.includes('127.0.0.1') || normalized.startsWith('http://192.');
+  
+  if (!isLocalhost && (isProduction || isHttpsPage) && normalized.startsWith('http://')) {
+    normalized = normalized.replace('http://', 'https://');
+    
+    // Debug logging
+    if (process.env.NODE_ENV === 'development') {
+      console.warn('[API] Converted HTTP to HTTPS:', apiUrl, '->', normalized);
+    }
   }
   
   // Debug logging in development

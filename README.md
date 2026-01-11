@@ -194,7 +194,8 @@ docker-compose exec backend alembic revision --autogenerate -m "description"
 # View database logs
 docker-compose logs db
 
-# Reset database (WARNING: deletes all data)
+# Reset database (WARNING: deletes all data - USE ONLY IN DEVELOPMENT!)
+# ⚠️ NEVER use 'down -v' in production! It will delete your database!
 docker-compose down -v
 docker-compose up -d
 ```
@@ -278,9 +279,18 @@ sudo chown -R $USER:$USER .
 
 **Clean restart**:
 ```bash
-# Stop and remove all containers, networks, volumes
+# ⚠️ WARNING: This deletes ALL data including database!
+# Only use in development when you want to start fresh
+# For production deployment, use the safe method below instead
+
+# DANGEROUS: Full reset (deletes volumes/database)
 docker-compose down -v
 docker-compose up -d --build
+
+# SAFE: Production deployment (preserves database)
+docker-compose pull
+docker-compose up -d --force-recreate --build
+docker-compose exec backend alembic upgrade head
 ```
 
 ## 📁 Project Structure

@@ -266,11 +266,38 @@ export default function CheckoutPage() {
                       }}
                       className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                     >
-                      <option value="PL">Польща</option>
-                      <option value="UA">Україна</option>
-                      <option value="DE">Німеччина</option>
-                      <option value="GB">Великобританія</option>
-                      <option value="US">США</option>
+                      {/* EU Countries */}
+                      <option value="AT">{t.checkout.countries.AT}</option>
+                      <option value="BE">{t.checkout.countries.BE}</option>
+                      <option value="BG">{t.checkout.countries.BG}</option>
+                      <option value="HR">{t.checkout.countries.HR}</option>
+                      <option value="CY">{t.checkout.countries.CY}</option>
+                      <option value="CZ">{t.checkout.countries.CZ}</option>
+                      <option value="DK">{t.checkout.countries.DK}</option>
+                      <option value="EE">{t.checkout.countries.EE}</option>
+                      <option value="FI">{t.checkout.countries.FI}</option>
+                      <option value="FR">{t.checkout.countries.FR}</option>
+                      <option value="DE">{t.checkout.countries.DE}</option>
+                      <option value="GR">{t.checkout.countries.GR}</option>
+                      <option value="HU">{t.checkout.countries.HU}</option>
+                      <option value="IE">{t.checkout.countries.IE}</option>
+                      <option value="IT">{t.checkout.countries.IT}</option>
+                      <option value="LV">{t.checkout.countries.LV}</option>
+                      <option value="LT">{t.checkout.countries.LT}</option>
+                      <option value="LU">{t.checkout.countries.LU}</option>
+                      <option value="MT">{t.checkout.countries.MT}</option>
+                      <option value="NL">{t.checkout.countries.NL}</option>
+                      <option value="PL">{t.checkout.countries.PL}</option>
+                      <option value="PT">{t.checkout.countries.PT}</option>
+                      <option value="RO">{t.checkout.countries.RO}</option>
+                      <option value="SK">{t.checkout.countries.SK}</option>
+                      <option value="SI">{t.checkout.countries.SI}</option>
+                      <option value="ES">{t.checkout.countries.ES}</option>
+                      <option value="SE">{t.checkout.countries.SE}</option>
+                      {/* Non-EU */}
+                      <option value="UA">{t.checkout.countries.UA}</option>
+                      <option value="GB">{t.checkout.countries.GB}</option>
+                      <option value="US">{t.checkout.countries.US}</option>
                     </select>
                   </div>
 
