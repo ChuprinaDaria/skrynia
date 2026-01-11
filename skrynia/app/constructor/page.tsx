@@ -53,6 +53,7 @@ export default function NecklaceConstructor() {
   const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState<string>('stone');
   const [selectedBead, setSelectedBead] = useState<Bead | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Necklace configuration
   const [threadCount, setThreadCount] = useState(1);
@@ -65,14 +66,36 @@ export default function NecklaceConstructor() {
   // Canvas controls
   const [zoom, setZoom] = useState(1);
   const [selectedThreadIndex, setSelectedThreadIndex] = useState(0);
+  const [canvasSize, setCanvasSize] = useState({ width: 800, height: 600 });
 
   // Initialize Fabric.js Canvas
   useEffect(() => {
     if (!canvasRef.current) return;
 
+    // Розраховуємо адаптивний розмір canvas
+    const updateCanvasSize = () => {
+      const isMobile = window.innerWidth < 768;
+      const containerWidth = canvasRef.current?.parentElement?.clientWidth || 800;
+      
+      if (isMobile) {
+        // На мобільних: ширина контейнера мінус padding, висота пропорційна
+        const width = Math.min(containerWidth - 32, window.innerWidth - 32);
+        const height = Math.min(width * 0.75, 400);
+        setCanvasSize({ width, height });
+      } else {
+        // На десктопі: стандартний розмір або адаптивний
+        const width = Math.min(containerWidth - 32, 800);
+        const height = Math.min(width * 0.75, 600);
+        setCanvasSize({ width, height });
+      }
+    };
+
+    updateCanvasSize();
+    window.addEventListener('resize', updateCanvasSize);
+
     const canvas = new Canvas(canvasRef.current, {
-      width: 800,
-      height: 600,
+      width: canvasSize.width,
+      height: canvasSize.height,
       backgroundColor: '#1a1a1a',
       selection: false,
     });
@@ -80,27 +103,50 @@ export default function NecklaceConstructor() {
     fabricCanvasRef.current = canvas;
 
     return () => {
+      window.removeEventListener('resize', updateCanvasSize);
       canvas.dispose();
     };
-  }, []);
+  }, [canvasSize.width, canvasSize.height]);
 
   const drawNecklaceArc = useCallback(async (canvas: Canvas) => {
     canvas.clear();
     canvas.backgroundColor = '#1a1a1a';
 
-    const centerX = canvas.width! / 2;
-    const centerY = canvas.height! / 2;
+    const canvasWidth = canvas.width || 800;
+    const canvasHeight = canvas.height || 600;
+    const centerX = canvasWidth / 2;
+    const centerY = Math.min(150, canvasHeight * 0.25); // Top of semicircle (neck level)
 
-    // Calculate arc radius based on thread length
-    // Realistic formula: circumference-based radius
-    const arcRadius = (threadLength * 10 * zoom) / (Math.PI * 0.6); // Convert cm to pixels
+    // Sort threads by length (shortest first - closest to neck)
+    const sortedThreads = [...threads].sort((a, b) => a.length_cm - b.length_cm);
+    
+    // Адаптивний радіус: на мобільних менший, на десктопі стандартний
+    const isMobile = canvasWidth < 600;
+    const scaleFactor = isMobile ? canvasWidth / 800 : 1;
+    const minRadius = 150 * scaleFactor;
+    const maxRadius = 300 * scaleFactor;
 
-    // Draw multiple thread arcs
-    for (const [threadIndex, thread] of threads.entries()) {
-      const threadRadius = arcRadius - threadIndex * 30; // Offset for multiple threads
-      const isSelected = threadIndex === selectedThreadIndex;
+    // Draw multiple thread arcs in semicircle
+    for (const [sortedIndex, thread] of sortedThreads.entries()) {
+      // Знаходимо оригінальний індекс нитки
+      const originalIndex = threads.findIndex(t => t.thread_number === thread.thread_number);
+      const isSelected = originalIndex === selectedThreadIndex;
+      
+      // Розраховуємо радіус на основі довжини нитки
+      // Найкоротша нитка (20см) - найменший радіус (найближче до шиї)
+      // Найдовша нитка (80см) - найбільший радіус (найдальше від шиї)
+      const threadRadius = minRadius + ((thread.length_cm - 20) / 60) * (maxRadius - minRadius);
+      
+      // Кут розташування нитки в полукрузі (від -90° до 90°)
+      const totalThreads = sortedThreads.length;
+      const angleStep = 180 / (totalThreads + 1);
+      const angle = (sortedIndex + 1) * angleStep - 90; // -90° to +90°
+      
+      const x = Math.cos(angle * Math.PI / 180) * threadRadius;
+      const y = Math.sin(angle * Math.PI / 180) * threadRadius;
 
-      // Draw thread arc (jewelry string)
+      // Draw thread as semicircle arc
+      // Використовуємо Circle з правильним розташуванням для полукруга
       const arc = new Circle({
         left: centerX - threadRadius,
         top: centerY - threadRadius / 2,
@@ -121,7 +167,7 @@ export default function NecklaceConstructor() {
         const bead = beads.find(b => b.id === placedBead.bead_id);
         if (!bead) continue;
 
-        // Calculate position on arc
+        // Calculate position on semicircle arc
         const totalBeads = thread.beads.length;
         const angleStep = Math.PI / (totalBeads + 1);
         const angle = angleStep * (beadIndex + 1);
@@ -164,8 +210,8 @@ export default function NecklaceConstructor() {
         }
       }
 
-      // Draw clasp if set
-      if (clasp && threadIndex === 0) {
+      // Draw clasp if set (on first thread by number)
+      if (clasp && thread.thread_number === 1) {
         const claspBead = beads.find(b => b.id === clasp.bead_id);
         if (claspBead) {
           try {
@@ -381,16 +427,24 @@ export default function NecklaceConstructor() {
               <Home className="w-5 h-5" />
               <span className="font-inter">{t.constructor.home}</span>
             </Link>
-            <h1 className="font-cinzel text-2xl text-ivory">{t.constructor.title}</h1>
+            <h1 className="font-cinzel text-xl md:text-2xl text-ivory">{t.constructor.title}</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <Button variant="secondary" onClick={handleSaveConfiguration}>
+          <div className="flex items-center gap-2 md:gap-3">
+            <Button 
+              variant="secondary" 
+              onClick={handleSaveConfiguration}
+              className="hidden md:flex"
+            >
               <Save className="w-4 h-4 mr-2" />
               {t.constructor.save}
             </Button>
-            <Button onClick={handleRequestQuote}>
-              <Send className="w-4 h-4 mr-2" />
-              {t.constructor.quoteRequest}
+            <Button 
+              onClick={handleRequestQuote}
+              className="text-xs md:text-base px-2 md:px-4 py-1 md:py-2"
+            >
+              <Send className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+              <span className="hidden sm:inline">{t.constructor.quoteRequest}</span>
+              <span className="sm:hidden">{t.constructor.send}</span>
             </Button>
           </div>
         </div>
@@ -398,10 +452,39 @@ export default function NecklaceConstructor() {
 
       <div className="pt-20 pb-8">
         <div className="container mx-auto px-4">
+          {/* Mobile hamburger button */}
+          <button 
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="md:hidden fixed top-24 left-4 z-50 p-3 bg-oxblood text-white rounded-sm hover:bg-oxblood/80 transition-colors"
+            aria-label="Toggle sidebar"
+          >
+            {isSidebarOpen ? '✕' : '☰'}
+          </button>
+
+          {/* Overlay for mobile */}
+          {isSidebarOpen && (
+            <div 
+              className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+              onClick={() => setIsSidebarOpen(false)}
+            />
+          )}
+
           <div className="grid grid-cols-12 gap-6">
             {/* Left Panel - Beads Selection */}
-            <div className="col-span-3 bg-footer-black rounded-sm p-4 max-h-[calc(100vh-8rem)] overflow-y-auto">
-              <h2 className="font-cinzel text-xl text-ivory mb-4">{t.constructor.beads}</h2>
+            <div className={`col-span-12 md:col-span-3 bg-footer-black rounded-sm p-4 overflow-y-auto fixed md:static top-20 md:top-auto left-0 z-40 w-80 md:w-auto h-[calc(100vh-5rem)] md:max-h-[calc(100vh-8rem)] transform transition-transform duration-300 ease-in-out ${
+              isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+            }`}>
+              {/* Close button for mobile */}
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="font-cinzel text-xl text-ivory">{t.constructor.beads}</h2>
+                <button
+                  onClick={() => setIsSidebarOpen(false)}
+                  className="md:hidden p-2 text-ivory hover:text-oxblood transition-colors"
+                  aria-label="Close sidebar"
+                >
+                  ✕
+                </button>
+              </div>
 
               {/* Category Tabs */}
               <div className="flex flex-col gap-2 mb-4">
@@ -491,7 +574,7 @@ export default function NecklaceConstructor() {
             </div>
 
             {/* Center - Canvas */}
-            <div className="col-span-6 bg-footer-black rounded-sm p-4">
+            <div className="col-span-12 md:col-span-6 bg-footer-black rounded-sm p-4">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="font-cinzel text-xl text-ivory">{t.constructor.visualEditor}</h2>
 
@@ -530,8 +613,16 @@ export default function NecklaceConstructor() {
               </div>
 
               {/* Canvas */}
-              <div className="bg-deep-black rounded-sm overflow-hidden">
-                <canvas ref={canvasRef} />
+              <div className="bg-deep-black rounded-sm overflow-hidden w-full">
+                <canvas 
+                  ref={canvasRef} 
+                  className="w-full max-w-full h-auto"
+                  style={{ 
+                    maxWidth: '100%', 
+                    height: 'auto',
+                    display: 'block'
+                  }}
+                />
               </div>
 
               {/* Thread Info */}
@@ -543,7 +634,7 @@ export default function NecklaceConstructor() {
             </div>
 
             {/* Right Panel - Settings */}
-            <div className="col-span-3 bg-footer-black rounded-sm p-4">
+            <div className="col-span-12 md:col-span-3 bg-footer-black rounded-sm p-4">
               <h2 className="font-cinzel text-xl text-ivory mb-4">{t.constructor.settings}</h2>
 
               {/* Thread Count */}
@@ -571,33 +662,32 @@ export default function NecklaceConstructor() {
                 <p className="text-xs text-sage/50 mt-1">{t.constructor.maxThreads}</p>
               </div>
 
-              {/* Thread Length */}
-              <div className="mb-6">
-                <label className="block text-sm text-ivory mb-2">
-                  {t.constructor.threadLength}: {threadLength} cm
-                </label>
-                <input
-                  type="range"
-                  min="20"
-                  max="80"
-                  step="5"
-                  value={threadLength}
-                  onChange={(e) => {
-                    const newLength = parseInt(e.target.value);
-                    setThreadLength(newLength);
-                    const updatedThreads = threads.map(t => ({
-                      ...t,
-                      length_cm: newLength
-                    }));
-                    setThreads(updatedThreads);
-                  }}
-                  className="w-full"
-                />
-                <div className="flex justify-between text-xs text-sage/50 mt-1">
-                  <span>20 cm</span>
-                  <span>80 cm</span>
+              {/* Current Thread Length */}
+              {threads[selectedThreadIndex] && (
+                <div className="mb-6">
+                  <label className="block text-sm text-ivory mb-2">
+                    {t.constructor.threadLength}: {threads[selectedThreadIndex].length_cm} cm
+                  </label>
+                  <input
+                    type="range"
+                    min="20"
+                    max="80"
+                    step="5"
+                    value={threads[selectedThreadIndex].length_cm}
+                    onChange={(e) => {
+                      const newLength = parseInt(e.target.value);
+                      const updatedThreads = [...threads];
+                      updatedThreads[selectedThreadIndex].length_cm = newLength;
+                      setThreads(updatedThreads);
+                    }}
+                    className="w-full"
+                  />
+                  <div className="flex justify-between text-xs text-sage/50 mt-1">
+                    <span>20 cm</span>
+                    <span>80 cm</span>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Thread Selector */}
               <div className="mb-6">
@@ -613,7 +703,7 @@ export default function NecklaceConstructor() {
                           : 'bg-deep-black text-sage hover:bg-deep-black/70'
                       }`}
                     >
-                      {t.constructor.thread} {thread.thread_number} ({thread.beads.length} {t.constructor.beads})
+                      {t.constructor.thread} {thread.thread_number} ({thread.length_cm}см, {thread.beads.length} {t.constructor.beads})
                     </button>
                   ))}
                 </div>

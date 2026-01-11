@@ -27,13 +27,13 @@ export default function RegisterPage() {
 
     // Validation
     if (formData.password !== formData.confirmPassword) {
-      setError('Паролі не співпадають');
+      setError(t.register.errors.passwordsMismatch);
       setLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('Пароль повинен містити мінімум 6 символів');
+      setError(t.register.errors.passwordTooShort);
       setLoading(false);
       return;
     }
@@ -53,7 +53,7 @@ export default function RegisterPage() {
       });
 
       if (!response.ok) {
-        let errorMessage = 'Помилка реєстрації';
+        let errorMessage = t.register.errors.defaultError;
         try {
           const contentType = response.headers.get('content-type');
           if (contentType && contentType.includes('application/json')) {
@@ -63,14 +63,14 @@ export default function RegisterPage() {
             // Server returned HTML error page (500, 502, etc.)
             const text = await response.text();
             if (response.status === 500) {
-              errorMessage = 'Помилка сервера. Будь ласка, спробуйте пізніше або зв\'яжіться з підтримкою.';
+              errorMessage = t.register.errors.serverError;
             } else {
-              errorMessage = `Помилка ${response.status}: ${response.statusText}`;
+              errorMessage = `${t.register.errors.defaultError} ${response.status}: ${response.statusText}`;
             }
           }
         } catch (parseError) {
           console.error('Failed to parse error response:', parseError);
-          errorMessage = `Помилка сервера (${response.status}). Спробуйте пізніше.`;
+          errorMessage = t.register.errors.serverError;
         }
         setError(errorMessage);
         setLoading(false);
@@ -85,12 +85,12 @@ export default function RegisterPage() {
     } catch (err) {
       console.error('Registration error:', err);
       if (err instanceof TypeError && err.message.includes('fetch')) {
-        setError('Не вдалося підключитися до сервера. Перевірте з\'єднання.');
+        setError(t.auth.errors.networkError);
       } else if (err instanceof SyntaxError) {
         // JSON parsing error - server probably returned HTML error page
-        setError('Помилка сервера. Будь ласка, спробуйте пізніше або зв\'яжіться з підтримкою.');
+        setError(t.register.errors.serverError);
       } else {
-        setError('Помилка реєстрації. Спробуйте ще раз.');
+        setError(t.register.errors.defaultError);
       }
     } finally {
       setLoading(false);
@@ -116,14 +116,14 @@ export default function RegisterPage() {
               </svg>
             </div>
             <h2 className="font-rutenia text-2xl text-ivory mb-4">
-              Реєстрація успішна!
+              {t.register.success.title}
             </h2>
             <p className="text-sage mb-6">
-              Ми надіслали лист для підтвердження email на адресу <strong>{formData.email}</strong>.
-              Будь ласка, перевірте пошту та натисніть на посилання для активації акаунту.
+              {t.register.success.message} <strong>{formData.email}</strong>.
+              {language === 'UA' && ' Будь ласка, перевірте пошту та натисніть на посилання для активації акаунту.'}
             </p>
             <p className="text-sage text-sm">
-              Перенаправлення на сторінку входу...
+              {t.register.success.redirecting}
             </p>
           </div>
         </div>
@@ -137,10 +137,10 @@ export default function RegisterPage() {
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
             <h1 className="font-rutenia text-4xl md:text-5xl text-ivory mb-4">
-              Реєстрація
+              {t.register.title}
             </h1>
             <p className="font-inter text-sage text-lg">
-              Створіть акаунт для отримання бонусів та відстеження замовлень
+              {t.register.subtitle}
             </p>
           </div>
 
@@ -148,7 +148,7 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label htmlFor="full_name" className="block text-ivory font-inter mb-2">
-                  Ім'я та прізвище
+                  {t.register.fullName}
                 </label>
                 <input
                   id="full_name"
@@ -156,13 +156,13 @@ export default function RegisterPage() {
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50 transition-all"
-                  placeholder="Іван Іванов"
+                  placeholder={t.register.fullNamePlaceholder}
                 />
               </div>
 
               <div>
                 <label htmlFor="email" className="block text-ivory font-inter mb-2">
-                  Email <span className="text-oxblood">*</span>
+                  {t.register.email} <span className="text-oxblood">*</span>
                 </label>
                 <input
                   id="email"
@@ -171,13 +171,13 @@ export default function RegisterPage() {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   required
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50 transition-all"
-                  placeholder="example@email.com"
+                  placeholder={t.register.emailPlaceholder}
                 />
               </div>
 
               <div>
                 <label htmlFor="password" className="block text-ivory font-inter mb-2">
-                  Пароль <span className="text-oxblood">*</span>
+                  {t.register.password} <span className="text-oxblood">*</span>
                 </label>
                 <input
                   id="password"
@@ -187,14 +187,14 @@ export default function RegisterPage() {
                   required
                   minLength={6}
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50 transition-all"
-                  placeholder="Мінімум 6 символів"
+                  placeholder={t.register.passwordPlaceholder}
                 />
-                <p className="text-sage text-xs mt-1">Мінімум 6 символів</p>
+                <p className="text-sage text-xs mt-1">{t.register.passwordHint}</p>
               </div>
 
               <div>
                 <label htmlFor="confirmPassword" className="block text-ivory font-inter mb-2">
-                  Підтвердження пароля <span className="text-oxblood">*</span>
+                  {t.register.confirmPassword} <span className="text-oxblood">*</span>
                 </label>
                 <input
                   id="confirmPassword"
@@ -204,7 +204,7 @@ export default function RegisterPage() {
                   required
                   minLength={6}
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50 transition-all"
-                  placeholder="Повторіть пароль"
+                  placeholder={t.register.confirmPasswordPlaceholder}
                 />
               </div>
 
@@ -221,14 +221,14 @@ export default function RegisterPage() {
                 fullWidth
                 className="text-lg"
               >
-                {loading ? 'Реєстрація...' : 'Зареєструватися'}
+                {loading ? t.register.submitting : t.register.submit}
               </Button>
 
               <div className="text-center text-sage text-sm">
                 <p>
-                  Вже маєте акаунт?{' '}
+                  {t.register.hasAccount}{' '}
                   <Link href="/login" className="text-oxblood hover:text-oxblood/80 transition-colors">
-                    Увійти
+                    {t.register.loginLink}
                   </Link>
                 </p>
               </div>
@@ -237,13 +237,13 @@ export default function RegisterPage() {
 
           <div className="mt-6 text-center text-sage text-xs">
             <p>
-              Реєструючись, ви погоджуєтесь з нашими{' '}
+              {t.register.agreement}{' '}
               <Link href="/regulamin" className="text-oxblood hover:text-oxblood/80">
-                умовами використання
+                {t.register.termsLink}
               </Link>{' '}
-              та{' '}
+              {t.language === 'UA' ? 'та' : 'and'}{' '}
               <Link href="/polityka-prywatnosci" className="text-oxblood hover:text-oxblood/80">
-                політикою конфіденційності
+                {t.register.privacyLink}
               </Link>
             </p>
           </div>

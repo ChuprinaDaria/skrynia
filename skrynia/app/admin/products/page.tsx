@@ -21,9 +21,13 @@ interface Product {
 interface ProductFormData {
   title_uk: string;
   title_en?: string;
+  title_de?: string;
+  title_pl?: string;
   slug: string;
   description_uk?: string;
   description_en?: string;
+  description_de?: string;
+  description_pl?: string;
   price: number;
   currency: string;
   stock_quantity: number;
@@ -42,7 +46,14 @@ export default function ProductsManagement() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [formData, setFormData] = useState<ProductFormData>({
     title_uk: '',
+    title_en: '',
+    title_de: '',
+    title_pl: '',
     slug: '',
+    description_uk: '',
+    description_en: '',
+    description_de: '',
+    description_pl: '',
     price: 0,
     currency: 'zł',
     stock_quantity: 0,
@@ -75,7 +86,14 @@ export default function ProductsManagement() {
     setEditingProduct(null);
     setFormData({
       title_uk: '',
+      title_en: '',
+      title_de: '',
+      title_pl: '',
       slug: '',
+      description_uk: '',
+      description_en: '',
+      description_de: '',
+      description_pl: '',
       price: 0,
       currency: 'zł',
       stock_quantity: 0,
@@ -86,19 +104,84 @@ export default function ProductsManagement() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (product: Product) => {
+  const handleEdit = async (product: Product) => {
     setEditingProduct(product);
-    setFormData({
-      title_uk: product.title_uk,
-      slug: product.slug,
-      price: product.price,
-      currency: product.currency,
-      stock_quantity: product.stock_quantity,
-      is_handmade: true,
-      is_active: product.is_active,
-      is_featured: product.is_featured,
-      category_id: product.category_id,
-    });
+    
+    // Завантажуємо повні дані товару для редагування
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(getApiEndpoint(`/api/v1/products/by-id/${product.id}`), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      
+      if (res.ok) {
+        const fullProduct = await res.json();
+        setFormData({
+          title_uk: fullProduct.title_uk || '',
+          title_en: fullProduct.title_en || '',
+          title_de: fullProduct.title_de || '',
+          title_pl: fullProduct.title_pl || '',
+          slug: fullProduct.slug || '',
+          description_uk: fullProduct.description_uk || '',
+          description_en: fullProduct.description_en || '',
+          description_de: fullProduct.description_de || '',
+          description_pl: fullProduct.description_pl || '',
+          price: fullProduct.price || 0,
+          currency: fullProduct.currency || 'zł',
+          stock_quantity: fullProduct.stock_quantity || 0,
+          sku: fullProduct.sku || '',
+          materials: fullProduct.materials || [],
+          is_handmade: fullProduct.is_handmade ?? true,
+          is_active: fullProduct.is_active ?? true,
+          is_featured: fullProduct.is_featured ?? false,
+          category_id: fullProduct.category_id || undefined,
+        });
+      } else {
+        // Fallback на дані зі списку, якщо не вдалось завантажити повні
+        setFormData({
+          title_uk: product.title_uk,
+          title_en: '',
+          title_de: '',
+          title_pl: '',
+          slug: product.slug,
+          description_uk: '',
+          description_en: '',
+          description_de: '',
+          description_pl: '',
+          price: product.price,
+          currency: product.currency,
+          stock_quantity: product.stock_quantity,
+          is_handmade: true,
+          is_active: product.is_active,
+          is_featured: product.is_featured,
+          category_id: product.category_id,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch product details:', error);
+      // Fallback на дані зі списку
+      setFormData({
+        title_uk: product.title_uk,
+        title_en: '',
+        title_de: '',
+        title_pl: '',
+        slug: product.slug,
+        description_uk: '',
+        description_en: '',
+        description_de: '',
+        description_pl: '',
+        price: product.price,
+        currency: product.currency,
+        stock_quantity: product.stock_quantity,
+        is_handmade: true,
+        is_active: product.is_active,
+        is_featured: product.is_featured,
+        category_id: product.category_id,
+      });
+    }
+    
     setIsModalOpen(true);
   };
 
@@ -249,9 +332,9 @@ export default function ProductsManagement() {
         {/* Product Form Modal */}
         <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={editingProduct ? 'Редагувати Товар' : 'Новий Товар'} maxWidth="lg">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Title */}
+            {/* Title - Ukrainian */}
             <div>
-              <label className="block text-ivory font-inter mb-2">Назва (UA)</label>
+              <label className="block text-ivory font-inter mb-2">Назва (UA) *</label>
               <input
                 type="text"
                 value={formData.title_uk}
@@ -263,6 +346,39 @@ export default function ProductsManagement() {
                 }}
                 className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
                 required
+              />
+            </div>
+
+            {/* Title - English */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Назва (EN)</label>
+              <input
+                type="text"
+                value={formData.title_en || ''}
+                onChange={(e) => setFormData({ ...formData, title_en: e.target.value })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
+              />
+            </div>
+
+            {/* Title - German */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Назва (DE)</label>
+              <input
+                type="text"
+                value={formData.title_de || ''}
+                onChange={(e) => setFormData({ ...formData, title_de: e.target.value })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
+              />
+            </div>
+
+            {/* Title - Polish */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Назва (PL)</label>
+              <input
+                type="text"
+                value={formData.title_pl || ''}
+                onChange={(e) => setFormData({ ...formData, title_pl: e.target.value })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
               />
             </div>
 
@@ -303,12 +419,45 @@ export default function ProductsManagement() {
               </div>
             </div>
 
-            {/* Description */}
+            {/* Description - Ukrainian */}
             <div>
               <label className="block text-ivory font-inter mb-2">Опис (UA)</label>
               <textarea
                 value={formData.description_uk || ''}
                 onChange={(e) => setFormData({ ...formData, description_uk: e.target.value })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
+                rows={4}
+              />
+            </div>
+
+            {/* Description - English */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Опис (EN)</label>
+              <textarea
+                value={formData.description_en || ''}
+                onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
+                rows={4}
+              />
+            </div>
+
+            {/* Description - German */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Опис (DE)</label>
+              <textarea
+                value={formData.description_de || ''}
+                onChange={(e) => setFormData({ ...formData, description_de: e.target.value })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
+                rows={4}
+              />
+            </div>
+
+            {/* Description - Polish */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Опис (PL)</label>
+              <textarea
+                value={formData.description_pl || ''}
+                onChange={(e) => setFormData({ ...formData, description_pl: e.target.value })}
                 className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
                 rows={4}
               />

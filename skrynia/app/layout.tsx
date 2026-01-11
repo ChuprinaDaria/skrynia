@@ -24,21 +24,24 @@ export const metadata: Metadata = {
   
   // Базові мета-теги
   title: {
-    default: "Rune box | Автентичні Прикраси Ручної Роботи",
-    template: "%s | Rune box",
+    default: "Rune Box - Unique Handmade Jewelry",
+    template: "%s | Rune Box",
   },
-  description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури. Натуральний корал, срібло 925 проби. Доставка по Європі.",
+  description: "Unique handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral, 925 silver. Create your necklace in the constructor.",
   
   // Ключові слова
   keywords: [
     "прикраси ручної роботи",
-    "слов'янські прикраси",
+    "українські прикраси",
+    "вікінгські намиста",
     "кельтські прикраси",
-    "вікінгські прикраси",
+    "корал",
+    "срібло 925",
+    "конструктор намиста",
+    "слов'янські прикраси",
     "намисто з коралу",
     "срібні прикраси",
     "етнічні прикраси",
-    "українські прикраси",
     "handmade jewelry",
     "slavic jewelry",
     "celtic jewelry",
@@ -49,15 +52,14 @@ export const metadata: Metadata = {
     "Schmuck handgefertigt",
     "biżuteria ręcznie robiona",
     "натуральний корал",
-    "срібло 925",
     "аутентичні прикраси",
     "подарунок для жінки",
     "ексклюзивні прикраси",
   ],
   
-  authors: [{ name: "Rune box", url: siteUrl }],
-  creator: "Rune box",
-  publisher: "Rune box",
+  authors: [{ name: "Rune Box", url: siteUrl }],
+  creator: "Rune Box",
+  publisher: "Rune Box",
   
   // Форматування
   formatDetection: {
@@ -66,39 +68,30 @@ export const metadata: Metadata = {
     telephone: true,
   },
   
-  // Open Graph
+  // Open Graph - для Facebook, Threads, LinkedIn
   openGraph: {
     type: "website",
-    siteName: "Rune box",
-    title: "Rune box | Автентичні Прикраси Ручної Роботи",
-    description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури. Натуральний корал, срібло 925 проби.",
+    locale: "en_US",
     url: siteUrl,
-    locale: "uk_UA",
-    alternateLocale: ["en_US", "de_DE", "pl_PL"],
+    siteName: "Rune Box",
+    title: "Rune Box - Unique Handmade Jewelry",
+    description: "Create your unique necklace! Jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral and 925 silver.",
     images: [
       {
-        url: `${siteUrl}/images/og/og-image.jpg`,
+        url: "/images/og/og-image.jpg",
         width: 1200,
         height: 630,
-        alt: "Rune box - Автентичні Прикраси Ручної Роботи",
-        type: "image/jpeg",
-      },
-      {
-        url: `${siteUrl}/images/og/og-image-square.jpg`,
-        width: 1200,
-        height: 1200,
-        alt: "Rune box - Автентичні Прикраси Ручної Роботи",
-        type: "image/jpeg",
-      },
+        alt: "Rune Box - Unique Handmade Jewelry",
+      }
     ],
   },
   
-  // Twitter Card
+  // Twitter Card - для Twitter/X
   twitter: {
     card: "summary_large_image",
-    title: "Rune box | Автентичні Прикраси Ручної Роботи",
-    description: "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури.",
-    images: [`${siteUrl}/images/og/og-image.jpg`],
+    title: "Rune Box - Unique Handmade Jewelry",
+    description: "Create your unique necklace! Jewelry inspired by Slavic, Viking and Celtic cultures.",
+    images: ["/images/og/og-image.jpg"],
     creator: "@runebox",
     site: "@runebox",
   },
@@ -166,7 +159,7 @@ export const metadata: Metadata = {
   other: {
     "apple-mobile-web-app-capable": "yes",
     "apple-mobile-web-app-status-bar-style": "black-translucent",
-    "apple-mobile-web-app-title": "Rune box",
+    "apple-mobile-web-app-title": "Rune Box",
     "mobile-web-app-capable": "yes",
     "msapplication-TileColor": "#660000",
     "msapplication-config": "/browserconfig.xml",
@@ -181,8 +174,8 @@ const jsonLd = {
       "@type": "WebSite",
       "@id": `${siteUrl}/#website`,
       "url": siteUrl,
-      "name": "Rune box",
-      "description": "Унікальні прикраси ручної роботи за мотивами слов'янської, вікінгської та кельтської культури",
+      "name": "Rune Box",
+      "description": "Unique handmade jewelry inspired by Slavic, Viking and Celtic cultures",
       "publisher": {
         "@id": `${siteUrl}/#organization`
       },
@@ -196,13 +189,13 @@ const jsonLd = {
           "query-input": "required name=search_term_string"
         }
       ],
-      "inLanguage": ["uk-UA", "en-US", "de-DE", "pl-PL"]
+      "inLanguage": ["uk-UA", "en-US", "de-DE", "pl-PL", "sv-SE", "no-NO", "da-DK", "fr-FR"]
     },
     {
       "@type": "Organization",
       "@id": `${siteUrl}/#organization`,
-      "name": "Rune box",
-      "alternateName": ["Rune box", "Rune box Jewelry"],
+      "name": "Rune Box",
+      "alternateName": ["Rune Box", "Rune Box Jewelry"],
       "url": siteUrl,
       "logo": {
         "@type": "ImageObject",
@@ -211,7 +204,7 @@ const jsonLd = {
         "contentUrl": `${siteUrl}/images/logo/logo-white-pink-1.png`,
         "width": 512,
         "height": 512,
-        "caption": "Rune box"
+        "caption": "Rune Box"
       },
       "image": { "@id": `${siteUrl}/#logo` },
       "sameAs": [
@@ -224,7 +217,7 @@ const jsonLd = {
           "@type": "ContactPoint",
           "telephone": "+48-xxx-xxx-xxx",
           "contactType": "customer service",
-          "availableLanguage": ["Ukrainian", "Polish", "English", "German"],
+          "availableLanguage": ["Ukrainian", "Polish", "English", "German", "Swedish", "Norwegian", "Danish", "French"],
           "areaServed": ["UA", "PL", "DE", "EU"]
         }
       ]
@@ -232,8 +225,8 @@ const jsonLd = {
     {
       "@type": "Store",
       "@id": `${siteUrl}/#store`,
-      "name": "Rune box",
-      "description": "Інтернет-магазин автентичних прикрас ручної роботи",
+      "name": "Rune Box",
+      "description": "Online store of authentic handmade jewelry",
       "url": siteUrl,
       "priceRange": "$$",
       "currenciesAccepted": "PLN, EUR, UAH",
@@ -292,6 +285,23 @@ export default function RootLayout({
   return (
     <html lang="uk" dir="ltr">
       <head>
+        {/* Preconnect для швидшого завантаження */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* DNS Prefetch */}
+        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+
+        {/* RSS Feed */}
+        <link
+          rel="alternate"
+          type="application/rss+xml"
+          title="Rune Box Blog RSS Feed"
+          href={`${siteUrl}/api/v1/blog/rss.xml`}
+        />
+      </head>
+      <body className="min-h-screen flex flex-col">
         {/* Google Tag Manager */}
         <Script
           id="google-tag-manager"
@@ -331,31 +341,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           strategy="afterInteractive"
         />
         
-        {/* Preconnect для швидшого завантаження */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
-        {/* DNS Prefetch */}
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="https://www.google-analytics.com" />
-        
-        {/* Preload Hero Background Image for better performance */}
-        <link
-          rel="preload"
-          href="/images/hero/hero-gemini.png"
-          as="image"
-          type="image/png"
-        />
-
-        {/* RSS Feed */}
-        <link
-          rel="alternate"
-          type="application/rss+xml"
-          title="Rune box Blog RSS Feed"
-          href={`${siteUrl}/api/v1/blog/rss.xml`}
-        />
-      </head>
-      <body className="min-h-screen flex flex-col">
         {/* Google Tag Manager (noscript) */}
         <noscript>
           <iframe

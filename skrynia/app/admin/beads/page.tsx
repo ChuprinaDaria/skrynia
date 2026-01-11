@@ -18,6 +18,7 @@ interface Bead {
   color?: string;
   price_netto: number;
   price_brutto: number;
+  supplier_link?: string;
   is_active: boolean;
   created_at?: string;
 }
@@ -31,6 +32,7 @@ interface BeadFormData {
   color: string;
   price_netto: number;
   price_brutto: number;
+  supplier_link: string;
   is_active: boolean;
 }
 
@@ -54,8 +56,10 @@ export default function BeadsPage() {
     color: '',
     price_netto: 0,
     price_brutto: 0,
+    supplier_link: '',
     is_active: true,
   });
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('admin_token');
@@ -98,6 +102,38 @@ export default function BeadsPage() {
     fetchBeads(category);
   };
 
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const token = localStorage.getItem('admin_token');
+      const uploadFormData = new FormData();
+      uploadFormData.append('file', file);
+
+      const res = await fetch(getApiEndpoint('/api/v1/upload/image'), {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: uploadFormData,
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setFormData({ ...formData, image_url: data.url });
+      } else {
+        alert('Помилка завантаження зображення');
+      }
+    } catch (error) {
+      console.error('Failed to upload image:', error);
+      alert('Не вдалося завантажити зображення');
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
   const openCreateModal = () => {
     setEditingBead(null);
     setFormData({
@@ -109,6 +145,7 @@ export default function BeadsPage() {
       color: '',
       price_netto: 0,
       price_brutto: 0,
+      supplier_link: '',
       is_active: true,
     });
     setIsModalOpen(true);
@@ -125,6 +162,7 @@ export default function BeadsPage() {
       color: bead.color || '',
       price_netto: bead.price_netto,
       price_brutto: bead.price_brutto,
+      supplier_link: bead.supplier_link || '',
       is_active: bead.is_active,
     });
     setIsModalOpen(true);
@@ -132,6 +170,11 @@ export default function BeadsPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.image_url) {
+      alert('Будь ласка, завантажте зображення або введіть URL');
+      return;
+    }
 
     const token = localStorage.getItem('admin_token');
     const url = editingBead
@@ -378,16 +421,33 @@ export default function BeadsPage() {
 
             <div>
               <label className="block text-sm font-medium text-ivory mb-1">
-                URL Зображення (PNG) <span className="text-oxblood">*</span>
+                Зображення (PNG) <span className="text-oxblood">*</span>
               </label>
-              <input
-                type="text"
-                required
-                value={formData.image_url}
-                onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
-                className="w-full px-3 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
-                placeholder="/static/beads/jasper-green.png"
-              />
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <label className="flex-1 cursor-pointer">
+                    <div className="px-3 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm hover:border-oxblood transition-colors flex items-center justify-center gap-2">
+                      <Upload className="w-4 h-4" />
+                      <span>{uploadingImage ? 'Завантаження...' : 'Завантажити файл'}</span>
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                    />
+                  </label>
+                </div>
+                <div className="text-xs text-sage/70 mb-2">або введіть URL:</div>
+                <input
+                  type="text"
+                  value={formData.image_url}
+                  onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
+                  className="w-full px-3 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                  placeholder="/static/beads/jasper-green.png"
+                />
+              </div>
               {formData.image_url && (
                 <img
                   src={formData.image_url}
@@ -492,6 +552,19 @@ export default function BeadsPage() {
                   className="w-full px-3 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
                 />
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-ivory mb-1">
+                Посилання на товар (де закуповувати)
+              </label>
+              <input
+                type="url"
+                value={formData.supplier_link}
+                onChange={(e) => setFormData({ ...formData, supplier_link: e.target.value })}
+                className="w-full px-3 py-2 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                placeholder="https://example.com/product"
+              />
             </div>
 
             <div className="flex items-center">

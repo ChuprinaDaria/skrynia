@@ -55,9 +55,6 @@ export default function CheckoutPage() {
     const packageSize = calculatePackageSize();
     const country = formData.shipping_country;
 
-    // Free shipping for orders over 1000 PLN
-    if (subtotal >= 1000) return 0;
-
     switch (deliveryMethod) {
       case 'inpost':
         // InPost Paczkomat prices (Poland)
@@ -166,7 +163,7 @@ export default function CheckoutPage() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || 'Помилка створення замовлення');
+        throw new Error(errorData.detail || t.checkout.errors.defaultError);
       }
 
       const order = await response.json();
@@ -183,7 +180,7 @@ export default function CheckoutPage() {
         router.push(`/order-success?order=${order.order_number}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Помилка оформлення замовлення');
+      setError(err instanceof Error ? err.message : t.checkout.errors.defaultError);
       console.error('Checkout error:', err);
     } finally {
       setLoading(false);
@@ -199,7 +196,7 @@ export default function CheckoutPage() {
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-6xl mx-auto">
           <h1 className="font-rutenia text-4xl md:text-5xl text-ivory mb-8">
-            Оформлення замовлення
+            {t.checkout.title}
           </h1>
 
           <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -207,11 +204,11 @@ export default function CheckoutPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Customer Information */}
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
-                <h2 className="font-rutenia text-2xl text-ivory mb-6">Контактна інформація</h2>
+                <h2 className="font-rutenia text-2xl text-ivory mb-6">{t.checkout.contactInfo}</h2>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-ivory font-inter mb-2">
-                      Email <span className="text-oxblood">*</span>
+                      {t.checkout.email} <span className="text-oxblood">*</span>
                     </label>
                     <input
                       type="email"
@@ -223,7 +220,7 @@ export default function CheckoutPage() {
                   </div>
                   <div>
                     <label className="block text-ivory font-inter mb-2">
-                      Ім'я та прізвище <span className="text-oxblood">*</span>
+                      {t.checkout.fullName} <span className="text-oxblood">*</span>
                     </label>
                     <input
                       type="text"
@@ -234,7 +231,7 @@ export default function CheckoutPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-ivory font-inter mb-2">Телефон</label>
+                    <label className="block text-ivory font-inter mb-2">{t.checkout.phone}</label>
                     <input
                       type="tel"
                       value={formData.customer_phone}
@@ -247,12 +244,12 @@ export default function CheckoutPage() {
 
               {/* Delivery Method & Address */}
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
-                <h2 className="font-rutenia text-2xl text-ivory mb-6">Доставка</h2>
+                <h2 className="font-rutenia text-2xl text-ivory mb-6">{t.checkout.delivery}</h2>
                 <div className="space-y-6">
                   {/* Country Selection */}
                   <div>
                     <label className="block text-ivory font-inter mb-2">
-                      Країна <span className="text-oxblood">*</span>
+                      {t.checkout.country} <span className="text-oxblood">*</span>
                     </label>
                     <select
                       required
@@ -280,7 +277,7 @@ export default function CheckoutPage() {
                   {/* Delivery Method Selection */}
                   <div>
                     <label className="block text-ivory font-inter mb-3">
-                      Спосіб доставки <span className="text-oxblood">*</span>
+                      {t.checkout.deliveryMethod} <span className="text-oxblood">*</span>
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {/* InPost Paczkomat */}
@@ -506,17 +503,6 @@ export default function CheckoutPage() {
                     </>
                   )}
 
-                  {/* Shipping cost info */}
-                  {subtotal < 1000 && (
-                    <div className="p-4 bg-oxblood/10 border border-oxblood/30 rounded-sm">
-                      <p className="text-ivory text-sm font-semibold mb-1">
-                        💰 Безкоштовна доставка від 1000 zł!
-                      </p>
-                      <p className="text-sage text-xs">
-                        Додайте ще {(1000 - subtotal).toFixed(2)} zł для безкоштовної доставки
-                      </p>
-                    </div>
-                  )}
                 </div>
               </div>
 
@@ -531,14 +517,14 @@ export default function CheckoutPage() {
                     className="w-5 h-5 accent-oxblood"
                   />
                   <label htmlFor="billing_same" className="text-ivory font-inter cursor-pointer">
-                    Адреса оплати така ж, як адреса доставки
+                    {t.checkout.billingSameAsShipping}
                   </label>
                 </div>
                 {!formData.billing_same_as_shipping && (
                   <div className="space-y-4">
-                    <h3 className="font-rutenia text-xl text-ivory mb-4">Адреса оплати</h3>
+                    <h3 className="font-rutenia text-xl text-ivory mb-4">{t.checkout.billingAddress}</h3>
                     <div>
-                      <label className="block text-ivory font-inter mb-2">Адреса</label>
+                      <label className="block text-ivory font-inter mb-2">{t.checkout.address}</label>
                       <input
                         type="text"
                         value={formData.billing_address_line1}
@@ -548,7 +534,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-ivory font-inter mb-2">Місто</label>
+                        <label className="block text-ivory font-inter mb-2">{t.checkout.city}</label>
                         <input
                           type="text"
                           value={formData.billing_city}
@@ -557,7 +543,7 @@ export default function CheckoutPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-ivory font-inter mb-2">Поштовий індекс</label>
+                        <label className="block text-ivory font-inter mb-2">{t.checkout.postalCode}</label>
                         <input
                           type="text"
                           value={formData.billing_postal_code}
@@ -572,7 +558,7 @@ export default function CheckoutPage() {
 
               {/* Payment Method */}
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
-                <h2 className="font-rutenia text-2xl text-ivory mb-6">Спосіб оплати</h2>
+                <h2 className="font-rutenia text-2xl text-ivory mb-6">{t.checkout.paymentMethod}</h2>
                 <div className="space-y-3">
                   <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
                     <input
@@ -583,7 +569,7 @@ export default function CheckoutPage() {
                       onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
                       className="w-5 h-5 accent-oxblood"
                     />
-                    <span className="text-ivory font-inter">Przelewy24</span>
+                    <span className="text-ivory font-inter">{t.checkout.paymentP24}</span>
                   </label>
                   <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
                     <input
@@ -594,7 +580,7 @@ export default function CheckoutPage() {
                       onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
                       className="w-5 h-5 accent-oxblood"
                     />
-                    <span className="text-ivory font-inter">Stripe (Картка)</span>
+                    <span className="text-ivory font-inter">{t.checkout.paymentStripe}</span>
                   </label>
                   <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
                     <input
@@ -605,7 +591,7 @@ export default function CheckoutPage() {
                       onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
                       className="w-5 h-5 accent-oxblood"
                     />
-                    <span className="text-ivory font-inter">BLIK</span>
+                    <span className="text-ivory font-inter">{t.checkout.paymentBLIK}</span>
                   </label>
                   <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
                     <input
@@ -616,20 +602,20 @@ export default function CheckoutPage() {
                       onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
                       className="w-5 h-5 accent-oxblood"
                     />
-                    <span className="text-ivory font-inter">Банківський переказ</span>
+                    <span className="text-ivory font-inter">{t.checkout.paymentBankTransfer}</span>
                   </label>
                 </div>
               </div>
 
               {/* Notes */}
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
-                <label className="block text-ivory font-inter mb-2">Примітки до замовлення</label>
+                <label className="block text-ivory font-inter mb-2">{t.checkout.orderNotes}</label>
                 <textarea
                   rows={4}
                   value={formData.customer_notes}
                   onChange={(e) => setFormData({ ...formData, customer_notes: e.target.value })}
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50 resize-none"
-                  placeholder="Додаткові побажання або інформація..."
+                  placeholder={t.checkout.orderNotesPlaceholder}
                 />
               </div>
             </div>
@@ -637,7 +623,7 @@ export default function CheckoutPage() {
             {/* Right Column - Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6 sticky top-24">
-                <h2 className="font-rutenia text-2xl text-ivory mb-6">Ваше замовлення</h2>
+                <h2 className="font-rutenia text-2xl text-ivory mb-6">{t.checkout.orderSummary}</h2>
                 
                 {/* Order Items */}
                 <div className="space-y-4 mb-6">
@@ -674,18 +660,18 @@ export default function CheckoutPage() {
                 {/* Totals */}
                 <div className="space-y-3 mb-6 pt-6 border-t border-sage/20">
                   <div className="flex justify-between font-inter text-sm">
-                    <span className="text-sage">Підсумок</span>
+                    <span className="text-sage">{t.checkout.subtotal}</span>
                     <span className="text-ivory">{subtotal} zł</span>
                   </div>
                   <div className="flex justify-between font-inter text-sm">
-                    <span className="text-sage">Доставка</span>
+                    <span className="text-sage">{t.checkout.shipping}</span>
                     <span className="text-ivory">
-                      {shipping === 0 ? 'Безкоштовно' : `${shipping} zł`}
+                      {shipping} zł
                     </span>
                   </div>
                   <div className="h-px bg-sage/20" />
                   <div className="flex justify-between font-inter text-lg">
-                    <span className="text-ivory font-semibold">Всього</span>
+                    <span className="text-ivory font-semibold">{t.checkout.total}</span>
                     <span className="text-ivory font-bold">{total} zł</span>
                   </div>
                 </div>
@@ -703,14 +689,14 @@ export default function CheckoutPage() {
                   disabled={loading}
                   className="mb-4"
                 >
-                  {loading ? 'Обробка...' : 'Оформити замовлення'}
+                  {loading ? t.checkout.submitting : t.checkout.submit}
                 </Button>
 
                 <Link
                   href="/cart"
                   className="block text-center text-sage hover:text-ivory font-inter text-sm transition-colors"
                 >
-                  ← Повернутися до кошика
+                  {t.checkout.backToCart}
                 </Link>
               </div>
             </div>

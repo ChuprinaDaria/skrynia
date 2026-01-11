@@ -109,53 +109,45 @@ export default function AdminDashboard() {
   }
 
   if (!stats) {
-    // Check if we have a token - if yes, it might be a DB error
+    // No token - redirect happens in useEffect, but show login prompt
     const token = localStorage.getItem('admin_token');
-    if (token) {
+    if (!token) {
       return (
-        <div className="min-h-screen bg-deep-black">
-          <AdminNav />
-          <div className="ml-64 pt-20 pb-20">
-            <div className="container mx-auto px-4 md:px-6">
-              <div className="text-center max-w-md mx-auto">
-                <div className="text-ivory text-xl font-cinzel mb-4">Помилка підключення до БД</div>
-                <p className="text-sage mb-6">
-                  Бекенд не може підключитися до бази даних. Перевірте налаштування БД або створіть БД та користувача.
-                </p>
-                <div className="bg-footer-black/50 border border-sage/20 rounded-lg p-4 mb-6 text-left">
-                  <p className="text-sage text-sm mb-2">Для створення БД виконайте:</p>
-                  <code className="text-xs text-ivory block bg-deep-black/50 p-2 rounded">
-                    psql -h localhost -p 5433 -U postgres<br/>
-                    CREATE USER skrynia_user WITH PASSWORD 'skrynia_password';<br/>
-                    CREATE DATABASE skrynia_db OWNER skrynia_user;<br/>
-                    GRANT ALL PRIVILEGES ON DATABASE skrynia_db TO skrynia_user;
-                  </code>
-                </div>
-                <a
-                  href="/admin/login"
-                  className="inline-block font-inter font-semibold transition-all duration-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-oxblood focus:ring-offset-2 focus:ring-offset-deep-black bg-oxblood text-ivory hover:bg-oxblood/90 hover:shadow-oxblood-glow active:scale-[0.98] px-6 py-3 text-base"
-                >
-                  Спробувати знову
-                </a>
-              </div>
-            </div>
+        <div className="min-h-screen bg-deep-black flex items-center justify-center">
+          <div className="text-center">
+            <div className="text-ivory text-xl font-cinzel mb-4">Потрібна авторизація</div>
+            <p className="text-sage mb-6">Будь ласка, увійдіть в систему для доступу до адмін-панелі</p>
+            <a
+              href="/admin/login"
+              className="inline-block font-inter font-semibold transition-all duration-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-oxblood focus:ring-offset-2 focus:ring-offset-deep-black bg-oxblood text-ivory hover:bg-oxblood/90 hover:shadow-oxblood-glow active:scale-[0.98] px-6 py-3 text-base"
+            >
+              Увійти
+            </a>
           </div>
         </div>
       );
     }
     
-    // No token - redirect happens in useEffect, but show login prompt
+    // If we have a token but no stats, data might still be loading or there was an error
+    // Return to loading state or show a generic error message
     return (
-      <div className="min-h-screen bg-deep-black flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-ivory text-xl font-cinzel mb-4">Потрібна авторизація</div>
-          <p className="text-sage mb-6">Будь ласка, увійдіть в систему для доступу до адмін-панелі</p>
-          <a
-            href="/admin/login"
-            className="inline-block font-inter font-semibold transition-all duration-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-oxblood focus:ring-offset-2 focus:ring-offset-deep-black bg-oxblood text-ivory hover:bg-oxblood/90 hover:shadow-oxblood-glow active:scale-[0.98] px-6 py-3 text-base"
-          >
-            Увійти
-          </a>
+      <div className="min-h-screen bg-deep-black">
+        <AdminNav />
+        <div className="ml-64 pt-20 pb-20">
+          <div className="container mx-auto px-4 md:px-6">
+            <div className="text-center max-w-md mx-auto">
+              <div className="text-ivory text-xl font-cinzel mb-4">Не вдалося завантажити дані</div>
+              <p className="text-sage mb-6">
+                Спробуйте оновити сторінку або перевірте підключення до інтернету.
+              </p>
+              <button
+                onClick={() => fetchDashboardData()}
+                className="inline-block font-inter font-semibold transition-all duration-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-oxblood focus:ring-offset-2 focus:ring-offset-deep-black bg-oxblood text-ivory hover:bg-oxblood/90 hover:shadow-oxblood-glow active:scale-[0.98] px-6 py-3 text-base"
+              >
+                Спробувати знову
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -90,7 +90,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-sage/20">
+        <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-sage/20">
           <h2 id="cart-title" className="font-rutenia text-2xl text-ivory">
             {t.cart.title}
           </h2>
@@ -117,8 +117,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
           </button>
         </div>
 
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto min-h-0">
         {/* Cart Items */}
-        <div className="flex-grow overflow-y-auto p-6">
+        <div className="p-6">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center">
               <div className="mb-6">
@@ -225,7 +227,6 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               ))}
             </div>
           )}
-        </div>
 
         {/* Footer - Totals & Checkout */}
         {items.length > 0 && (
@@ -436,6 +437,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
             </div>
           </div>
         )}
+        </div>
       </div>
     </>
   );

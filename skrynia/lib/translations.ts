@@ -367,6 +367,94 @@ export interface Translations {
       defaultError: string;
     };
   };
+  register: {
+    title: string;
+    subtitle: string;
+    fullName: string;
+    fullNamePlaceholder: string;
+    email: string;
+    emailPlaceholder: string;
+    password: string;
+    passwordPlaceholder: string;
+    passwordHint: string;
+    confirmPassword: string;
+    confirmPasswordPlaceholder: string;
+    submit: string;
+    submitting: string;
+    success: {
+      title: string;
+      message: string;
+      redirecting: string;
+    };
+    hasAccount: string;
+    loginLink: string;
+    agreement: string;
+    termsLink: string;
+    privacyLink: string;
+    errors: {
+      passwordsMismatch: string;
+      passwordTooShort: string;
+      defaultError: string;
+      serverError: string;
+    };
+  };
+  checkout: {
+    title: string;
+    contactInfo: string;
+    email: string;
+    fullName: string;
+    phone: string;
+    delivery: string;
+    country: string;
+    deliveryMethod: string;
+    inpostLabel: string;
+    inpostDescription: string;
+    novaposhtaLabel: string;
+    novaposhtaDescription: string;
+    pocztaLabel: string;
+    pocztaDescription: string;
+    courierLabel: string;
+    courierDescription: string;
+    courierDescriptionUA: string;
+    courierDescriptionOther: string;
+    paczkomat: string;
+    paczkomatPlaceholder: string;
+    paczkomatHint: string;
+    novaposhtaOffice: string;
+    novaposhtaOfficePlaceholder: string;
+    novaposhtaOfficeHint: string;
+    address: string;
+    addressPlaceholder: string;
+    addressPlaceholderUA: string;
+    address2: string;
+    address2Placeholder: string;
+    address2PlaceholderUA: string;
+    city: string;
+    cityPlaceholder: string;
+    cityPlaceholderUA: string;
+    postalCode: string;
+    postalCodePlaceholder: string;
+    postalCodePlaceholderUA: string;
+    billingSameAsShipping: string;
+    billingAddress: string;
+    paymentMethod: string;
+    paymentStripe: string;
+    paymentP24: string;
+    paymentBLIK: string;
+    paymentBankTransfer: string;
+    orderNotes: string;
+    orderNotesPlaceholder: string;
+    orderSummary: string;
+    subtotal: string;
+    shipping: string;
+    total: string;
+    submit: string;
+    submitting: string;
+    backToCart: string;
+    errors: {
+      defaultError: string;
+    };
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -737,6 +825,94 @@ const translations: Record<Language, Translations> = {
         defaultError: 'Помилка авторизації',
       },
     },
+    register: {
+      title: 'Реєстрація',
+      subtitle: 'Створіть акаунт для отримання бонусів та відстеження замовлень',
+      fullName: 'Ім\'я та прізвище',
+      fullNamePlaceholder: 'Іван Іванов',
+      email: 'Email',
+      emailPlaceholder: 'example@email.com',
+      password: 'Пароль',
+      passwordPlaceholder: 'Мінімум 6 символів',
+      passwordHint: 'Мінімум 6 символів',
+      confirmPassword: 'Підтвердження пароля',
+      confirmPasswordPlaceholder: 'Повторіть пароль',
+      submit: 'Зареєструватися',
+      submitting: 'Реєстрація...',
+      success: {
+        title: 'Реєстрація успішна!',
+        message: 'Ми надіслали лист для підтвердження email на адресу',
+        redirecting: 'Перенаправлення на сторінку входу...',
+      },
+      hasAccount: 'Вже маєте акаунт?',
+      loginLink: 'Увійти',
+      agreement: 'Реєструючись, ви погоджуєтесь з нашими',
+      termsLink: 'умовами використання',
+      privacyLink: 'політикою конфіденційності',
+      errors: {
+        passwordsMismatch: 'Паролі не співпадають',
+        passwordTooShort: 'Пароль повинен містити мінімум 6 символів',
+        defaultError: 'Помилка реєстрації',
+        serverError: 'Помилка сервера. Будь ласка, спробуйте пізніше або зв\'яжіться з підтримкою.',
+      },
+    },
+    checkout: {
+      title: 'Оформлення замовлення',
+      contactInfo: 'Контактна інформація',
+      email: 'Email',
+      fullName: 'Ім\'я та прізвище',
+      phone: 'Телефон',
+      delivery: 'Доставка',
+      country: 'Країна',
+      deliveryMethod: 'Спосіб доставки',
+      inpostLabel: 'InPost Paczkomat',
+      inpostDescription: 'Odbiór z paczkomatu',
+      novaposhtaLabel: 'Нова Пошта',
+      novaposhtaDescription: 'Відділення Нової Пошти',
+      pocztaLabel: 'Poczta Polska',
+      pocztaDescription: 'Dostawa do domu',
+      courierLabel: 'Кур\'єр',
+      courierDescription: 'Dostawa kurierem',
+      courierDescriptionUA: 'Кур\'єрська доставка',
+      courierDescriptionOther: 'Courier delivery',
+      paczkomat: 'Paczkomat',
+      paczkomatPlaceholder: 'Wpisz kod paczkomatu lub adres (np. WAW01M)',
+      paczkomatHint: '💡 W przyszłości będziesz mógł wybrać paczkomat z mapy. Na razie wpisz kod paczkomatu ręcznie.',
+      novaposhtaOffice: 'Відділення',
+      novaposhtaOfficePlaceholder: 'Введіть номер відділення (напр. Відділення №1)',
+      novaposhtaOfficeHint: '💡 Незабаром ви зможете обрати відділення з карти. Поки що введіть адресу відділення вручну.',
+      address: 'Adres',
+      addressPlaceholder: 'ul. Główna 1',
+      addressPlaceholderUA: 'вул. Хрещатик, 1',
+      address2: 'Adres (dodatkowy)',
+      address2Placeholder: 'Mieszkanie, biuro',
+      address2PlaceholderUA: 'Квартира, офіс',
+      city: 'Miasto',
+      cityPlaceholder: 'Warszawa',
+      cityPlaceholderUA: 'Київ',
+      postalCode: 'Kod pocztowy',
+      postalCodePlaceholder: '00-001',
+      postalCodePlaceholderUA: '01001',
+      billingSameAsShipping: 'Адреса оплати така ж, як адреса доставки',
+      billingAddress: 'Адреса оплати',
+      paymentMethod: 'Спосіб оплати',
+      paymentStripe: 'Stripe (Картка)',
+      paymentP24: 'Przelewy24',
+      paymentBLIK: 'BLIK',
+      paymentBankTransfer: 'Банківський переказ',
+      orderNotes: 'Примітки до замовлення',
+      orderNotesPlaceholder: 'Додаткові побажання або інформація...',
+      orderSummary: 'Ваше замовлення',
+      subtotal: 'Підсумок',
+      shipping: 'Доставка',
+      total: 'Всього',
+      submit: 'Оформити замовлення',
+      submitting: 'Обробка...',
+      backToCart: '← Повернутися до кошика',
+      errors: {
+        defaultError: 'Помилка оформлення замовлення',
+      },
+    },
   },
   EN: {
     nav: {
@@ -1086,6 +1262,94 @@ const translations: Record<Language, Translations> = {
         emailNotVerified: 'Email not verified. Please check your email for verification link.',
         networkError: 'Failed to connect to server',
         defaultError: 'Authentication error',
+      },
+    },
+    register: {
+      title: 'Registration',
+      subtitle: 'Create an account to receive bonuses and track orders',
+      fullName: 'Full name',
+      fullNamePlaceholder: 'John Doe',
+      email: 'Email',
+      emailPlaceholder: 'example@email.com',
+      password: 'Password',
+      passwordPlaceholder: 'Minimum 6 characters',
+      passwordHint: 'Minimum 6 characters',
+      confirmPassword: 'Confirm password',
+      confirmPasswordPlaceholder: 'Repeat password',
+      submit: 'Register',
+      submitting: 'Registering...',
+      success: {
+        title: 'Registration successful!',
+        message: 'We have sent an email confirmation to',
+        redirecting: 'Redirecting to login page...',
+      },
+      hasAccount: 'Already have an account?',
+      loginLink: 'Log in',
+      agreement: 'By registering, you agree to our',
+      termsLink: 'terms of use',
+      privacyLink: 'privacy policy',
+      errors: {
+        passwordsMismatch: 'Passwords do not match',
+        passwordTooShort: 'Password must contain at least 6 characters',
+        defaultError: 'Registration error',
+        serverError: 'Server error. Please try again later or contact support.',
+      },
+    },
+    checkout: {
+      title: 'Checkout',
+      contactInfo: 'Contact Information',
+      email: 'Email',
+      fullName: 'Full name',
+      phone: 'Phone',
+      delivery: 'Delivery',
+      country: 'Country',
+      deliveryMethod: 'Delivery method',
+      inpostLabel: 'InPost Paczkomat',
+      inpostDescription: 'Pickup from parcel locker',
+      novaposhtaLabel: 'Nova Poshta',
+      novaposhtaDescription: 'Nova Poshta branch',
+      pocztaLabel: 'Poczta Polska',
+      pocztaDescription: 'Home delivery',
+      courierLabel: 'Courier',
+      courierDescription: 'Courier delivery',
+      courierDescriptionUA: 'Courier delivery',
+      courierDescriptionOther: 'Courier delivery',
+      paczkomat: 'Paczkomat',
+      paczkomatPlaceholder: 'Enter paczkomat code or address (e.g. WAW01M)',
+      paczkomatHint: '💡 In the future you will be able to select a paczkomat from the map. For now, enter the paczkomat code manually.',
+      novaposhtaOffice: 'Branch',
+      novaposhtaOfficePlaceholder: 'Enter branch number (e.g. Branch #1)',
+      novaposhtaOfficeHint: '💡 Soon you will be able to select a branch from the map. For now, enter the branch address manually.',
+      address: 'Address',
+      addressPlaceholder: 'Main St. 1',
+      addressPlaceholderUA: 'Khreshchatyk St. 1',
+      address2: 'Address (additional)',
+      address2Placeholder: 'Apartment, office',
+      address2PlaceholderUA: 'Apartment, office',
+      city: 'City',
+      cityPlaceholder: 'Warsaw',
+      cityPlaceholderUA: 'Kyiv',
+      postalCode: 'Postal code',
+      postalCodePlaceholder: '00-001',
+      postalCodePlaceholderUA: '01001',
+      billingSameAsShipping: 'Billing address same as shipping address',
+      billingAddress: 'Billing Address',
+      paymentMethod: 'Payment method',
+      paymentStripe: 'Stripe (Card)',
+      paymentP24: 'Przelewy24',
+      paymentBLIK: 'BLIK',
+      paymentBankTransfer: 'Bank transfer',
+      orderNotes: 'Order notes',
+      orderNotesPlaceholder: 'Additional wishes or information...',
+      orderSummary: 'Your order',
+      subtotal: 'Subtotal',
+      shipping: 'Shipping',
+      total: 'Total',
+      submit: 'Place order',
+      submitting: 'Processing...',
+      backToCart: '← Back to cart',
+      errors: {
+        defaultError: 'Order processing error',
       },
     },
   },
@@ -1439,6 +1703,94 @@ const translations: Record<Language, Translations> = {
         defaultError: 'Authentifizierungsfehler',
       },
     },
+    register: {
+      title: 'Registrierung',
+      subtitle: 'Erstellen Sie ein Konto, um Boni zu erhalten und Bestellungen zu verfolgen',
+      fullName: 'Vollständiger Name',
+      fullNamePlaceholder: 'Max Mustermann',
+      email: 'E-Mail',
+      emailPlaceholder: 'beispiel@email.com',
+      password: 'Passwort',
+      passwordPlaceholder: 'Mindestens 6 Zeichen',
+      passwordHint: 'Mindestens 6 Zeichen',
+      confirmPassword: 'Passwort bestätigen',
+      confirmPasswordPlaceholder: 'Passwort wiederholen',
+      submit: 'Registrieren',
+      submitting: 'Registrierung...',
+      success: {
+        title: 'Registrierung erfolgreich!',
+        message: 'Wir haben eine E-Mail-Bestätigung gesendet an',
+        redirecting: 'Weiterleitung zur Anmeldeseite...',
+      },
+      hasAccount: 'Haben Sie bereits ein Konto?',
+      loginLink: 'Anmelden',
+      agreement: 'Mit der Registrierung stimmen Sie unseren',
+      termsLink: 'Nutzungsbedingungen',
+      privacyLink: 'Datenschutzrichtlinie',
+      errors: {
+        passwordsMismatch: 'Passwörter stimmen nicht überein',
+        passwordTooShort: 'Passwort muss mindestens 6 Zeichen enthalten',
+        defaultError: 'Registrierungsfehler',
+        serverError: 'Serverfehler. Bitte versuchen Sie es später erneut oder kontaktieren Sie den Support.',
+      },
+    },
+    checkout: {
+      title: 'Kasse',
+      contactInfo: 'Kontaktinformationen',
+      email: 'E-Mail',
+      fullName: 'Vollständiger Name',
+      phone: 'Telefon',
+      delivery: 'Lieferung',
+      country: 'Land',
+      deliveryMethod: 'Liefermethode',
+      inpostLabel: 'InPost Paczkomat',
+      inpostDescription: 'Abholung am Paketautomaten',
+      novaposhtaLabel: 'Nova Poshta',
+      novaposhtaDescription: 'Nova Poshta Filiale',
+      pocztaLabel: 'Poczta Polska',
+      pocztaDescription: 'Hauslieferung',
+      courierLabel: 'Kurier',
+      courierDescription: 'Kurierlieferung',
+      courierDescriptionUA: 'Kurierlieferung',
+      courierDescriptionOther: 'Kurierlieferung',
+      paczkomat: 'Paczkomat',
+      paczkomatPlaceholder: 'Paczkomat-Code oder Adresse eingeben (z.B. WAW01M)',
+      paczkomatHint: '💡 In Zukunft können Sie einen Paczkomat auf der Karte auswählen. Geben Sie vorerst den Paczkomat-Code manuell ein.',
+      novaposhtaOffice: 'Filiale',
+      novaposhtaOfficePlaceholder: 'Filialnummer eingeben (z.B. Filiale #1)',
+      novaposhtaOfficeHint: '💡 Bald können Sie eine Filiale auf der Karte auswählen. Geben Sie vorerst die Filialadresse manuell ein.',
+      address: 'Adresse',
+      addressPlaceholder: 'Hauptstr. 1',
+      addressPlaceholderUA: 'Chreschtschatyk-Str. 1',
+      address2: 'Adresse (zusätzlich)',
+      address2Placeholder: 'Wohnung, Büro',
+      address2PlaceholderUA: 'Wohnung, Büro',
+      city: 'Stadt',
+      cityPlaceholder: 'Warschau',
+      cityPlaceholderUA: 'Kiew',
+      postalCode: 'Postleitzahl',
+      postalCodePlaceholder: '00-001',
+      postalCodePlaceholderUA: '01001',
+      billingSameAsShipping: 'Rechnungsadresse entspricht Lieferadresse',
+      billingAddress: 'Rechnungsadresse',
+      paymentMethod: 'Zahlungsmethode',
+      paymentStripe: 'Stripe (Karte)',
+      paymentP24: 'Przelewy24',
+      paymentBLIK: 'BLIK',
+      paymentBankTransfer: 'Banküberweisung',
+      orderNotes: 'Bestellnotizen',
+      orderNotesPlaceholder: 'Zusätzliche Wünsche oder Informationen...',
+      orderSummary: 'Ihre Bestellung',
+      subtotal: 'Zwischensumme',
+      shipping: 'Versand',
+      total: 'Gesamt',
+      submit: 'Bestellung aufgeben',
+      submitting: 'Verarbeitung...',
+      backToCart: '← Zurück zum Warenkorb',
+      errors: {
+        defaultError: 'Bestellverarbeitungsfehler',
+      },
+    },
   },
   PL: {
     nav: {
@@ -1790,6 +2142,94 @@ const translations: Record<Language, Translations> = {
         defaultError: 'Błąd uwierzytelniania',
       },
     },
+    register: {
+      title: 'Rejestracja',
+      subtitle: 'Utwórz konto, aby otrzymywać bonusy i śledzić zamówienia',
+      fullName: 'Imię i nazwisko',
+      fullNamePlaceholder: 'Jan Kowalski',
+      email: 'Email',
+      emailPlaceholder: 'przyklad@email.com',
+      password: 'Hasło',
+      passwordPlaceholder: 'Minimum 6 znaków',
+      passwordHint: 'Minimum 6 znaków',
+      confirmPassword: 'Potwierdzenie hasła',
+      confirmPasswordPlaceholder: 'Powtórz hasło',
+      submit: 'Zarejestruj się',
+      submitting: 'Rejestracja...',
+      success: {
+        title: 'Rejestracja udana!',
+        message: 'Wysłaliśmy e-mail potwierdzający na adres',
+        redirecting: 'Przekierowywanie do strony logowania...',
+      },
+      hasAccount: 'Masz już konto?',
+      loginLink: 'Zaloguj się',
+      agreement: 'Rejestrując się, zgadzasz się z naszymi',
+      termsLink: 'warunkami użytkowania',
+      privacyLink: 'polityką prywatności',
+      errors: {
+        passwordsMismatch: 'Hasła nie są zgodne',
+        passwordTooShort: 'Hasło musi zawierać co najmniej 6 znaków',
+        defaultError: 'Błąd rejestracji',
+        serverError: 'Błąd serwera. Proszę spróbować ponownie później lub skontaktować się z pomocą.',
+      },
+    },
+    checkout: {
+      title: 'Zamówienie',
+      contactInfo: 'Informacje kontaktowe',
+      email: 'Email',
+      fullName: 'Imię i nazwisko',
+      phone: 'Telefon',
+      delivery: 'Dostawa',
+      country: 'Kraj',
+      deliveryMethod: 'Sposób dostawy',
+      inpostLabel: 'InPost Paczkomat',
+      inpostDescription: 'Odbiór z paczkomatu',
+      novaposhtaLabel: 'Nova Poshta',
+      novaposhtaDescription: 'Oddział Nova Poshta',
+      pocztaLabel: 'Poczta Polska',
+      pocztaDescription: 'Dostawa do domu',
+      courierLabel: 'Kurier',
+      courierDescription: 'Dostawa kurierem',
+      courierDescriptionUA: 'Dostawa kurierem',
+      courierDescriptionOther: 'Dostawa kurierem',
+      paczkomat: 'Paczkomat',
+      paczkomatPlaceholder: 'Wpisz kod paczkomatu lub adres (np. WAW01M)',
+      paczkomatHint: '💡 W przyszłości będziesz mógł wybrać paczkomat z mapy. Na razie wpisz kod paczkomatu ręcznie.',
+      novaposhtaOffice: 'Oddział',
+      novaposhtaOfficePlaceholder: 'Wpisz numer oddziału (np. Oddział #1)',
+      novaposhtaOfficeHint: '💡 Wkrótce będziesz mógł wybrać oddział z mapy. Na razie wpisz adres oddziału ręcznie.',
+      address: 'Adres',
+      addressPlaceholder: 'ul. Główna 1',
+      addressPlaceholderUA: 'ul. Chreszczatyk 1',
+      address2: 'Adres (dodatkowy)',
+      address2Placeholder: 'Mieszkanie, biuro',
+      address2PlaceholderUA: 'Mieszkanie, biuro',
+      city: 'Miasto',
+      cityPlaceholder: 'Warszawa',
+      cityPlaceholderUA: 'Kijów',
+      postalCode: 'Kod pocztowy',
+      postalCodePlaceholder: '00-001',
+      postalCodePlaceholderUA: '01001',
+      billingSameAsShipping: 'Adres rozliczeniowy taki sam jak adres dostawy',
+      billingAddress: 'Adres rozliczeniowy',
+      paymentMethod: 'Sposób płatności',
+      paymentStripe: 'Stripe (Karta)',
+      paymentP24: 'Przelewy24',
+      paymentBLIK: 'BLIK',
+      paymentBankTransfer: 'Przelew bankowy',
+      orderNotes: 'Uwagi do zamówienia',
+      orderNotesPlaceholder: 'Dodatkowe życzenia lub informacje...',
+      orderSummary: 'Twoje zamówienie',
+      subtotal: 'Podsumowanie',
+      shipping: 'Dostawa',
+      total: 'Razem',
+      submit: 'Złóż zamówienie',
+      submitting: 'Przetwarzanie...',
+      backToCart: '← Wróć do koszyka',
+      errors: {
+        defaultError: 'Błąd przetwarzania zamówienia',
+      },
+    },
   },
   SE: {
     nav: {
@@ -2139,6 +2579,94 @@ const translations: Record<Language, Translations> = {
         emailNotVerified: 'E-posten är inte verifierad. Vänligen kontrollera din e-post för verifieringslänk.',
         networkError: 'Kunde inte ansluta till servern',
         defaultError: 'Autentiseringsfel',
+      },
+    },
+    register: {
+      title: 'Registrering',
+      subtitle: 'Skapa ett konto för att få bonusar och spåra beställningar',
+      fullName: 'Fullständigt namn',
+      fullNamePlaceholder: 'Jan Andersson',
+      email: 'E-post',
+      emailPlaceholder: 'exempel@email.com',
+      password: 'Lösenord',
+      passwordPlaceholder: 'Minst 6 tecken',
+      passwordHint: 'Minst 6 tecken',
+      confirmPassword: 'Bekräfta lösenord',
+      confirmPasswordPlaceholder: 'Upprepa lösenord',
+      submit: 'Registrera',
+      submitting: 'Registrerar...',
+      success: {
+        title: 'Registrering lyckades!',
+        message: 'Vi har skickat ett e-postbekräftelse till',
+        redirecting: 'Omdirigerar till inloggningssidan...',
+      },
+      hasAccount: 'Har du redan ett konto?',
+      loginLink: 'Logga in',
+      agreement: 'Genom att registrera dig godkänner du våra',
+      termsLink: 'användarvillkor',
+      privacyLink: 'integritetspolicy',
+      errors: {
+        passwordsMismatch: 'Lösenorden matchar inte',
+        passwordTooShort: 'Lösenordet måste innehålla minst 6 tecken',
+        defaultError: 'Registreringsfel',
+        serverError: 'Serverfel. Vänligen försök igen senare eller kontakta support.',
+      },
+    },
+    checkout: {
+      title: 'Kassa',
+      contactInfo: 'Kontaktinformation',
+      email: 'E-post',
+      fullName: 'Fullständigt namn',
+      phone: 'Telefon',
+      delivery: 'Leverans',
+      country: 'Land',
+      deliveryMethod: 'Leveransmetod',
+      inpostLabel: 'InPost Paczkomat',
+      inpostDescription: 'Hämta från paketlåda',
+      novaposhtaLabel: 'Nova Poshta',
+      novaposhtaDescription: 'Nova Poshta-filial',
+      pocztaLabel: 'Poczta Polska',
+      pocztaDescription: 'Hemleverans',
+      courierLabel: 'Kurir',
+      courierDescription: 'Kurirleverans',
+      courierDescriptionUA: 'Kurirleverans',
+      courierDescriptionOther: 'Kurirleverans',
+      paczkomat: 'Paczkomat',
+      paczkomatPlaceholder: 'Ange paczkomat-kod eller adress (t.ex. WAW01M)',
+      paczkomatHint: '💡 I framtiden kommer du att kunna välja en paczkomat från kartan. För närvarande, ange paczkomat-koden manuellt.',
+      novaposhtaOffice: 'Filial',
+      novaposhtaOfficePlaceholder: 'Ange filialnummer (t.ex. Filial #1)',
+      novaposhtaOfficeHint: '💡 Snart kommer du att kunna välja en filial från kartan. För närvarande, ange filialadressen manuellt.',
+      address: 'Adress',
+      addressPlaceholder: 'Huvudgatan 1',
+      addressPlaceholderUA: 'Chresjtjatikgatan 1',
+      address2: 'Adress (ytterligare)',
+      address2Placeholder: 'Lägenhet, kontor',
+      address2PlaceholderUA: 'Lägenhet, kontor',
+      city: 'Stad',
+      cityPlaceholder: 'Warszawa',
+      cityPlaceholderUA: 'Kiev',
+      postalCode: 'Postnummer',
+      postalCodePlaceholder: '00-001',
+      postalCodePlaceholderUA: '01001',
+      billingSameAsShipping: 'Faktureringsadress samma som leveransadress',
+      billingAddress: 'Faktureringsadress',
+      paymentMethod: 'Betalningsmetod',
+      paymentStripe: 'Stripe (Kort)',
+      paymentP24: 'Przelewy24',
+      paymentBLIK: 'BLIK',
+      paymentBankTransfer: 'Banköverföring',
+      orderNotes: 'Beställningsanteckningar',
+      orderNotesPlaceholder: 'Ytterligare önskemål eller information...',
+      orderSummary: 'Din beställning',
+      subtotal: 'Delsumma',
+      shipping: 'Frakt',
+      total: 'Totalt',
+      submit: 'Lägg beställning',
+      submitting: 'Bearbetar...',
+      backToCart: '← Tillbaka till varukorgen',
+      errors: {
+        defaultError: 'Beställningsbearbetningsfel',
       },
     },
   },
