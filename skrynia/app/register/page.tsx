@@ -241,7 +241,7 @@ export default function RegisterPage() {
               <Link href="/regulamin" className="text-oxblood hover:text-oxblood/80">
                 {t.register.termsLink}
               </Link>{' '}
-              {t.language === 'UA' ? 'та' : 'and'}{' '}
+              {language === 'UA' ? 'та' : 'and'}{' '}
               <Link href="/polityka-prywatnosci" className="text-oxblood hover:text-oxblood/80">
                 {t.register.privacyLink}
               </Link>
