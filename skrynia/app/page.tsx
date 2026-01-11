@@ -189,7 +189,7 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <p className="text-sage font-inter">{t.home.featuredProducts.noProducts || 'Немає рекомендованих товарів на даний момент'}</p>
+              <p className="text-sage font-inter">Немає рекомендованих товарів на даний момент</p>
             </div>
           )}
 
