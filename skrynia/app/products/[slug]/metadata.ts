@@ -63,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
           url: `${siteUrl}/products/${slug}`,
-          type: 'product',
+          type: 'website',
           siteName: 'Rune Box',
           images: [
             {
