@@ -68,6 +68,10 @@ interface ProductFormData {
   title_en: string;
   title_de: string;
   title_pl: string;
+  title_se?: string;
+  title_no?: string;
+  title_dk?: string;
+  title_fr?: string;
   slug: string;
 
   // Descriptions (Markdown)
@@ -75,12 +79,24 @@ interface ProductFormData {
   description_en: string;
   description_de: string;
   description_pl: string;
+  description_se?: string;
+  description_no?: string;
+  description_dk?: string;
+  description_fr?: string;
 
   // Legend
   legend_title_uk: string;
   legend_title_en: string;
+  legend_title_se?: string;
+  legend_title_no?: string;
+  legend_title_dk?: string;
+  legend_title_fr?: string;
   legend_content_uk: string;
   legend_content_en: string;
+  legend_content_se?: string;
+  legend_content_no?: string;
+  legend_content_dk?: string;
+  legend_content_fr?: string;
 
   // Pricing
   price: number;
@@ -144,15 +160,31 @@ function ProductEditorContent() {
     title_en: '',
     title_de: '',
     title_pl: '',
+    title_se: '',
+    title_no: '',
+    title_dk: '',
+    title_fr: '',
     slug: '',
     description_uk: '',
     description_en: '',
     description_de: '',
     description_pl: '',
+    description_se: '',
+    description_no: '',
+    description_dk: '',
+    description_fr: '',
     legend_title_uk: '',
     legend_title_en: '',
+    legend_title_se: '',
+    legend_title_no: '',
+    legend_title_dk: '',
+    legend_title_fr: '',
     legend_content_uk: '',
     legend_content_en: '',
+    legend_content_se: '',
+    legend_content_no: '',
+    legend_content_dk: '',
+    legend_content_fr: '',
     price: 0,
     currency: 'zł',
     compare_at_price: null,
@@ -177,7 +209,7 @@ function ProductEditorContent() {
   });
 
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit');
-  const [activeLang, setActiveLang] = useState<'uk' | 'en' | 'de' | 'pl'>('uk');
+  const [activeLang, setActiveLang] = useState<'uk' | 'en' | 'de' | 'pl' | 'se' | 'no' | 'dk' | 'fr'>('uk');
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [iconSearch, setIconSearch] = useState('');
   const [iconCategory, setIconCategory] = useState<string>('all');
@@ -574,19 +606,19 @@ function ProductEditorContent() {
             <h2 className="font-cinzel text-2xl text-ivory mb-6">Основна Інформація</h2>
 
             {/* Language Tabs */}
-            <div className="flex gap-2 mb-6 border-b border-sage/20">
-              {(['uk', 'en', 'de', 'pl'] as const).map((lang) => (
+            <div className="flex gap-2 mb-6 border-b border-sage/20 overflow-x-auto">
+              {(['uk', 'en', 'de', 'pl', 'se', 'no', 'dk', 'fr'] as const).map((lang) => (
                 <button
                   key={lang}
                   type="button"
                   onClick={() => setActiveLang(lang)}
-                  className={`px-4 py-2 font-inter text-sm transition-colors ${
+                  className={`px-4 py-2 font-inter text-sm transition-colors whitespace-nowrap ${
                     activeLang === lang
                       ? 'text-ivory border-b-2 border-oxblood'
                       : 'text-sage hover:text-ivory'
                   }`}
                 >
-                  {lang.toUpperCase()}
+                  {lang === 'uk' ? 'UA' : lang.toUpperCase()}
                 </button>
               ))}
             </div>

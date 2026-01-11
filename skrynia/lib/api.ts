@@ -6,7 +6,7 @@
 /**
  * Get the normalized API base URL
  * Removes trailing slashes and ensures it doesn't end with /api
- * Automatically converts HTTP to HTTPS in production or when page is loaded over HTTPS
+ * Automatically converts HTTP to HTTPS in production (works for both SSR and client)
  */
 export function getApiUrl(): string {
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
@@ -20,21 +20,23 @@ export function getApiUrl(): string {
     normalized = normalized.slice(0, -4);
   }
   
-  // Convert HTTP to HTTPS if:
-  // 1. We're in production (not localhost)
-  // 2. The page is loaded over HTTPS (if running in browser)
-  // 3. The URL is not localhost
+  // Convert HTTP to HTTPS in production (works for both SSR and client)
+  // Only convert if URL is not localhost/127.0.0.1/192.x.x.x (local development)
   const isProduction = process.env.NODE_ENV === 'production';
-  const isHttpsPage = typeof window !== 'undefined' && window.location.protocol === 'https:';
-  const isLocalhost = normalized.includes('localhost') || normalized.includes('127.0.0.1') || normalized.startsWith('http://192.');
+  const isLocalhost = 
+    normalized.includes('localhost') || 
+    normalized.includes('127.0.0.1') || 
+    normalized.startsWith('http://192.');
   
-  if (!isLocalhost && (isProduction || isHttpsPage) && normalized.startsWith('http://')) {
+  // Always use HTTPS in production for non-localhost URLs
+  // This ensures consistent behavior between SSR and client-side rendering
+  if (!isLocalhost && isProduction && normalized.startsWith('http://')) {
     normalized = normalized.replace('http://', 'https://');
-    
-    // Debug logging
-    if (process.env.NODE_ENV === 'development') {
-      console.warn('[API] Converted HTTP to HTTPS:', apiUrl, '->', normalized);
-    }
+  }
+  
+  // For client-side, also check if page is loaded over HTTPS (for staging/dev environments)
+  if (typeof window !== 'undefined' && !isLocalhost && !normalized.startsWith('https://') && window.location.protocol === 'https:') {
+    normalized = normalized.replace('http://', 'https://');
   }
   
   // Debug logging in development

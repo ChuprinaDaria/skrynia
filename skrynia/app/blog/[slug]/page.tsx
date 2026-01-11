@@ -35,8 +35,9 @@ interface BlogPost {
 
 async function getBlogPost(slug: string): Promise<BlogPost | null> {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const response = await fetch(`${apiUrl}/api/v1/blog/${slug}`, {
+    // Use getApiEndpoint for consistent HTTPS handling (works for both SSR and client)
+    const { getApiEndpoint } = await import('@/lib/api');
+    const response = await fetch(getApiEndpoint(`/api/v1/blog/${slug}`), {
       next: { revalidate: 60 }, // Revalidate every 60 seconds
     });
 

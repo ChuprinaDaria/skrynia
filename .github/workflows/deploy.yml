@@ -138,7 +138,8 @@ jobs:
               git reset --hard origin/main
             fi
             
-            echo "📝 Creating .env file..."
+            echo "📝 Creating/updating .env file..."
+            # Force overwrite .env file with latest secrets
             cat > .env << 'ENVEOF'
           DB_NAME=${{ secrets.DB_NAME }}
           DB_USER=${{ secrets.DB_USER }}
@@ -168,19 +169,26 @@ jobs:
           FRONTEND_IMAGE=ghcr.io/chuprinadaria/skrynia/frontend:latest
           ENVEOF
             
+            echo "✅ .env file updated with latest secrets"
+            
             echo "🐳 Pulling latest Docker images..."
             docker compose -f docker-compose.prod.yml pull || {
               echo "⚠️  Warning: Failed to pull some images, continuing..."
             }
             
-            echo "🚀 Starting containers..."
+            echo "🔄 Stopping containers to apply new environment..."
+            # Stop containers before restarting (preserves volumes/database)
+            docker compose -f docker-compose.prod.yml down --remove-orphans || true
+            
+            echo "🚀 Starting containers with updated .env file..."
+            # Start all containers - backend will read .env file, frontend uses runtime env from docker-compose.prod.yml
             docker compose -f docker-compose.prod.yml up -d --force-recreate --remove-orphans || {
               echo "❌ Failed to start containers"
               exit 1
             }
             
-            echo "⏳ Waiting for backend to be ready..."
-            sleep 10
+            echo "⏳ Waiting for services to be ready..."
+            sleep 15
             
             echo "🗄️  Running database migrations..."
             docker compose -f docker-compose.prod.yml exec -T backend alembic upgrade head || {
