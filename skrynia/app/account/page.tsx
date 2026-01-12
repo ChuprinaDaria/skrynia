@@ -151,7 +151,7 @@ export default function AccountPage() {
       setUser(data);
     } catch (err) {
       console.error('Error fetching user profile:', err);
-      setError('Не вдалося завантажити профіль');
+      setError(t.account.failedToLoad);
     } finally {
       setLoading(false);
     }
@@ -269,7 +269,7 @@ export default function AccountPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-deep-black pt-24 pb-20 flex items-center justify-center">
-        <div className="text-ivory text-lg">Завантаження...</div>
+        <div className="text-ivory text-lg">{t.account.loading}</div>
       </div>
     );
   }
@@ -277,7 +277,7 @@ export default function AccountPage() {
   if (error || !user) {
     return (
       <div className="min-h-screen bg-deep-black pt-24 pb-20 flex items-center justify-center">
-        <div className="text-oxblood text-lg">{error || 'Помилка завантаження профілю'}</div>
+        <div className="text-oxblood text-lg">{error || t.account.errorLoading}</div>
       </div>
     );
   }
@@ -285,10 +285,10 @@ export default function AccountPage() {
   const defaultAddress = addresses.find((addr) => addr.is_default) || addresses[0];
   const getLoyaltyStatusName = (status: string | null) => {
     switch (status) {
-      case 'human': return 'Людина';
-      case 'elf': return 'Ельф';
-      case 'dwarf': return 'Гном/Дворф';
-      return 'Людина';
+      case 'human': return t.account.loyaltyStatuses.human;
+      case 'elf': return t.account.loyaltyStatuses.elf;
+      case 'dwarf': return t.account.loyaltyStatuses.dwarf;
+      return t.account.loyaltyStatuses.human;
     }
   };
 
@@ -299,10 +299,10 @@ export default function AccountPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className="font-rutenia text-4xl md:text-5xl text-ivory mb-4">
-              Особистий кабінет
+              {t.account.title}
             </h1>
             <p className="font-inter text-sage text-lg">
-              Керуйте своїм профілем та замовленнями
+              {t.account.subtitle}
             </p>
           </div>
 
@@ -325,17 +325,17 @@ export default function AccountPage() {
                 onClick={handleLogout}
                 className="mt-4 md:mt-0"
               >
-                Вийти
+                {t.account.logout}
               </Button>
             </div>
 
             {/* Shipping Address / Paczkomat */}
             {defaultAddress && (
               <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4 mb-6">
-                <h3 className="text-ivory font-semibold mb-2">Адреса доставки</h3>
+                <h3 className="text-ivory font-semibold mb-2">{t.account.shippingAddress}</h3>
                 {defaultAddress.pickup_point_code ? (
                   <div className="text-sage text-sm">
-                    <p className="font-semibold text-ivory">InPost Paczkomat: {defaultAddress.pickup_point_code}</p>
+                    <p className="font-semibold text-ivory">{t.account.inpostPaczkomat} {defaultAddress.pickup_point_code}</p>
                     {defaultAddress.address_line1 && (
                       <p>{defaultAddress.address_line1}</p>
                     )}
@@ -361,22 +361,22 @@ export default function AccountPage() {
                 <div className="flex items-center justify-between mb-3">
                   <div>
                     <h3 className="text-ivory font-semibold mb-1">
-                      Статус лояльності: {bonusInfo.current_status.name}
+                      {t.account.loyaltyStatus} {bonusInfo.current_status.name}
                     </h3>
                     <p className="text-sage text-xs">{bonusInfo.current_status.description}</p>
                   </div>
                   <div className="text-right">
                     <div className="text-ivory font-semibold text-lg">
-                      {bonusInfo.bonus_points.toFixed(2)} балів
+                      {bonusInfo.bonus_points.toFixed(2)} {t.account.bonusPoints}
                     </div>
-                    <div className="text-sage text-xs">Бонусні бали</div>
+                    <div className="text-sage text-xs">{t.account.bonusPointsLabel}</div>
                   </div>
                 </div>
                 
                 {bonusInfo.progress && bonusInfo.next_status && (
                   <div className="mt-4">
                     <div className="flex justify-between text-xs text-sage mb-2">
-                      <span>До статусу "{bonusInfo.progress.next_status}"</span>
+                      <span>{t.account.toStatus} "{bonusInfo.progress.next_status}"</span>
                       <span>{bonusInfo.progress.current.toFixed(2)} / {bonusInfo.next_status.min_spent} zł</span>
                     </div>
                     <div className="w-full bg-deep-black rounded-full h-3 overflow-hidden">
@@ -386,7 +386,7 @@ export default function AccountPage() {
                       />
                     </div>
                     <p className="text-sage text-xs mt-2">
-                      Залишилось: {bonusInfo.progress.needed.toFixed(2)} zł
+                      {t.account.remaining} {bonusInfo.progress.needed.toFixed(2)} zł
                     </p>
                   </div>
                 )}
@@ -396,11 +396,11 @@ export default function AccountPage() {
             {/* Stats Grid */}
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">
-                <div className="text-sage text-sm mb-1">Всього замовлень</div>
+                <div className="text-sage text-sm mb-1">{t.account.totalOrders}</div>
                 <div className="text-ivory font-semibold text-lg">{user.total_orders}</div>
               </div>
               <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">
-                <div className="text-sage text-sm mb-1">В обробці</div>
+                <div className="text-sage text-sm mb-1">{t.account.inProcessing}</div>
                 <div className="text-ivory font-semibold text-lg">{user.pending_orders}</div>
               </div>
             </div>
@@ -408,13 +408,13 @@ export default function AccountPage() {
 
           {/* Orders Section */}
           <div className="bg-footer-black border border-sage/20 rounded-sm p-6 md:p-8">
-            <h2 className="font-rutenia text-2xl text-ivory mb-6">Мої замовлення</h2>
+            <h2 className="font-rutenia text-2xl text-ivory mb-6">{t.account.myOrders}</h2>
             
             {orders.length === 0 ? (
               <div className="text-center py-12">
-                <p className="text-sage mb-4">У вас поки немає замовлень</p>
+                <p className="text-sage mb-4">{t.account.noOrders}</p>
                 <Link href="/collections">
-                  <Button>Перейти до каталогу</Button>
+                  <Button>{t.account.goToCatalog}</Button>
                 </Link>
               </div>
             ) : (
@@ -429,7 +429,7 @@ export default function AccountPage() {
                       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
                         <div className="mb-4 md:mb-0">
                           <div className="text-ivory font-semibold mb-1">
-                            Замовлення #{order.order_number}
+                            {t.account.orderNumber}{order.order_number}
                           </div>
                           <div className="text-sage text-sm">
                             {new Date(order.created_at).toLocaleDateString('uk-UA', {
@@ -439,7 +439,7 @@ export default function AccountPage() {
                             })}
                           </div>
                           <div className="text-sage text-sm mt-1">
-                            {order.items_count} {order.items_count === 1 ? 'товар' : 'товарів'}
+                            {order.items_count} {order.items_count === 1 ? t.account.item : t.account.items}
                           </div>
                         </div>
                         <div className="flex flex-col md:items-end gap-2">
@@ -453,10 +453,10 @@ export default function AccountPage() {
                                 : 'bg-oxblood/20 text-oxblood'
                             }`}>
                               {order.status === 'completed' || order.status === 'delivered' 
-                                ? 'Завершено' 
+                                ? t.account.status.completed
                                 : order.status === 'shipped' 
-                                ? 'Відправлено' 
-                                : 'В обробці'}
+                                ? t.account.status.shipped
+                                : t.account.status.inProcessing}
                             </span>
                             <span className={`px-3 py-1 rounded-sm text-xs ${
                               order.payment_status === 'paid' || order.payment_status === 'completed'
@@ -464,8 +464,8 @@ export default function AccountPage() {
                                 : 'bg-oxblood/20 text-oxblood'
                             }`}>
                               {order.payment_status === 'paid' || order.payment_status === 'completed' 
-                                ? 'Оплачено' 
-                                : 'Не оплачено'}
+                                ? t.account.status.paid
+                                : t.account.status.notPaid}
                             </span>
                           </div>
                         </div>
@@ -477,7 +477,7 @@ export default function AccountPage() {
                           <div className="flex items-center justify-between mb-2">
                             <div>
                               <p className="text-ivory text-sm font-semibold">
-                                Відстеження: {order.tracking_number}
+                                {t.account.tracking} {order.tracking_number}
                               </p>
                               {order.tracking_url && (
                                 <a
@@ -486,7 +486,7 @@ export default function AccountPage() {
                                   rel="noopener noreferrer"
                                   className="text-oxblood hover:text-oxblood/80 text-xs underline"
                                 >
-                                  Відкрити на сайті перевізника
+                                  {t.account.openOnCarrierSite}
                                 </a>
                               )}
                             </div>
@@ -494,7 +494,7 @@ export default function AccountPage() {
                           
                           {tracking && tracking.events && tracking.events.length > 0 && (
                             <div className="mt-3 space-y-2">
-                              <p className="text-sage text-xs font-semibold">Історія відстеження:</p>
+                              <p className="text-sage text-xs font-semibold">{t.account.trackingHistory}</p>
                               <div className="space-y-1">
                                 {tracking.events.slice(0, 3).map((event, idx) => (
                                   <div key={idx} className="text-sage text-xs pl-4 border-l-2 border-sage/30">

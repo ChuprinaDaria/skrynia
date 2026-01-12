@@ -218,21 +218,28 @@ export default function ProductsManagement() {
 
       const method = editingProduct ? 'PATCH' : 'POST';
 
+      // Prepare data for API - add images array if not present
+      const apiData = {
+        ...formData,
+        images: formData.images || [],
+      };
+
       const res = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiData),
       });
 
       if (res.ok) {
         setIsModalOpen(false);
         fetchProducts();
       } else {
-        const error = await res.json();
-        alert(`Error: ${error.detail}`);
+        const errorData = await res.json().catch(() => ({ detail: 'Unknown error' }));
+        console.error('API Error:', errorData);
+        alert(`Error: ${errorData.detail || 'Failed to save product'}`);
       }
     } catch (error) {
       console.error('Failed to save product:', error);

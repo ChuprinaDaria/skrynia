@@ -89,11 +89,14 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/ssl/runebox:/etc/ssl/runebox:ro
+      - /etc/ssl/atbalance:/etc/ssl/atbalance:ro
     depends_on:
       - backend
       - frontend
     networks:
       - skrynia_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     restart: unless-stopped
 
 

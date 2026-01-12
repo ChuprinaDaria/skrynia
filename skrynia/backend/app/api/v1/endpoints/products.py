@@ -276,7 +276,8 @@ def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
     return product
 
 
-@router.post("/", response_model=ProductSchema)
+@router.post("", response_model=ProductSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=ProductSchema, status_code=status.HTTP_201_CREATED)
 def create_product(
     product_in: ProductCreate,
     db: Session = Depends(get_db),

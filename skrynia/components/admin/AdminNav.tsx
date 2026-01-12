@@ -29,6 +29,11 @@ const navItems = [
     icon: Package,
   },
   {
+    href: '/admin/categories',
+    label: 'Категорії',
+    icon: Package,
+  },
+  {
     href: '/admin/orders',
     label: 'Замовлення',
     icon: ShoppingCart,

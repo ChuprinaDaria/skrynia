@@ -56,6 +56,7 @@ class CategoryUpdate(BaseModel):
 router = APIRouter()
 
 
+@router.get("", response_model=List[CategorySchema])
 @router.get("/", response_model=List[CategorySchema])
 def get_categories(db: Session = Depends(get_db)):
     """Get all categories."""

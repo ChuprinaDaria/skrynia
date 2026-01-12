@@ -541,6 +541,44 @@ export interface Translations {
     paymentRefunded: string;
     close: string;
   };
+  account: {
+    title: string;
+    subtitle: string;
+    logout: string;
+    loading: string;
+    errorLoading: string;
+    failedToLoad: string;
+    shippingAddress: string;
+    inpostPaczkomat: string;
+    loyaltyStatus: string;
+    bonusPoints: string;
+    bonusPointsLabel: string;
+    toStatus: string;
+    remaining: string;
+    totalOrders: string;
+    inProcessing: string;
+    myOrders: string;
+    noOrders: string;
+    goToCatalog: string;
+    orderNumber: string;
+    item: string;
+    items: string;
+    tracking: string;
+    openOnCarrierSite: string;
+    trackingHistory: string;
+    status: {
+      completed: string;
+      shipped: string;
+      inProcessing: string;
+      paid: string;
+      notPaid: string;
+    };
+    loyaltyStatuses: {
+      human: string;
+      elf: string;
+      dwarf: string;
+    };
+  };
 }
 
 const translations: Record<Language, Translations> = {
@@ -1083,6 +1121,44 @@ const translations: Record<Language, Translations> = {
       paymentRefunded: 'Повернено',
       close: 'Закрити',
     },
+    account: {
+      title: 'Особистий кабінет',
+      subtitle: 'Керуйте своїм профілем та замовленнями',
+      logout: 'Вийти',
+      loading: 'Завантаження...',
+      errorLoading: 'Помилка завантаження профілю',
+      failedToLoad: 'Не вдалося завантажити профіль',
+      shippingAddress: 'Адреса доставки',
+      inpostPaczkomat: 'InPost Paczkomat:',
+      loyaltyStatus: 'Статус лояльності:',
+      bonusPoints: 'балів',
+      bonusPointsLabel: 'Бонусні бали',
+      toStatus: 'До статусу',
+      remaining: 'Залишилось:',
+      totalOrders: 'Всього замовлень',
+      inProcessing: 'В обробці',
+      myOrders: 'Мої замовлення',
+      noOrders: 'У вас поки немає замовлень',
+      goToCatalog: 'Перейти до каталогу',
+      orderNumber: 'Замовлення #',
+      item: 'товар',
+      items: 'товарів',
+      tracking: 'Відстеження:',
+      openOnCarrierSite: 'Відкрити на сайті перевізника',
+      trackingHistory: 'Історія відстеження:',
+      status: {
+        completed: 'Завершено',
+        shipped: 'Відправлено',
+        inProcessing: 'В обробці',
+        paid: 'Оплачено',
+        notPaid: 'Не оплачено',
+      },
+      loyaltyStatuses: {
+        human: 'Людина',
+        elf: 'Ельф',
+        dwarf: 'Гном/Дворф',
+      },
+    },
   },
   EN: {
     nav: {
@@ -1607,6 +1683,44 @@ const translations: Record<Language, Translations> = {
       paymentFailed: 'Failed',
       paymentRefunded: 'Refunded',
       close: 'Close',
+    },
+    account: {
+      title: 'Personal Account',
+      subtitle: 'Manage your profile and orders',
+      logout: 'Logout',
+      loading: 'Loading...',
+      errorLoading: 'Error loading profile',
+      failedToLoad: 'Failed to load profile',
+      shippingAddress: 'Shipping Address',
+      inpostPaczkomat: 'InPost Paczkomat:',
+      loyaltyStatus: 'Loyalty Status:',
+      bonusPoints: 'points',
+      bonusPointsLabel: 'Bonus Points',
+      toStatus: 'To status',
+      remaining: 'Remaining:',
+      totalOrders: 'Total Orders',
+      inProcessing: 'In Processing',
+      myOrders: 'My Orders',
+      noOrders: 'You have no orders yet',
+      goToCatalog: 'Go to Catalog',
+      orderNumber: 'Order #',
+      item: 'item',
+      items: 'items',
+      tracking: 'Tracking:',
+      openOnCarrierSite: 'Open on carrier website',
+      trackingHistory: 'Tracking History:',
+      status: {
+        completed: 'Completed',
+        shipped: 'Shipped',
+        inProcessing: 'In Processing',
+        paid: 'Paid',
+        notPaid: 'Not Paid',
+      },
+      loyaltyStatuses: {
+        human: 'Human',
+        elf: 'Elf',
+        dwarf: 'Dwarf',
+      },
     },
   },
   DE: {
@@ -2133,6 +2247,44 @@ const translations: Record<Language, Translations> = {
       paymentRefunded: 'Erstattet',
       close: 'Schließen',
     },
+    account: {
+      title: 'Persönliches Konto',
+      subtitle: 'Verwalten Sie Ihr Profil und Ihre Bestellungen',
+      logout: 'Abmelden',
+      loading: 'Laden...',
+      errorLoading: 'Fehler beim Laden des Profils',
+      failedToLoad: 'Profil konnte nicht geladen werden',
+      shippingAddress: 'Lieferadresse',
+      inpostPaczkomat: 'InPost Paczkomat:',
+      loyaltyStatus: 'Treuestatus:',
+      bonusPoints: 'Punkte',
+      bonusPointsLabel: 'Bonuspunkte',
+      toStatus: 'Zum Status',
+      remaining: 'Verbleibend:',
+      totalOrders: 'Gesamtbestellungen',
+      inProcessing: 'In Bearbeitung',
+      myOrders: 'Meine Bestellungen',
+      noOrders: 'Sie haben noch keine Bestellungen',
+      goToCatalog: 'Zum Katalog gehen',
+      orderNumber: 'Bestellung #',
+      item: 'Artikel',
+      items: 'Artikel',
+      tracking: 'Sendungsverfolgung:',
+      openOnCarrierSite: 'Auf der Website des Versandunternehmens öffnen',
+      trackingHistory: 'Sendungsverfolgungsverlauf:',
+      status: {
+        completed: 'Abgeschlossen',
+        shipped: 'Versandt',
+        inProcessing: 'In Bearbeitung',
+        paid: 'Bezahlt',
+        notPaid: 'Nicht bezahlt',
+      },
+      loyaltyStatuses: {
+        human: 'Mensch',
+        elf: 'Elf',
+        dwarf: 'Zwerg',
+      },
+    },
   },
   PL: {
     nav: {
@@ -2657,6 +2809,44 @@ const translations: Record<Language, Translations> = {
       paymentFailed: 'Niepowodzenie',
       paymentRefunded: 'Zwrócone',
       close: 'Zamknij',
+    },
+    account: {
+      title: 'Konto osobiste',
+      subtitle: 'Zarządzaj swoim profilem i zamówieniami',
+      logout: 'Wyloguj się',
+      loading: 'Ładowanie...',
+      errorLoading: 'Błąd ładowania profilu',
+      failedToLoad: 'Nie udało się załadować profilu',
+      shippingAddress: 'Adres dostawy',
+      inpostPaczkomat: 'InPost Paczkomat:',
+      loyaltyStatus: 'Status lojalnościowy:',
+      bonusPoints: 'punktów',
+      bonusPointsLabel: 'Punkty bonusowe',
+      toStatus: 'Do statusu',
+      remaining: 'Pozostało:',
+      totalOrders: 'Wszystkie zamówienia',
+      inProcessing: 'W przetwarzaniu',
+      myOrders: 'Moje zamówienia',
+      noOrders: 'Nie masz jeszcze zamówień',
+      goToCatalog: 'Przejdź do katalogu',
+      orderNumber: 'Zamówienie #',
+      item: 'produkt',
+      items: 'produktów',
+      tracking: 'Śledzenie:',
+      openOnCarrierSite: 'Otwórz na stronie przewoźnika',
+      trackingHistory: 'Historia śledzenia:',
+      status: {
+        completed: 'Zakończone',
+        shipped: 'Wysłane',
+        inProcessing: 'W przetwarzaniu',
+        paid: 'Opłacone',
+        notPaid: 'Nie opłacone',
+      },
+      loyaltyStatuses: {
+        human: 'Człowiek',
+        elf: 'Elf',
+        dwarf: 'Krasnolud',
+      },
     },
   },
   SE: {
