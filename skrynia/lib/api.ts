@@ -14,6 +14,21 @@ export function getApiUrl(): string {
   // Remove trailing slashes
   let normalized = apiUrl.trim().replace(/\/+$/, '');
   
+  // CRITICAL: Convert HTTP to HTTPS for production domains BEFORE any other processing
+  // This must happen first to prevent mixed content errors
+  // Check if domain is runebox.eu or api.runebox.eu
+  const isRuneboxDomain = normalized.includes('runebox.eu') || normalized.includes('api.runebox.eu');
+  const isLocalhost = 
+    normalized.includes('localhost') || 
+    normalized.includes('127.0.0.1') || 
+    normalized.startsWith('http://192.');
+  
+  // PRIORITY 1: If domain is runebox.eu, ALWAYS use HTTPS (unless localhost)
+  // This is critical for preventing mixed content errors - must happen before path normalization
+  if (!isLocalhost && isRuneboxDomain && normalized.startsWith('http://')) {
+    normalized = normalized.replace('http://', 'https://');
+  }
+  
   // If the URL ends with /api/v1, remove it to prevent double /api/v1/api/v1/ paths
   // This handles cases where NEXT_PUBLIC_API_URL is set to something like "https://runebox.eu/api/v1"
   if (normalized.endsWith('/api/v1')) {
@@ -30,20 +45,8 @@ export function getApiUrl(): string {
   // This is a fallback for edge cases
   normalized = normalized.replace(/\/api\/v1\/?$/, '');
   
-  // Check if URL is localhost/127.0.0.1/192.x.x.x (local development)
-  const isLocalhost = 
-    normalized.includes('localhost') || 
-    normalized.includes('127.0.0.1') || 
-    normalized.startsWith('http://192.');
-  
-  // PRIORITY 1: If domain is runebox.eu or api.runebox.eu, ALWAYS use HTTPS (unless localhost)
-  // This ensures production domains always use HTTPS regardless of other conditions
-  // This is critical for preventing mixed content errors
-  if (!isLocalhost && normalized.startsWith('http://') && (normalized.includes('runebox.eu') || normalized.includes('api.runebox.eu'))) {
-    normalized = normalized.replace('http://', 'https://');
-  }
-  
   // PRIORITY 2: Check if we're in production or if the page is loaded over HTTPS
+  // Additional HTTPS conversion for any remaining HTTP URLs (for other domains)
   const isProduction = process.env.NODE_ENV === 'production';
   const isPageHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
   
