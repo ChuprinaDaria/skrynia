@@ -151,7 +151,8 @@ export function InPostGeowidget({
     widgetProps.country = country;
   }
 
-  return <inpost-geowidget {...widgetProps} />;
+  // Use React.createElement to avoid TypeScript JSX type checking issues
+  return React.createElement('inpost-geowidget', widgetProps);
 }
 
 /**
