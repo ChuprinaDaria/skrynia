@@ -2,21 +2,6 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'inpost-geowidget': {
-        token: string;
-        country?: string; // Only for International version
-        language?: string;
-        config?: string;
-        onpoint?: string;
-        id?: string;
-      };
-    }
-  }
-}
-
 export interface InPostPoint {
   name: string;
   location: {

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import FilterSidebar, { Filters } from '@/components/product/FilterSidebar';
@@ -114,12 +115,12 @@ const CategoryCollectionsPage: React.FC = () => {
         <div className="text-center">
           <h1 className="font-rutenia text-4xl text-ivory mb-4">404</h1>
           <p className="text-sage font-inter mb-6">Категорія не знайдена</p>
-          <a
+          <Link
             href="/collections"
             className="text-oxblood hover:text-ivory transition-colors font-inter"
           >
             Повернутися до колекцій
-          </a>
+          </Link>
         </div>
       </div>
     );

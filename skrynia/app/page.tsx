@@ -197,7 +197,7 @@ export default function HomePage() {
 
           {/* View All Products Link */}
           <div className="text-center mt-12">
-            <a
+            <Link
               href="/collections"
               className="inline-flex items-center gap-2 text-ivory hover:text-oxblood font-inter text-lg transition-colors duration-300 group"
               aria-label={t.home.featuredProducts.viewAll}
