@@ -17,7 +17,7 @@ COPY --from=deps /app/node_modules ./node_modules
 
 # Copy all necessary files (excluding node_modules, .next, etc. via .dockerignore)
 COPY package.json package-lock.json* ./
-COPY next.config.js tsconfig.json tailwind.config.ts postcss.config.mjs ./
+COPY next.config.js tsconfig.json tailwind.config.ts postcss.config.mjs global.d.ts ./
 COPY app ./app
 COPY components ./components
 COPY contexts ./contexts
