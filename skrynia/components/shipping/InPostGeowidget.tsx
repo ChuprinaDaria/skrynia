@@ -152,6 +152,7 @@ export function InPostGeowidget({
   }
 
   // Use React.createElement to avoid TypeScript JSX type checking issues
+  // @ts-ignore - Custom HTML element not in JSX.IntrinsicElements
   return React.createElement('inpost-geowidget', widgetProps);
 }
 
