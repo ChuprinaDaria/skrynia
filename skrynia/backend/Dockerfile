@@ -19,13 +19,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create directories and non-root user
-RUN mkdir -p static/uploads && \
-    useradd -m -u 1000 appuser && \
-    chown -R appuser:appuser /app
+# Copy and set permissions for entrypoint script
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
-# Switch to non-root user
-USER appuser
+# Create non-root user (but don't switch yet - entrypoint will handle it)
+RUN useradd -m -u 1000 appuser && \
+    chown -R appuser:appuser /app
 
 # Expose port
 EXPOSE 8000
@@ -33,6 +33,9 @@ EXPOSE 8000
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
+
+# Set entrypoint
+ENTRYPOINT ["/entrypoint.sh"]
 
 # Run database migrations and start server
 CMD ["sh", "-c", "python ensure_tables.py && alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000"]

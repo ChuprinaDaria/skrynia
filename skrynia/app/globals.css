@@ -270,3 +270,44 @@
 .w-md-editor-text-input a:hover {
   color: rgba(102, 0, 0, 0.8) !important;
 }
+
+/* Fix text visibility in markdown editor textarea/input */
+.w-md-editor textarea,
+.w-md-editor input,
+.w-md-editor-text-textarea,
+.w-md-editor-text-input textarea,
+.w-md-editor-text-input,
+.w-md-editor-text-pre textarea,
+/* More specific selectors for MDEditor internal elements */
+.w-md-editor .w-md-editor-text textarea,
+.w-md-editor .w-md-editor-text-pre textarea,
+.w-md-editor .w-md-editor-text-input textarea {
+  color: #FFFFF0 !important;
+  background-color: #0B0C10 !important;
+}
+
+/* Fix for contenteditable divs in markdown editor */
+.w-md-editor [contenteditable="true"],
+.w-md-editor-text-input [contenteditable="true"] {
+  color: #FFFFF0 !important;
+}
+
+/* Fix for legend editor textarea and all admin textareas */
+textarea[placeholder*="Опис"],
+.legend-editor textarea,
+textarea[placeholder*="Легенд"],
+/* More specific selectors for admin editor */
+div[data-color-mode="dark"] textarea,
+div[data-color-mode="dark"] input[type="text"],
+/* Ensure all textareas in admin editor page have visible text */
+div[data-color-mode="dark"] .w-md-editor textarea {
+  color: #FFFFF0 !important;
+  background-color: rgba(11, 12, 16, 0.5) !important;
+}
+
+/* Ensure all textareas in admin have visible text */
+.admin-editor textarea,
+.markdown-editor textarea {
+  color: #FFFFF0 !important;
+  background-color: rgba(11, 12, 16, 0.5) !important;
+}

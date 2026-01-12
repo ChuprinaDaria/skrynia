@@ -1,8 +1,7 @@
 import type { Metadata } from 'next';
-import { getApiEndpoint } from '@/lib/api';
+import { getApiEndpoint, getApiUrl } from '@/lib/api';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
-const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -27,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           ogImage = imageUrl;
         } else if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
           // Backend static files
-          const backendBase = apiUrl.replace(/\/api$/, '').replace(/\/$/, '');
+          const backendBase = getApiUrl().replace(/\/api$/, '').replace(/\/$/, '');
           ogImage = `${backendBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         } else {
           // Frontend public images

@@ -26,13 +26,14 @@ export function getApiUrl(): string {
     normalized.includes('127.0.0.1') || 
     normalized.startsWith('http://192.');
   
-  // Additional safety check FIRST: if domain is runebox.eu, always use HTTPS (unless localhost)
+  // PRIORITY 1: If domain is runebox.eu or api.runebox.eu, ALWAYS use HTTPS (unless localhost)
   // This ensures production domains always use HTTPS regardless of other conditions
+  // This is critical for preventing mixed content errors
   if (!isLocalhost && normalized.startsWith('http://') && (normalized.includes('runebox.eu') || normalized.includes('api.runebox.eu'))) {
     normalized = normalized.replace('http://', 'https://');
   }
   
-  // Check if we're in production or if the page is loaded over HTTPS
+  // PRIORITY 2: Check if we're in production or if the page is loaded over HTTPS
   const isProduction = process.env.NODE_ENV === 'production';
   const isPageHttps = typeof window !== 'undefined' && window.location.protocol === 'https:';
   
