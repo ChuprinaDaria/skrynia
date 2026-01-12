@@ -23,8 +23,7 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.get("/", response_model=List[ProductList])
-def get_products(
+def _get_products_impl(
     skip: int = 0,
     limit: int = 100,
     category_id: Optional[int] = None,
@@ -76,6 +75,21 @@ def get_products(
         ))
 
     return result
+
+
+@router.get("", response_model=List[ProductList])
+@router.get("/", response_model=List[ProductList])
+def get_products(
+    skip: int = 0,
+    limit: int = 100,
+    category_id: Optional[int] = None,
+    is_featured: Optional[bool] = None,
+    is_active: Optional[bool] = True,
+    search: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
+    """Get all products with optional filtering."""
+    return _get_products_impl(skip, limit, category_id, is_featured, is_active, search, db)
 
 
 @router.api_route("/catalog.csv", methods=["GET", "HEAD"])

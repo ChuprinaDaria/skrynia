@@ -17,8 +17,7 @@ from app.core.config import settings
 router = APIRouter()
 
 
-@router.get("/", response_model=List[BlogListItem])
-def get_blogs(
+def _get_blogs_impl(
     skip: int = 0,
     limit: int = 20,
     published_only: bool = True,
@@ -38,6 +37,18 @@ def get_blogs(
         # Fallback to created_at if published_at doesn't exist or causes issues
         blogs = query.order_by(desc(Blog.created_at)).offset(skip).limit(limit).all()
     return blogs
+
+
+@router.get("", response_model=List[BlogListItem])
+@router.get("/", response_model=List[BlogListItem])
+def get_blogs(
+    skip: int = 0,
+    limit: int = 20,
+    published_only: bool = True,
+    db: Session = Depends(get_db)
+):
+    """Get all blog posts (published only by default)."""
+    return _get_blogs_impl(skip, limit, published_only, db)
 
 
 @router.get("/{slug}", response_model=BlogSchema)
