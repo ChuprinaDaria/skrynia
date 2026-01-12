@@ -11,6 +11,7 @@ class OrderStatus(str, enum.Enum):
     PROCESSING = "processing"
     SHIPPED = "shipped"
     DELIVERED = "delivered"
+    COMPLETED = "completed"  # Завершене замовлення (оплачено і доставлено)
     CANCELLED = "cancelled"
     REFUNDED = "refunded"
 

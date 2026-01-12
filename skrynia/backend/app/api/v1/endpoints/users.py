@@ -52,7 +52,7 @@ def get_current_user_profile(
     
     completed_orders = db.query(func.count(Order.id)).filter(
         Order.customer_email == current_user.email,
-        Order.status == OrderStatus.DELIVERED
+        Order.status.in_([OrderStatus.COMPLETED, OrderStatus.DELIVERED])
     ).scalar() or 0
     
     # Get default address
