@@ -19,6 +19,7 @@ export const metadata: Metadata = {
     url: `${siteUrl}/contact`,
     type: 'website',
     siteName: 'Rune Box',
+    locale: 'en_US',
     images: [
       {
         url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
@@ -33,6 +34,8 @@ export const metadata: Metadata = {
     title: 'Contact Us | Rune Box',
     description: 'Get in touch with us to order jewelry or get a consultation',
     images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
+    creator: '@runebox',
+    site: '@runebox',
   },
   alternates: {
     canonical: `${siteUrl}/contact`,

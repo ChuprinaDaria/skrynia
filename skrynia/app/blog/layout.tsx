@@ -22,29 +22,28 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: 'website',
-    title: 'Блог Skrynia | Історії та Традиції Етнічних Прикрас',
-    description: 'Дізнайтеся більше про слов\'янські, вікінгські та кельтські символи, традиції створення прикрас ручної роботи, історії та легенди.',
+    title: 'Blog | Rune Box - Stories and Traditions of Ethnic Jewelry',
+    description: 'Learn more about Slavic, Viking and Celtic symbols, traditions of handmade jewelry creation, stories and legends.',
     url: `${siteUrl}/blog`,
-    siteName: 'Skrynia',
-    locale: 'uk_UA',
+    siteName: 'Rune Box',
+    locale: 'en_US',
     images: [
       {
-        url: `${siteUrl}/images/og/og-blog.jpg`,
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
         width: 1200,
         height: 630,
-        alt: 'Блог Skrynia - Історії та Традиції Етнічних Прикрас',
-        type: 'image/jpeg',
+        alt: 'Blog | Rune Box - Stories and Traditions of Ethnic Jewelry',
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Блог Skrynia | Історії та Традиції Етнічних Прикрас',
-    description: 'Дізнайтеся більше про слов\'янські, вікінгські та кельтські символи, традиції створення прикрас ручної роботи.',
-    images: [`${siteUrl}/images/og/og-blog.jpg`],
-    creator: '@skrynia',
-    site: '@skrynia',
+    title: 'Blog | Rune Box - Stories and Traditions of Ethnic Jewelry',
+    description: 'Learn more about Slavic, Viking and Celtic symbols, traditions of handmade jewelry creation.',
+    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
+    creator: '@runebox',
+    site: '@runebox',
   },
 
   alternates: {

@@ -64,6 +64,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           url: `${siteUrl}/products/${slug}`,
           type: 'website',
           siteName: 'Rune Box',
+          locale: 'en_US',
           images: [
             {
               url: ogImage,
@@ -78,6 +79,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
           images: [ogImage],
+          creator: '@runebox',
+          site: '@runebox',
         },
         alternates: {
           canonical: `${siteUrl}/products/${slug}`,
@@ -98,6 +101,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: `${siteUrl}/products/${slug}`,
       type: 'website',
       siteName: 'Rune Box',
+      locale: 'en_US',
       images: [
         {
           url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
@@ -112,6 +116,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: 'Product | Rune Box',
       description: 'Unique handmade jewelry from Rune Box',
       images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
+      creator: '@runebox',
+      site: '@runebox',
     },
   };
 }

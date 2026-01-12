@@ -80,8 +80,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: metaTitle,
       description: metaDescription,
       url: pageUrl,
-      siteName: 'Rune box',
-      locale: 'uk_UA',
+      siteName: 'Rune Box',
+      locale: 'en_US',
       images: [
         {
           url: ogImage,
@@ -91,7 +91,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         },
       ],
       publishedTime: blog.published_at || blog.created_at,
-      authors: blog.author ? [blog.author] : ['Rune box Team'],
+      authors: blog.author ? [blog.author] : ['Rune Box Team'],
       tags: blog.tags ? blog.tags.split(',').map(tag => tag.trim()) : [],
     },
 

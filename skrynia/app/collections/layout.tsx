@@ -24,27 +24,26 @@ export const metadata: Metadata = {
 
   openGraph: {
     type: 'website',
-    title: 'Колекції Прикрас | Rune box - Слов\'янські, Вікінгські, Кельтські',
-    description: 'Унікальні колекції прикрас ручної роботи: слов\'янські обереги, вікінгські руни, кельтські символи. Натуральний корал, срібло 925 проби.',
+    title: 'Collections | Rune Box - Slavic, Viking, Celtic',
+    description: 'Unique handmade jewelry collections: Slavic amulets, Viking runes, Celtic symbols. Natural coral, 925 silver.',
     url: `${siteUrl}/collections`,
-    siteName: 'Rune box',
-    locale: 'uk_UA',
+    siteName: 'Rune Box',
+    locale: 'en_US',
     images: [
       {
-        url: `${siteUrl}/images/og/og-collections.jpg`,
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
         width: 1200,
         height: 630,
-        alt: 'Колекції Прикрас Rune box - Слов\'янські, Вікінгські, Кельтські',
-        type: 'image/jpeg',
+        alt: 'Collections | Rune Box - Slavic, Viking, Celtic',
       },
     ],
   },
 
   twitter: {
     card: 'summary_large_image',
-    title: 'Колекції Прикрас | Rune box',
-    description: 'Унікальні колекції прикрас ручної роботи: слов\'янські обереги, вікінгські руни, кельтські символи.',
-    images: [`${siteUrl}/images/og/og-collections.jpg`],
+    title: 'Collections | Rune Box',
+    description: 'Unique handmade jewelry collections: Slavic amulets, Viking runes, Celtic symbols.',
+    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
     creator: '@runebox',
     site: '@runebox',
   },

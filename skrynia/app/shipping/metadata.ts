@@ -21,6 +21,7 @@ export const metadata: Metadata = {
     url: `${siteUrl}/shipping`,
     type: 'website',
     siteName: 'Rune Box',
+    locale: 'en_US',
     images: [
       {
         url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
@@ -35,6 +36,8 @@ export const metadata: Metadata = {
     title: 'Shipping & Payment | Rune Box',
     description: 'Information about delivery methods, payment options and return conditions',
     images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
+    creator: '@runebox',
+    site: '@runebox',
   },
   alternates: {
     canonical: `${siteUrl}/shipping`,

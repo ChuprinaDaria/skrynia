@@ -10,17 +10,31 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 // 4. Extract interactive parts (cart, quantity selector) into client components
 
 export const metadata: Metadata = {
-  title: 'Прикраси Ручної Роботи | Rune box',
-  description: 'Унікальні прикраси ручної роботи за мотивами слов\'янської, вікінгської та кельтської культури. Натуральний корал, срібло 925 проби.',
+  title: 'Handmade Jewelry | Rune Box',
+  description: 'Unique handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral, 925 silver.',
 
   openGraph: {
     type: 'website',
-    siteName: 'Rune box',
-    locale: 'uk_UA',
+    title: 'Handmade Jewelry | Rune Box',
+    description: 'Unique handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral, 925 silver.',
+    url: `${siteUrl}/products`,
+    siteName: 'Rune Box',
+    locale: 'en_US',
+    images: [
+      {
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
+        width: 1200,
+        height: 630,
+        alt: 'Handmade Jewelry | Rune Box',
+      },
+    ],
   },
 
   twitter: {
     card: 'summary_large_image',
+    title: 'Handmade Jewelry | Rune Box',
+    description: 'Unique handmade jewelry inspired by Slavic, Viking and Celtic cultures.',
+    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
     creator: '@runebox',
     site: '@runebox',
   },

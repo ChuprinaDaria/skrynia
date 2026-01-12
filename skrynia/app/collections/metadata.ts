@@ -23,6 +23,7 @@ export const metadata: Metadata = {
     url: `${siteUrl}/collections`,
     type: 'website',
     siteName: 'Rune Box',
+    locale: 'en_US',
     images: [
       {
         url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
@@ -37,6 +38,8 @@ export const metadata: Metadata = {
     title: 'Collections | Rune Box',
     description: 'Unique handmade jewelry collections: Ukrainian, Viking and Celtic designs',
     images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
+    creator: '@runebox',
+    site: '@runebox',
   },
   alternates: {
     canonical: `${siteUrl}/collections`,
