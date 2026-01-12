@@ -15,8 +15,18 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('[Login] handleSubmit called', { email, password: '***' });
+    
+    // Validate inputs
+    if (!email || !password) {
+      setError('Будь ласка, заповніть всі поля');
+      return;
+    }
+    
     setError('');
     setLoading(true);
 
@@ -90,7 +100,7 @@ export default function LoginPage() {
           </div>
 
           <div className="bg-footer-black border border-sage/20 rounded-sm p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" noValidate>
               <div>
                 <label htmlFor="email" className="block text-ivory font-inter mb-2">
                   {t.auth.email}
@@ -135,9 +145,11 @@ export default function LoginPage() {
                 className="text-lg"
                 onClick={(e) => {
                   console.log('[Login] Button clicked', { email, hasPassword: !!password });
+                  // Don't prevent default here - let form handle it
                   if (!email || !password) {
                     e.preventDefault();
                     setError('Будь ласка, заповніть всі поля');
+                    return false;
                   }
                 }}
               >
