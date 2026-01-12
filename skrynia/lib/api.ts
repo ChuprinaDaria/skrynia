@@ -5,7 +5,7 @@
 
 /**
  * Get the normalized API base URL
- * Removes trailing slashes and ensures it doesn't end with /api
+ * Removes trailing slashes and ensures it doesn't end with /api or /api/v1
  * Automatically converts HTTP to HTTPS in production (works for both SSR and client)
  */
 export function getApiUrl(): string {
@@ -14,11 +14,21 @@ export function getApiUrl(): string {
   // Remove trailing slashes
   let normalized = apiUrl.trim().replace(/\/+$/, '');
   
+  // If the URL ends with /api/v1, remove it to prevent double /api/v1/api/v1/ paths
+  // This handles cases where NEXT_PUBLIC_API_URL is set to something like "https://runebox.eu/api/v1"
+  if (normalized.endsWith('/api/v1')) {
+    normalized = normalized.slice(0, -7);
+  }
+  
   // If the URL ends with /api, remove it to prevent double /api/api/ paths
   // This handles cases where NEXT_PUBLIC_API_URL is set to something like "https://runebox.eu/api"
   if (normalized.endsWith('/api')) {
     normalized = normalized.slice(0, -4);
   }
+  
+  // Additional safety check: remove any /api/v1 from anywhere in the URL (shouldn't happen, but just in case)
+  // This is a fallback for edge cases
+  normalized = normalized.replace(/\/api\/v1\/?$/, '');
   
   // Check if URL is localhost/127.0.0.1/192.x.x.x (local development)
   const isLocalhost = 
@@ -64,15 +74,34 @@ export function getApiEndpoint(endpoint: string): string {
   // Ensure endpoint starts with /
   let normalizedEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   
-  // Remove any duplicate /api/ in the endpoint path
-  // This handles cases where endpoint might already contain /api/
-  normalizedEndpoint = normalizedEndpoint.replace(/\/api\/api\//g, '/api/');
+  // Check if baseUrl already contains /api/v1 and endpoint starts with /api/v1
+  // Remove the duplicate from endpoint to prevent double /api/v1/api/v1
+  if (baseUrl.includes('/api/v1') && normalizedEndpoint.startsWith('/api/v1')) {
+    normalizedEndpoint = normalizedEndpoint.replace(/^\/api\/v1/, '');
+  }
   
-  const fullUrl = `${baseUrl}${normalizedEndpoint}`;
+  // Build the full URL
+  let fullUrl = `${baseUrl}${normalizedEndpoint}`;
+  
+  // Remove any duplicate /api/v1/api/v1 patterns (handles any remaining edge cases)
+  // This regex finds /api/v1/api/v1 followed by / or end of string
+  fullUrl = fullUrl.replace(/\/api\/v1\/api\/v1(\/|$)/g, '/api/v1$1');
+  
+  // Remove any duplicate /api/api patterns
+  fullUrl = fullUrl.replace(/\/api\/api(\/|$)/g, '/api$1');
+  
+  // Remove any duplicate /v1/v1 patterns
+  fullUrl = fullUrl.replace(/\/v1\/v1(\/|$)/g, '/v1$1');
+  
+  // Final safety check: if URL still contains /api/v1/api/v1 anywhere, remove it
+  // This is a catch-all for any remaining edge cases
+  while (fullUrl.includes('/api/v1/api/v1')) {
+    fullUrl = fullUrl.replace(/\/api\/v1\/api\/v1/g, '/api/v1');
+  }
   
   // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
-    console.debug('[API] Endpoint:', endpoint, 'Full URL:', fullUrl);
+    console.debug('[API] Endpoint:', endpoint, 'Base URL:', baseUrl, 'Full URL:', fullUrl);
   }
   
   return fullUrl;

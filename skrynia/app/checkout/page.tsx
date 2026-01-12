@@ -8,6 +8,7 @@ import Button from '@/components/ui/Button';
 import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint } from '@/lib/api';
+import { InPostGeowidget, InPostPoint } from '@/components/shipping/InPostGeowidget';
 
 type PaymentMethod = 'stripe' | 'przelewy24' | 'blik' | 'bank_transfer';
 type DeliveryMethod = 'inpost' | 'novaposhta' | 'poczta' | 'courier';
@@ -20,6 +21,8 @@ export default function CheckoutPage() {
   const [error, setError] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('inpost');
   const [selectedPickupPoint, setSelectedPickupPoint] = useState('');
+  const [showInPostMap, setShowInPostMap] = useState(false);
+  const [selectedInPostPoint, setSelectedInPostPoint] = useState<InPostPoint | null>(null);
 
   // Form state - moved before functions that use it
   const [formData, setFormData] = useState({
@@ -440,33 +443,99 @@ export default function CheckoutPage() {
                         {deliveryMethod === 'inpost' ? 'Paczkomat' : 'Відділення'} <span className="text-oxblood">*</span>
                       </label>
                       <div className="space-y-3">
-                        <input
-                          type="text"
-                          required
-                          value={selectedPickupPoint}
-                          onChange={(e) => setSelectedPickupPoint(e.target.value)}
-                          placeholder={
-                            deliveryMethod === 'inpost'
-                              ? 'Wpisz kod paczkomatu lub adres (np. WAW01M)'
-                              : 'Введіть номер відділення (напр. Відділення №1)'
-                          }
-                          className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                        />
-                        <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
-                          <p className="text-sage text-xs">
-                            {deliveryMethod === 'inpost' ? (
-                              <>
-                                💡 W przyszłości będziesz mógł wybrać paczkomat z mapy.
-                                Na razie wpisz kod paczkomatu ręcznie.
-                              </>
+                        {deliveryMethod === 'inpost' ? (
+                          <>
+                            {/* InPost Map Widget */}
+                            {showInPostMap && process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN ? (
+                              <div className="space-y-3">
+                                <div className="border border-sage/30 rounded-sm overflow-hidden" style={{ minHeight: '500px' }}>
+                                  <InPostGeowidget
+                                    token={process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN}
+                                    version="international"
+                                    country="PL"
+                                    language="pl"
+                                    config="parcelCollect"
+                                    sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
+                                    onPointSelect={(point: InPostPoint) => {
+                                      setSelectedInPostPoint(point);
+                                      // Extract point code from name (e.g., "WAW01M" from "Paczkomat InPost WAW01M")
+                                      const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] || point.name;
+                                      setSelectedPickupPoint(pointCode);
+                                      setShowInPostMap(false);
+                                    }}
+                                  />
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  onClick={() => setShowInPostMap(false)}
+                                  className="w-full"
+                                >
+                                  {t.checkout.cancel || 'Скасувати'}
+                                </Button>
+                              </div>
                             ) : (
                               <>
-                                💡 Незабаром ви зможете обрати відділення з карти.
-                                Поки що введіть адресу відділення вручну.
+                                <div className="flex gap-2">
+                                  <input
+                                    type="text"
+                                    required
+                                    value={selectedPickupPoint}
+                                    onChange={(e) => setSelectedPickupPoint(e.target.value)}
+                                    placeholder="Wpisz kod paczkomatu (np. WAW01M) lub wybierz z mapy"
+                                    className="flex-1 px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                                  />
+                                  {process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN && (
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      onClick={() => setShowInPostMap(true)}
+                                      className="whitespace-nowrap"
+                                    >
+                                      {selectedInPostPoint ? t.checkout.changePoint || 'Змінити' : t.checkout.selectFromMap || 'Вибрати з карти'}
+                                    </Button>
+                                  )}
+                                </div>
+                                {selectedInPostPoint && (
+                                  <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
+                                    <p className="text-sage text-sm">
+                                      <strong className="text-ivory">Вибрано:</strong> {selectedInPostPoint.name}
+                                      <br />
+                                      <span className="text-xs">
+                                        {selectedInPostPoint.address.street}, {selectedInPostPoint.address.city} {selectedInPostPoint.address.post_code}
+                                      </span>
+                                    </p>
+                                  </div>
+                                )}
+                                {!process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN && (
+                                  <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
+                                    <p className="text-sage text-xs">
+                                      {t.checkout.paczkomatHint}
+                                    </p>
+                                  </div>
+                                )}
                               </>
                             )}
-                          </p>
-                        </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Nova Poshta - manual input for now */}
+                            <input
+                              type="text"
+                              required
+                              value={selectedPickupPoint}
+                              onChange={(e) => setSelectedPickupPoint(e.target.value)}
+                              placeholder="Введіть номер відділення (напр. Відділення №1)"
+                              className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                            />
+                            <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
+                              <p className="text-sage text-xs">
+                                💡 Незабаром ви зможете обрати відділення з карти.
+                                Поки що введіть адресу відділення вручну.
+                              </p>
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
                   )}
