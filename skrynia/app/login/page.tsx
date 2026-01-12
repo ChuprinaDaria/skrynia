@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
@@ -14,6 +14,29 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  // Save current page before redirecting to login (if coming from another page)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const referrer = document.referrer;
+      const currentPath = window.location.pathname;
+      
+      // Only save if we came from the same domain and not from login page itself
+      if (referrer && referrer.includes(window.location.origin) && currentPath === '/login') {
+        try {
+          const referrerUrl = new URL(referrer);
+          const referrerPath = referrerUrl.pathname;
+          if (referrerPath !== '/login' && referrerPath !== '/') {
+            sessionStorage.setItem('previousPage', referrerPath);
+            console.log('[Login] Saved previous page:', referrerPath);
+          }
+        } catch (e) {
+          console.error('[Login] Error saving previous page:', e);
+        }
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -78,16 +101,12 @@ export default function LoginPage() {
       setSuccess(true);
       setError('');
       
-      // Get the previous page from sessionStorage or default to home
-      const previousPage = sessionStorage.getItem('previousPage') || '/';
-      console.log('[Login] Redirecting to:', previousPage);
-      
-      // Clear the previous page from sessionStorage
-      sessionStorage.removeItem('previousPage');
+      // Redirect to account page after successful login
+      console.log('[Login] Redirecting to account page');
       
       // Wait a moment to show success message, then redirect
       setTimeout(() => {
-        router.push(previousPage);
+        router.push('/account');
         router.refresh(); // Refresh to update UI with user data
       }, 1000);
     } catch (err) {
