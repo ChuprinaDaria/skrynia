@@ -23,6 +23,10 @@ export default function CheckoutPage() {
   const [selectedPickupPoint, setSelectedPickupPoint] = useState('');
   const [showInPostMap, setShowInPostMap] = useState(false);
   const [selectedInPostPoint, setSelectedInPostPoint] = useState<InPostPoint | null>(null);
+  
+  // Get InPost token from environment (available at build time)
+  const inpostToken = process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN || '';
+  const hasInPostToken = !!inpostToken;
 
   // Form state - moved before functions that use it
   const [formData, setFormData] = useState({
@@ -446,11 +450,11 @@ export default function CheckoutPage() {
                         {deliveryMethod === 'inpost' ? (
                           <>
                             {/* InPost Map Widget */}
-                            {showInPostMap && process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN ? (
+                            {showInPostMap && hasInPostToken ? (
                               <div className="space-y-3">
                                 <div className="border border-sage/30 rounded-sm overflow-hidden" style={{ minHeight: '500px' }}>
                                   <InPostGeowidget
-                                    token={process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN}
+                                    token={inpostToken}
                                     version="international"
                                     country="PL"
                                     language="pl"
@@ -485,7 +489,7 @@ export default function CheckoutPage() {
                                     placeholder="Wpisz kod paczkomatu (np. WAW01M) lub wybierz z mapy"
                                     className="flex-1 px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                                   />
-                                  {process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN && (
+                                  {hasInPostToken && (
                                     <Button
                                       type="button"
                                       variant="ghost"
@@ -507,7 +511,7 @@ export default function CheckoutPage() {
                                     </p>
                                   </div>
                                 )}
-                                {!process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN && (
+                                {!hasInPostToken && (
                                   <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
                                     <p className="text-sage text-xs">
                                       {t.checkout.paczkomatHint}

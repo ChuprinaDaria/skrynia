@@ -159,6 +159,7 @@ jobs:
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
           NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN=${{ secrets.INPOST_GEOWIDGET_TOKEN }}
+          NEXT_PUBLIC_INPOST_SANDBOX=${{ secrets.INPOST_SANDBOX }}
           
           # Stripe Payment
           STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
