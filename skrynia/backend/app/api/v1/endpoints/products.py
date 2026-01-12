@@ -369,6 +369,10 @@ def delete_product(
     current_user: User = Depends(get_current_admin_user)
 ):
     """Delete a product (admin only)."""
+    from app.models.order import OrderItem
+    from app.models.blog import blog_products
+    from sqlalchemy import text
+    
     product = db.query(Product).filter(Product.id == product_id).first()
 
     if not product:
@@ -377,7 +381,34 @@ def delete_product(
             detail="Product not found"
         )
 
-    db.delete(product)
-    db.commit()
+    # Check if product is used in any orders
+    order_items_count = db.query(OrderItem).filter(OrderItem.product_id == product_id).count()
+    if order_items_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Cannot delete product: it is used in {order_items_count} order(s). Products in orders cannot be deleted to preserve order history."
+        )
+
+    # Check if product is linked to any blog posts
+    blog_links_count = db.execute(
+        text("SELECT COUNT(*) FROM blog_products WHERE product_id = :product_id"),
+        {"product_id": product_id}
+    ).scalar()
+    if blog_links_count > 0:
+        # Remove links to blog posts (cascade delete from association table)
+        db.execute(
+            text("DELETE FROM blog_products WHERE product_id = :product_id"),
+            {"product_id": product_id}
+        )
+
+    try:
+        db.delete(product)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to delete product: {str(e)}"
+        )
 
     return None
