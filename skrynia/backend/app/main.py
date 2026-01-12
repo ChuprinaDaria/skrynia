@@ -14,6 +14,7 @@ app = FastAPI(
     description="Premium E-commerce API for Handmade Ethnic Jewelry",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
+    redirect_slashes=False,  # Disable automatic trailing slash redirects to prevent 307 errors
 )
 
 # Security middleware (must be first)
