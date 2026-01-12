@@ -452,22 +452,32 @@ export default function CheckoutPage() {
                             {/* InPost Map Widget */}
                             {showInPostMap && hasInPostToken ? (
                               <div className="space-y-3">
-                                <div className="border border-sage/30 rounded-sm overflow-hidden" style={{ minHeight: '500px' }}>
-                                  <InPostGeowidget
-                                    token={inpostToken}
-                                    version="international"
-                                    country="PL"
-                                    language="pl"
-                                    config="parcelCollect"
-                                    sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
-                                    onPointSelect={(point: InPostPoint) => {
-                                      setSelectedInPostPoint(point);
-                                      // Extract point code from name (e.g., "WAW01M" from "Paczkomat InPost WAW01M")
-                                      const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] || point.name;
-                                      setSelectedPickupPoint(pointCode);
-                                      setShowInPostMap(false);
-                                    }}
-                                  />
+                                <div 
+                                  className="border border-sage/30 rounded-sm"
+                                  style={{ 
+                                    height: '600px',
+                                    width: '100%',
+                                    position: 'relative',
+                                    overflow: 'visible'
+                                  }}
+                                >
+                                  <div style={{ height: '100%', width: '100%' }}>
+                                    <InPostGeowidget
+                                      token={inpostToken}
+                                      version="international"
+                                      country="PL"
+                                      language="pl"
+                                      config="parcelCollect"
+                                      sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
+                                      onPointSelect={(point: InPostPoint) => {
+                                        setSelectedInPostPoint(point);
+                                        // Extract point code from name (e.g., "WAW01M" from "Paczkomat InPost WAW01M")
+                                        const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] || point.name;
+                                        setSelectedPickupPoint(pointCode);
+                                        setShowInPostMap(false);
+                                      }}
+                                    />
+                                  </div>
                                 </div>
                                 <Button
                                   type="button"
