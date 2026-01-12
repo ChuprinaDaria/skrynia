@@ -23,6 +23,7 @@ COPY components ./components
 COPY contexts ./contexts
 COPY lib ./lib
 COPY public ./public
+COPY types ./types
 
 # Set environment variables for build
 ENV NEXT_TELEMETRY_DISABLED=1

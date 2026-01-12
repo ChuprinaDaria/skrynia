@@ -1,5 +1,7 @@
 'use client';
 
+/// <reference path="../../types/inpost-geowidget.d.ts" />
+
 import { useEffect, useRef, useState } from 'react';
 
 export interface InPostPoint {
