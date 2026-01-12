@@ -293,12 +293,12 @@ export default function AccountPage() {
     }
   };
 
-  const getLoyaltyStatusImage = (status: string | null) => {
+  const getLoyaltyStatusImage = (status: string | null): string => {
     switch (status) {
       case 'human': return '/images/bonus/human.jpg';
       case 'elf': return '/images/bonus/elf.jpg';
       case 'dwarf': return '/images/bonus/dwarf.jpg';
-      return '/images/bonus/human.jpg';
+      default: return '/images/bonus/human.jpg';
     }
   };
 
