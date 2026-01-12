@@ -109,12 +109,23 @@ def update_made_to_order_request(
             detail="Request not found"
         )
     
+    # Зберігаємо поточний product_id, щоб він не змінився
+    original_product_id = request.product_id
+    
+    # Оновлюємо тільки дозволені поля (product_id не можна змінювати)
     if update.status is not None:
         request.status = update.status
     if update.is_read is not None:
         request.is_read = update.is_read
     if update.admin_notes is not None:
         request.admin_notes = update.admin_notes
+    
+    # Гарантуємо, що product_id залишається незмінним
+    request.product_id = original_product_id
+    
+    # Оновлюємо updated_at
+    from datetime import datetime, timezone
+    request.updated_at = datetime.now(timezone.utc)
     
     db.commit()
     db.refresh(request)
