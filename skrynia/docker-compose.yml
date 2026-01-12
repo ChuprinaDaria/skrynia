@@ -55,6 +55,12 @@ services:
       MAIL_FROM: ${MAIL_FROM:-noreply@skrynia.com}
       MAIL_SERVER: ${MAIL_SERVER:-smtp.gmail.com}
       MAIL_FROM_NAME: "Skrynia Pani Darii"
+      
+      # InPost
+      INPOST_API_TOKEN: ${INPOST_API_TOKEN:-}
+      INPOST_ORGANIZATION_ID: ${INPOST_ORGANIZATION_ID:-}
+      INPOST_GEOWIDGET_TOKEN: ${INPOST_GEOWIDGET_TOKEN:-}
+      INPOST_SANDBOX: ${INPOST_SANDBOX:-true}
     volumes:
       - ./backend/app:/app/app
       - backend_uploads:/app/static/uploads
@@ -74,6 +80,7 @@ services:
       - backend
     environment:
       NEXT_PUBLIC_API_URL: http://localhost:8000
+      NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN: ${INPOST_GEOWIDGET_TOKEN:-}
     ports:
       - "3000:3000"
     networks:

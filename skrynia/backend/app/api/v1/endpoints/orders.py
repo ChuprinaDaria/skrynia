@@ -188,6 +188,9 @@ def get_order(
     current_user: User = Depends(get_current_admin_user)
 ):
     """Get a single order by ID (admin only)."""
+    from app.models.shipping import Shipment
+    from app.schemas.order import Order as OrderSchemaModel
+    
     order = db.query(Order).filter(Order.id == order_id).first()
 
     if not order:
@@ -196,7 +199,27 @@ def get_order(
             detail="Order not found"
         )
 
-    return order
+    # Get shipment info if exists
+    shipment = db.query(Shipment).filter(Shipment.order_id == order_id).first()
+    
+    # Convert order to dict and add shipment info
+    order_dict = {
+        **{c.name: getattr(order, c.name) for c in order.__table__.columns},
+        "items": [{"id": item.id, "product_id": item.product_id, "product_title": item.product_title,
+                   "product_sku": item.product_sku, "product_image": item.product_image,
+                   "price": item.price, "quantity": item.quantity, "subtotal": item.subtotal}
+                  for item in order.items]
+    }
+    
+    if shipment:
+        from app.schemas.order import ShipmentInfo
+        order_dict["shipment"] = ShipmentInfo(
+            label_url=shipment.label_url,
+            provider=shipment.provider.value if shipment.provider else None,
+            status=shipment.status.value if shipment.status else None
+        ).model_dump()
+    
+    return OrderSchemaModel(**order_dict)
 
 
 @router.get("/number/{order_number}", response_model=OrderSchema)
@@ -274,5 +297,14 @@ async def update_order(
 
     db.commit()
     db.refresh(order)
+
+    # Send email notification if status changed
+    if "status" in update_data:
+        background_tasks.add_task(
+            send_order_status_email,
+            order=order,
+            status=order.status,
+            db=db
+        )
 
     return order

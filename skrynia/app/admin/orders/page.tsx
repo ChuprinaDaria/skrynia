@@ -21,6 +21,13 @@ interface Order {
   shipping_country: string;
   shipping_city: string;
   created_at: string;
+  tracking_number?: string;
+  tracking_url?: string;
+  shipment?: {
+    label_url?: string;
+    provider?: string;
+    status?: string;
+  };
   items?: Array<{
     product_title: string;
     quantity: number;
@@ -99,6 +106,22 @@ export default function OrdersPage() {
       console.error('Failed to fetch orders:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchOrderDetails = async (orderId: number) => {
+    try {
+      const token = localStorage.getItem('admin_token');
+      const res = await fetch(getApiEndpoint(`/api/v1/orders/${orderId}`), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const orderData = await res.json();
+        setSelectedOrder(orderData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch order details:', error);
     }
   };
 
@@ -293,7 +316,7 @@ export default function OrdersPage() {
                       </td>
                       <td className="py-3 px-4">
                         <button
-                          onClick={() => setSelectedOrder(order)}
+                          onClick={() => fetchOrderDetails(order.id)}
                           className="text-sage hover:text-oxblood transition-colors flex items-center gap-1"
                         >
                           <Edit className="w-4 h-4" />
@@ -393,6 +416,52 @@ export default function OrdersPage() {
                         </div>
                       </div>
                     </div>
+
+                    {/* Shipping Info */}
+                    {(selectedOrder.tracking_number || selectedOrder.shipment?.label_url) && (
+                      <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">
+                        <h3 className="font-cinzel text-lg text-ivory mb-3">Відправлення</h3>
+                        <div className="space-y-2 text-sage">
+                          {selectedOrder.tracking_number && (
+                            <div className="flex items-center justify-between">
+                              <span>Номер відстеження:</span>
+                              <div className="flex items-center gap-2">
+                                <span className="text-ivory font-mono text-sm">{selectedOrder.tracking_number}</span>
+                                {selectedOrder.tracking_url && (
+                                  <a
+                                    href={selectedOrder.tracking_url}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-oxblood hover:text-oxblood/80 transition-colors"
+                                  >
+                                    Відкрити
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          )}
+                          {selectedOrder.shipment?.label_url && (
+                            <div className="flex items-center justify-between">
+                              <span>Етикетка:</span>
+                              <a
+                                href={selectedOrder.shipment.label_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-oxblood hover:text-oxblood/80 transition-colors"
+                              >
+                                Завантажити етикетку
+                              </a>
+                            </div>
+                          )}
+                          {selectedOrder.shipment?.provider && (
+                            <div className="flex items-center justify-between">
+                              <span>Перевізник:</span>
+                              <span className="text-ivory">{selectedOrder.shipment.provider}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
 
                     {/* Status Updates */}
                     <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-4">

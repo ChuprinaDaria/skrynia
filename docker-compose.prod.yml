@@ -48,6 +48,11 @@ services:
       MAIL_FROM: ${MAIL_FROM}
       MAIL_SERVER: ${MAIL_SERVER}
       MAIL_FROM_NAME: ${MAIL_FROM_NAME}
+      # InPost
+      INPOST_API_TOKEN: ${INPOST_API_TOKEN}
+      INPOST_ORGANIZATION_ID: ${INPOST_ORGANIZATION_ID}
+      INPOST_GEOWIDGET_TOKEN: ${INPOST_GEOWIDGET_TOKEN}
+      INPOST_SANDBOX: ${INPOST_SANDBOX:-true}
     volumes:
       - ./backend/static:/app/static
       - ./skrynia/backend/static:/app/static
@@ -67,6 +72,7 @@ services:
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+      NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN: ${INPOST_GEOWIDGET_TOKEN}
     networks:
       - skrynia_network
     ports:

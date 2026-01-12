@@ -61,6 +61,16 @@ class OrderUpdate(BaseModel):
     admin_notes: Optional[str] = None
 
 
+class ShipmentInfo(BaseModel):
+    """Shipment information for order"""
+    label_url: Optional[str] = None
+    provider: Optional[str] = None
+    status: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 class Order(OrderBase):
     id: int
     order_number: str
@@ -78,9 +88,11 @@ class Order(OrderBase):
 
     status: OrderStatus
     tracking_number: Optional[str]
+    tracking_url: Optional[str]
     admin_notes: Optional[str]
 
     items: List[OrderItem] = []
+    shipment: Optional[ShipmentInfo] = None
 
     created_at: datetime
     updated_at: Optional[datetime]

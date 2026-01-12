@@ -152,6 +152,7 @@ jobs:
           BACKEND_URL=${{ secrets.BACKEND_URL }}
           NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN=${{ secrets.INPOST_GEOWIDGET_TOKEN }}
           STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_PUBLIC_KEY=${{ secrets.STRIPE_PUBLIC_KEY }}
           STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
@@ -165,6 +166,11 @@ jobs:
           MAIL_SERVER=${{ secrets.MAIL_SERVER }}
           MAIL_FROM_NAME=${{ secrets.MAIL_FROM_NAME }}
           ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+          # InPost
+          INPOST_API_TOKEN=${{ secrets.INPOST_API_TOKEN }}
+          INPOST_ORGANIZATION_ID=${{ secrets.INPOST_ORGANIZATION_ID }}
+          INPOST_GEOWIDGET_TOKEN=${{ secrets.INPOST_GEOWIDGET_TOKEN }}
+          INPOST_SANDBOX=${{ secrets.INPOST_SANDBOX }}
           BACKEND_IMAGE=ghcr.io/chuprinadaria/skrynia/backend:latest
           FRONTEND_IMAGE=ghcr.io/chuprinadaria/skrynia/frontend:latest
           ENVEOF

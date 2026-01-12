@@ -33,8 +33,10 @@ class Settings(BaseSettings):
     P24_TEST_MODE: bool = True
 
     # InPost
-    INPOST_API_TOKEN: str = ""
-    INPOST_ORGANIZATION_ID: str = ""
+    INPOST_API_TOKEN: str = ""  # ShipX API token (Bearer token)
+    INPOST_ORGANIZATION_ID: str = ""  # Organization ID (optional, can be fetched from API)
+    INPOST_SANDBOX: bool = True  # Use sandbox environment
+    INPOST_GEOWIDGET_TOKEN: str = ""  # Geowidget PUBLIC token (for frontend widget)
 
     # Nova Poshta
     NOVA_POSHTA_API_KEY: str = ""

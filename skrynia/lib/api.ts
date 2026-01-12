@@ -78,3 +78,36 @@ export function getApiEndpoint(endpoint: string): string {
   return fullUrl;
 }
 
+/**
+ * Normalize image URL - converts relative paths to absolute URLs
+ * Handles both relative paths (/static/uploads/...) and absolute URLs
+ * @param imageUrl - The image URL (can be relative or absolute)
+ * @returns The normalized absolute URL
+ */
+export function normalizeImageUrl(imageUrl: string | null | undefined): string {
+  if (!imageUrl) {
+    return '/images/products/placeholder.jpg';
+  }
+
+  // If already absolute URL (http:// or https://), return as is
+  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+
+  // If relative path starting with /static/ or /uploads/, use backend URL
+  if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
+    const backendBase = getApiUrl().replace(/\/api$/, '').replace(/\/$/, '');
+    return `${backendBase}${imageUrl}`;
+  }
+
+  // If relative path starting with /, assume it's a frontend public asset
+  if (imageUrl.startsWith('/')) {
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
+    return `${siteUrl}${imageUrl}`;
+  }
+
+  // Fallback: treat as relative path from site root
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
+  return `${siteUrl}/${imageUrl}`;
+}
+
