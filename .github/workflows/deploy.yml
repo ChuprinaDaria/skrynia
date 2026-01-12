@@ -105,6 +105,8 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL || 'http://localhost:8000' }}
             NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu' }}
+            NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN=${{ secrets.INPOST_GEOWIDGET_TOKEN }}
+            NEXT_PUBLIC_INPOST_SANDBOX=${{ secrets.INPOST_SANDBOX || 'true' }}
 
   deploy:
     runs-on: ubuntu-latest
