@@ -452,6 +452,9 @@ export interface Translations {
     paczkomat: string;
     paczkomatPlaceholder: string;
     paczkomatHint: string;
+    selectFromMap: string;
+    changePoint: string;
+    cancel: string;
     novaposhtaOffice: string;
     novaposhtaOfficePlaceholder: string;
     novaposhtaOfficeHint: string;
@@ -1514,6 +1517,9 @@ const translations: Record<Language, Translations> = {
       paczkomat: 'Paczkomat',
       paczkomatPlaceholder: 'Enter paczkomat code or address (e.g. WAW01M)',
       paczkomatHint: '💡 In the future you will be able to select a paczkomat from the map. For now, enter the paczkomat code manually.',
+      selectFromMap: 'Select from map',
+      changePoint: 'Change',
+      cancel: 'Cancel',
       novaposhtaOffice: 'Branch',
       novaposhtaOfficePlaceholder: 'Enter branch number (e.g. Branch #1)',
       novaposhtaOfficeHint: '💡 Soon you will be able to select a branch from the map. For now, enter the branch address manually.',
@@ -2034,6 +2040,9 @@ const translations: Record<Language, Translations> = {
       paczkomat: 'Paczkomat',
       paczkomatPlaceholder: 'Paczkomat-Code oder Adresse eingeben (z.B. WAW01M)',
       paczkomatHint: '💡 In Zukunft können Sie einen Paczkomat auf der Karte auswählen. Geben Sie vorerst den Paczkomat-Code manuell ein.',
+      selectFromMap: 'Von Karte auswählen',
+      changePoint: 'Ändern',
+      cancel: 'Abbrechen',
       novaposhtaOffice: 'Filiale',
       novaposhtaOfficePlaceholder: 'Filialnummer eingeben (z.B. Filiale #1)',
       novaposhtaOfficeHint: '💡 Bald können Sie eine Filiale auf der Karte auswählen. Geben Sie vorerst die Filialadresse manuell ein.',
@@ -3077,6 +3086,9 @@ const translations: Record<Language, Translations> = {
       paczkomat: 'Paczkomat',
       paczkomatPlaceholder: 'Ange paczkomat-kod eller adress (t.ex. WAW01M)',
       paczkomatHint: '💡 I framtiden kommer du att kunna välja en paczkomat från kartan. För närvarande, ange paczkomat-koden manuellt.',
+      selectFromMap: 'Välj från karta',
+      changePoint: 'Ändra',
+      cancel: 'Avbryt',
       novaposhtaOffice: 'Filial',
       novaposhtaOfficePlaceholder: 'Ange filialnummer (t.ex. Filial #1)',
       novaposhtaOfficeHint: '💡 Snart kommer du att kunna välja en filial från kartan. För närvarande, ange filialadressen manuellt.',
@@ -3597,6 +3609,9 @@ const translations: Record<Language, Translations> = {
       paczkomat: 'Paczkomat',
       paczkomatPlaceholder: 'Skriv inn paczkomat-kode eller adresse (f.eks. WAW01M)',
       paczkomatHint: '💡 I fremtiden vil du kunne velge en paczkomat fra kartet. For nå, skriv inn paczkomat-koden manuelt.',
+      selectFromMap: 'Velg fra kart',
+      changePoint: 'Endre',
+      cancel: 'Avbryt',
       novaposhtaOffice: 'Filial',
       novaposhtaOfficePlaceholder: 'Skriv inn filialnummer (f.eks. Filial #1)',
       novaposhtaOfficeHint: '💡 Snart vil du kunne velge en filial fra kartet. For nå, skriv inn filialadressen manuelt.',
@@ -4117,6 +4132,9 @@ const translations: Record<Language, Translations> = {
       paczkomat: 'Paczkomat',
       paczkomatPlaceholder: 'Indtast paczkomat-kode eller adresse (f.eks. WAW01M)',
       paczkomatHint: '💡 I fremtiden vil du kunne vælge en paczkomat fra kortet. For nu, indtast paczkomat-koden manuelt.',
+      selectFromMap: 'Vælg fra kort',
+      changePoint: 'Ændre',
+      cancel: 'Annuller',
       novaposhtaOffice: 'Filial',
       novaposhtaOfficePlaceholder: 'Indtast filialnummer (f.eks. Filial #1)',
       novaposhtaOfficeHint: '💡 Snart vil du kunne vælge en filial fra kortet. For nu, indtast filialadressen manuelt.',
@@ -4637,6 +4655,9 @@ const translations: Record<Language, Translations> = {
       paczkomat: 'Paczkomat',
       paczkomatPlaceholder: 'Entrez le code ou l\'adresse du paczkomat (ex. WAW01M)',
       paczkomatHint: '💡 À l\'avenir, vous pourrez sélectionner un paczkomat sur la carte. Pour l\'instant, entrez le code du paczkomat manuellement.',
+      selectFromMap: 'Sélectionner sur la carte',
+      changePoint: 'Changer',
+      cancel: 'Annuler',
       novaposhtaOffice: 'Bureau',
       novaposhtaOfficePlaceholder: 'Entrez le numéro du bureau (ex. Bureau #1)',
       novaposhtaOfficeHint: '💡 Bientôt, vous pourrez sélectionner un bureau sur la carte. Pour l\'instant, entrez l\'adresse du bureau manuellement.',
