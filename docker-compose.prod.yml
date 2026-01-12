@@ -84,8 +84,8 @@ services:
     image: nginx:alpine
     container_name: skrynia_nginx_prod
     ports:
-      - "80:80"
-      - "443:443"
+      - "8080:80"   # Змінюємо 80 на 8080 на хості, щоб уникнути конфлікту з хостовим nginx
+      - "8443:443"  # Змінюємо 443 на 8443 на хості
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - /etc/ssl/runebox:/etc/ssl/runebox:ro

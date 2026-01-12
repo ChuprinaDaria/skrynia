@@ -35,14 +35,14 @@ const navItems = [
     icon: Package,
   },
   {
-    href: '/admin/orders',
-    label: 'Замовлення',
-    icon: ShoppingCart,
-  },
-  {
     href: '/admin/blog',
     label: 'Блог',
     icon: BookOpen,
+  },
+  {
+    href: '/admin/orders',
+    label: 'Замовлення',
+    icon: ShoppingCart,
   },
   {
     href: '/admin/made-to-order',
