@@ -624,9 +624,10 @@ def verify_inpost_webhook(request: Request):
 
 
 @router.post("/inpost/webhook")
-def handle_inpost_webhook(
+async def handle_inpost_webhook(
     event: InPostWebhookEvent,
     request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     """
@@ -762,15 +763,6 @@ def handle_inpost_webhook(
                     # Set shipped_at if picked up
                     if new_status == ShippingStatus.PICKED_UP and not shipment.order.shipped_at:
                         shipment.order.shipped_at = datetime.now()
-                        if shipment.order.status != OrderStatus.SHIPPED:
-                            shipment.order.status = OrderStatus.SHIPPED
-                            # Send email notification
-                            background_tasks.add_task(
-                                send_order_status_email,
-                                order=shipment.order,
-                                status=OrderStatus.SHIPPED,
-                                db=db
-                            )
                         if shipment.order.status != OrderStatus.SHIPPED:
                             shipment.order.status = OrderStatus.SHIPPED
                             # Send email notification
