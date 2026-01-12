@@ -44,6 +44,12 @@ interface ProductFormData {
   is_active: boolean;
   is_featured: boolean;
   category_id?: number;
+  images?: Array<{
+    image_url: string;
+    alt_text?: string;
+    position?: number;
+    is_primary?: boolean;
+  }>;
 }
 
 export default function ProductsManagement() {
@@ -221,7 +227,7 @@ export default function ProductsManagement() {
       // Prepare data for API - add images array if not present
       const apiData = {
         ...formData,
-        images: formData.images || [],
+        images: formData.images ?? [],
       };
 
       const res = await fetch(url, {
