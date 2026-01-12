@@ -39,7 +39,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 # Include routers
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/api/v1/users", tags=["User Profile"])
-app.include_router(user_addresses.router, prefix="/api/v1/users/addresses", tags=["User Addresses"])
+app.include_router(user_addresses.router, prefix="/api/v1/users", tags=["User Addresses"])
 app.include_router(products.router, prefix="/api/v1/products", tags=["Products"])
 app.include_router(categories.router, prefix="/api/v1/categories", tags=["Categories"])
 app.include_router(social_links.router, prefix="/api/v1/social-links", tags=["Social Links"])

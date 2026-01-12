@@ -276,20 +276,6 @@ def get_product_by_id(product_id: int, db: Session = Depends(get_db)):
     return product
 
 
-@router.get("/{slug}", response_model=ProductSchema)
-def get_product(slug: str, db: Session = Depends(get_db)):
-    """Get a single product by slug."""
-    product = db.query(Product).filter(Product.slug == slug).first()
-
-    if not product:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Product not found"
-        )
-
-    return product
-
-
 @router.post("/", response_model=ProductSchema)
 def create_product(
     product_in: ProductCreate,
@@ -332,6 +318,20 @@ def create_product(
     db.refresh(new_product)
 
     return new_product
+
+
+@router.get("/{slug}", response_model=ProductSchema)
+def get_product(slug: str, db: Session = Depends(get_db)):
+    """Get a single product by slug."""
+    product = db.query(Product).filter(Product.slug == slug).first()
+
+    if not product:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Product not found"
+        )
+
+    return product
 
 
 @router.patch("/{product_id}", response_model=ProductSchema)

@@ -61,6 +61,11 @@ def get_current_user_profile(
         UserAddress.is_default == True
     ).first()
     
+    # Convert default_address to schema if it exists
+    default_address_schema = None
+    if default_address:
+        default_address_schema = UserAddressSchema.model_validate(default_address)
+    
     return UserProfile(
         id=current_user.id,
         email=current_user.email,
@@ -75,7 +80,7 @@ def get_current_user_profile(
         total_orders=total_orders,
         pending_orders=pending_orders,
         completed_orders=completed_orders,
-        default_address=default_address
+        default_address=default_address_schema
     )
 
 

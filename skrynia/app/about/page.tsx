@@ -9,7 +9,7 @@ import Script from 'next/script';
 const aboutJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'AboutPage',
-  name: 'Про Скриню Пані Дарії',
+  name: 'Про Rune Box',
   description: 'Історія створення та філософія бренду автентичних прикрас ручної роботи',
   url: 'https://runebox.eu/about',
   mainEntity: {

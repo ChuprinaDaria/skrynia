@@ -18,6 +18,13 @@ interface Product {
   category_id?: number;
 }
 
+interface Category {
+  id: number;
+  name_uk: string;
+  name_en?: string;
+  slug: string;
+}
+
 interface ProductFormData {
   title_uk: string;
   title_en?: string;
@@ -41,6 +48,7 @@ interface ProductFormData {
 
 export default function ProductsManagement() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -64,7 +72,20 @@ export default function ProductsManagement() {
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
+
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch(getApiEndpoint('/api/v1/categories'));
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -100,6 +121,7 @@ export default function ProductsManagement() {
       is_handmade: true,
       is_active: true,
       is_featured: false,
+      category_id: undefined,
     });
     setIsModalOpen(true);
   };
@@ -394,15 +416,40 @@ export default function ProductsManagement() {
               />
             </div>
 
+            {/* Category */}
+            <div>
+              <label className="block text-ivory font-inter mb-2">Категорія</label>
+              <select
+                value={formData.category_id || ''}
+                onChange={(e) => setFormData({ ...formData, category_id: e.target.value ? parseInt(e.target.value) : undefined })}
+                className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
+              >
+                <option value="">Без категорії</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {category.name_uk}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* Price & Stock */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-ivory font-inter mb-2">Ціна (zł)</label>
                 <input
-                  type="number"
+                  type="text"
+                  inputMode="decimal"
                   step="0.01"
-                  value={formData.price}
-                  onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
+                  value={formData.price === 0 ? '' : formData.price.toString()}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '' || value === '.') {
+                      setFormData({ ...formData, price: 0 });
+                    } else if (!isNaN(parseFloat(value))) {
+                      setFormData({ ...formData, price: parseFloat(value) });
+                    }
+                  }}
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
                   required
                 />
@@ -410,9 +457,17 @@ export default function ProductsManagement() {
               <div>
                 <label className="block text-ivory font-inter mb-2">Запас</label>
                 <input
-                  type="number"
-                  value={formData.stock_quantity}
-                  onChange={(e) => setFormData({ ...formData, stock_quantity: parseInt(e.target.value) })}
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.stock_quantity === 0 ? '' : formData.stock_quantity.toString()}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    if (value === '') {
+                      setFormData({ ...formData, stock_quantity: 0 });
+                    } else if (/^\d+$/.test(value)) {
+                      setFormData({ ...formData, stock_quantity: parseInt(value) });
+                    }
+                  }}
                   className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:border-oxblood"
                   required
                 />

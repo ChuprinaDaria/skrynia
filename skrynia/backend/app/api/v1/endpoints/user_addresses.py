@@ -15,7 +15,7 @@ from app.core.security import get_current_user
 router = APIRouter()
 
 
-@router.get("/", response_model=List[UserAddressSchema])
+@router.get("/addresses", response_model=List[UserAddressSchema])
 def get_my_addresses(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -28,7 +28,7 @@ def get_my_addresses(
     return addresses
 
 
-@router.get("/default", response_model=UserAddressSchema)
+@router.get("/addresses/default", response_model=UserAddressSchema)
 def get_default_address(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -48,7 +48,7 @@ def get_default_address(
     return address
 
 
-@router.post("/", response_model=UserAddressSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/addresses", response_model=UserAddressSchema, status_code=status.HTTP_201_CREATED)
 def create_address(
     address_in: UserAddressCreate,
     current_user: User = Depends(get_current_user),
@@ -74,7 +74,7 @@ def create_address(
     return new_address
 
 
-@router.get("/{address_id}", response_model=UserAddressSchema)
+@router.get("/addresses/{address_id}", response_model=UserAddressSchema)
 def get_address(
     address_id: int,
     current_user: User = Depends(get_current_user),
@@ -95,7 +95,7 @@ def get_address(
     return address
 
 
-@router.patch("/{address_id}", response_model=UserAddressSchema)
+@router.patch("/addresses/{address_id}", response_model=UserAddressSchema)
 def update_address(
     address_id: int,
     address_update: UserAddressUpdate,
@@ -133,7 +133,7 @@ def update_address(
     return address
 
 
-@router.delete("/{address_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/addresses/{address_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_address(
     address_id: int,
     current_user: User = Depends(get_current_user),
@@ -157,7 +157,7 @@ def delete_address(
     return None
 
 
-@router.post("/{address_id}/set-default", response_model=UserAddressSchema)
+@router.post("/addresses/{address_id}/set-default", response_model=UserAddressSchema)
 def set_default_address(
     address_id: int,
     current_user: User = Depends(get_current_user),

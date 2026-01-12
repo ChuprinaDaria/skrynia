@@ -32,12 +32,13 @@ def init_db(db: Session) -> None:
     # Create categories
     categories_data = [
         {
-            "name_uk": "Українські",
-            "name_en": "Ukrainian",
-            "slug": "ukrainian",
+            "name_uk": "Слов'янські",
+            "name_en": "Slavic",
+            "slug": "slavic",
             "description_uk": "Символи сили та захисту",
-            "culture_type": "ukrainian",
-            "icon": "alatyr"
+            "culture_type": "slavic",
+            "icon": "alatyr",
+            "is_featured": True
         },
         {
             "name_uk": "Вікінгські",
@@ -45,7 +46,8 @@ def init_db(db: Session) -> None:
             "slug": "viking",
             "description_uk": "Відвага і доля воїнів",
             "culture_type": "viking",
-            "icon": "valknut"
+            "icon": "valknut",
+            "is_featured": True
         },
         {
             "name_uk": "Кельтські",
@@ -53,7 +55,8 @@ def init_db(db: Session) -> None:
             "slug": "celtic",
             "description_uk": "Триєдність і вічність",
             "culture_type": "celtic",
-            "icon": "triquetra"
+            "icon": "triquetra",
+            "is_featured": True
         }
     ]
 

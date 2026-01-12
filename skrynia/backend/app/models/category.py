@@ -16,7 +16,8 @@ class Category(Base):
     description_uk = Column(Text, nullable=True)
     description_en = Column(Text, nullable=True)
     icon = Column(String, nullable=True)  # Icon name or SVG path
-    culture_type = Column(String, nullable=False)  # ukrainian, viking, celtic
+    culture_type = Column(String, nullable=False)  # slavic, viking, celtic (or custom)
+    is_featured = Column(Boolean, default=False)  # Featured collections (main: slavic, viking, celtic)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 

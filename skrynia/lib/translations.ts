@@ -6,6 +6,8 @@ export interface Translations {
     'constructor': string;
     about: string;
     contact: string;
+    login?: string;
+    account?: string;
   };
   hero: {
     title: string;
@@ -591,7 +593,7 @@ const translations: Record<Language, Translations> = {
         viewAll: 'Переглянути всі прикраси',
       },
       about: {
-        title: 'Про Скриню',
+        title: 'Про Rune Box',
         paragraph1: 'Кожна прикраса — це не лише аксесуар, а портал до історії наших предків.',
         paragraph2: 'Ми створюємо автентичні вироби за справжніми археологічними зразками, використовуючи давні техніки та натуральні матеріали.',
         paragraph3: 'Натуральний корал, срібло 925 проби, бурштин — кожен елемент обирається з любов\'ю та повагою до традицій слов\'янської, вікінгської та кельтської культур.',
@@ -655,7 +657,7 @@ const translations: Record<Language, Translations> = {
       privacy: 'Ми поважаємо вашу конфіденційність. Відписатися можна будь-коли.',
     },
     about: {
-      title: 'Про Скриню Пані Дарії',
+      title: 'Про Rune Box',
       subtitle: 'Автентичні прикраси ручної роботи з душею та історією',
       history: {
         title: 'Наша Історія',
@@ -1088,6 +1090,8 @@ const translations: Record<Language, Translations> = {
       constructor: 'Necklace Constructor',
       about: 'About',
       contact: 'Contact',
+      login: 'Login',
+      account: 'Account',
     },
     hero: {
       title: 'Rune box',
@@ -1131,7 +1135,7 @@ const translations: Record<Language, Translations> = {
         viewAll: 'View all jewelry',
       },
       about: {
-        title: 'About the Chest',
+        title: 'About Rune Box',
         paragraph1: 'Each piece is not just an accessory, but a portal to our ancestors\' history.',
         paragraph2: 'We create authentic pieces based on real archaeological samples, using ancient techniques and natural materials.',
         paragraph3: 'Natural coral, 925 silver, amber — each element is chosen with love and respect for the traditions of Slavic, Viking, and Celtic cultures.',
@@ -1611,6 +1615,8 @@ const translations: Record<Language, Translations> = {
       constructor: 'Halsketten-Konstruktor',
       about: 'Über uns',
       contact: 'Kontakt',
+      login: 'Anmelden',
+      account: 'Konto',
     },
     hero: {
       title: 'Rune box',
@@ -2134,6 +2140,8 @@ const translations: Record<Language, Translations> = {
       constructor: 'Konstruktor Naszyjników',
       about: 'O nas',
       contact: 'Kontakt',
+      login: 'Zaloguj się',
+      account: 'Konto',
     },
     hero: {
       title: 'Rune box',

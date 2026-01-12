@@ -9,6 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { t, language, setLanguage } = useLanguage();
   const { itemCount, openCart } = useCart();
 
@@ -19,6 +20,12 @@ const Header: React.FC = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('user_token');
+    setIsLoggedIn(!!token);
   }, []);
 
   const languages = ['UA', 'EN', 'DE', 'PL', 'SE', 'NO', 'DK', 'FR'] as const;
@@ -82,6 +89,47 @@ const Header: React.FC = () => {
                 </button>
               ))}
             </div>
+
+            {/* Login/Account Button */}
+            {isLoggedIn ? (
+              <Link
+                href="/account"
+                className="hidden md:flex items-center gap-2 px-4 py-2 text-ivory hover:text-oxblood transition-colors duration-200 font-inter text-sm"
+                aria-label="Account"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span className="hidden lg:inline">{t.nav.account || 'Акаунт'}</span>
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="hidden md:flex items-center gap-2 px-4 py-2 text-ivory hover:text-oxblood transition-colors duration-200 font-inter text-sm"
+                aria-label="Login"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                </svg>
+                <span className="hidden lg:inline">{t.nav.login || 'Вхід'}</span>
+              </Link>
+            )}
 
             {/* Constructor Button */}
             <Link
@@ -195,6 +243,25 @@ const Header: React.FC = () => {
                 {link.label}
               </Link>
             ))}
+
+            {/* Mobile Login/Account Button */}
+            {isLoggedIn ? (
+              <Link
+                href="/account"
+                className="mt-2 px-4 py-3 text-ivory hover:text-oxblood transition-colors duration-200 font-inter text-center"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t.nav.account || 'Акаунт'}
+              </Link>
+            ) : (
+              <Link
+                href="/login"
+                className="mt-2 px-4 py-3 text-ivory hover:text-oxblood transition-colors duration-200 font-inter text-center"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                {t.nav.login || 'Вхід'}
+              </Link>
+            )}
 
             {/* Mobile Constructor Button */}
             <Link
