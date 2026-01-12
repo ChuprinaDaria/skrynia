@@ -15,6 +15,7 @@ import {
   Mail,
   Circle,
   FileQuestion,
+  BookOpen,
 } from 'lucide-react';
 
 const navItems = [
@@ -37,6 +38,11 @@ const navItems = [
     href: '/admin/orders',
     label: 'Замовлення',
     icon: ShoppingCart,
+  },
+  {
+    href: '/admin/blog',
+    label: 'Блог',
+    icon: BookOpen,
   },
   {
     href: '/admin/made-to-order',

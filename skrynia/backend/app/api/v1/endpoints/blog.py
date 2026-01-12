@@ -89,6 +89,22 @@ def create_blog(
 
     # Create blog post
     blog_data = blog_in.dict(exclude={'linked_product_ids'})
+    
+    # Ensure title_uk and content_uk are set (required fields)
+    if not blog_data.get('title_uk') and blog_data.get('title'):
+        blog_data['title_uk'] = blog_data['title']
+    if not blog_data.get('content_uk') and blog_data.get('content'):
+        blog_data['content_uk'] = blog_data['content']
+    if not blog_data.get('excerpt_uk') and blog_data.get('excerpt'):
+        blog_data['excerpt_uk'] = blog_data['excerpt']
+    
+    # Set legacy fields for backward compatibility if not provided
+    if not blog_data.get('title') and blog_data.get('title_uk'):
+        blog_data['title'] = blog_data['title_uk']
+    if not blog_data.get('content') and blog_data.get('content_uk'):
+        blog_data['content'] = blog_data['content_uk']
+    if not blog_data.get('excerpt') and blog_data.get('excerpt_uk'):
+        blog_data['excerpt'] = blog_data['excerpt_uk']
 
     # Set published_at if publishing
     if blog_in.published:
@@ -139,6 +155,22 @@ def update_blog(
             )
 
     update_data = blog_in.dict(exclude_unset=True, exclude={'linked_product_ids'})
+    
+    # Ensure title_uk and content_uk are set if updating legacy fields
+    if 'title' in update_data and not update_data.get('title_uk'):
+        update_data['title_uk'] = update_data['title']
+    if 'content' in update_data and not update_data.get('content_uk'):
+        update_data['content_uk'] = update_data['content']
+    if 'excerpt' in update_data and not update_data.get('excerpt_uk'):
+        update_data['excerpt_uk'] = update_data['excerpt']
+    
+    # Set legacy fields for backward compatibility
+    if 'title_uk' in update_data and not update_data.get('title'):
+        update_data['title'] = update_data['title_uk']
+    if 'content_uk' in update_data and not update_data.get('content'):
+        update_data['content'] = update_data['content_uk']
+    if 'excerpt_uk' in update_data and not update_data.get('excerpt'):
+        update_data['excerpt'] = update_data['excerpt_uk']
 
     # Set published_at when publishing for the first time
     if blog_in.published and not blog.published and not blog.published_at:
@@ -182,6 +214,29 @@ def delete_blog(
     db.commit()
 
     return {"message": "Blog post deleted successfully"}
+
+
+@router.get("/admin/{blog_id}", response_model=BlogSchema)
+def get_blog_admin(
+    blog_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Get a blog post by ID (admin only)."""
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not enough permissions"
+        )
+    
+    blog = db.query(Blog).filter(Blog.id == blog_id).first()
+    if not blog:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Blog post not found"
+        )
+    
+    return blog
 
 
 @router.get("/admin/all", response_model=List[BlogSchema])
