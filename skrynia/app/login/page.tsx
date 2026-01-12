@@ -69,10 +69,27 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
+      console.log('[Login] Login successful, token received');
+      
       // Store user token
       localStorage.setItem('user_token', data.access_token);
-      // Redirect to home or previous page
-      router.push('/');
+      
+      // Show success message briefly
+      setSuccess(true);
+      setError('');
+      
+      // Get the previous page from sessionStorage or default to home
+      const previousPage = sessionStorage.getItem('previousPage') || '/';
+      console.log('[Login] Redirecting to:', previousPage);
+      
+      // Clear the previous page from sessionStorage
+      sessionStorage.removeItem('previousPage');
+      
+      // Wait a moment to show success message, then redirect
+      setTimeout(() => {
+        router.push(previousPage);
+        router.refresh(); // Refresh to update UI with user data
+      }, 1000);
     } catch (err) {
       if (err instanceof TypeError && err.message.includes('fetch')) {
         const apiUrl = getApiUrl();
@@ -134,6 +151,12 @@ export default function LoginPage() {
               {error && (
                 <div className="p-3 bg-oxblood/20 border border-oxblood/50 rounded-sm text-oxblood text-sm">
                   {error}
+                </div>
+              )}
+
+              {success && (
+                <div className="p-3 bg-sage/20 border border-sage/50 rounded-sm text-sage text-sm">
+                  Успішний вхід! Перенаправлення...
                 </div>
               )}
 
