@@ -215,7 +215,7 @@ export default function HomePage() {
               >
                 <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -251,7 +251,7 @@ export default function HomePage() {
                   </p>
                 </div>
                 <div className="mt-8">
-                  <a
+                  <Link
                     href="/about"
                     className="inline-flex items-center gap-2 text-oxblood hover:text-ivory font-inter transition-colors duration-300 group border-b border-oxblood hover:border-ivory pb-1"
                   >
@@ -268,7 +268,7 @@ export default function HomePage() {
                     >
                       <path d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                  </a>
+                  </Link>
                 </div>
               </article>
 
