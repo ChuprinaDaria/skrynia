@@ -129,10 +129,17 @@ export default function LoginPage() {
 
               <Button
                 type="submit"
-                disabled={loading}
+                disabled={loading || !email || !password}
                 size="lg"
                 fullWidth
                 className="text-lg"
+                onClick={(e) => {
+                  console.log('[Login] Button clicked', { email, hasPassword: !!password });
+                  if (!email || !password) {
+                    e.preventDefault();
+                    setError('Будь ласка, заповніть всі поля');
+                  }
+                }}
               >
                 {loading ? t.auth.loggingIn : t.auth.loginButton}
               </Button>
