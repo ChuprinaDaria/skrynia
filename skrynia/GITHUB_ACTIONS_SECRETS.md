@@ -36,8 +36,9 @@
 4. Organization ID відображається в інформації про API
 5. Або використайте API для отримання:
    ```bash
+   # Замініть <your-api-token> на ваш реальний токен
    curl -X GET https://api-shipx-pl.easypack24.net/v1/organizations \
-     -H "Authorization: Bearer YOUR_TOKEN"
+     -H "Authorization: Bearer <your-api-token>"
    ```
 
 **Використання**: 
