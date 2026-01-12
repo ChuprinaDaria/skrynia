@@ -20,14 +20,21 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
 
+    // Debug logging
+    console.log('[Login] Form submitted', { email, password: '***' });
+    const apiUrl = getApiEndpoint('/api/v1/auth/login');
+    console.log('[Login] API URL:', apiUrl);
+
     try {
-      const response = await fetch(getApiEndpoint('/api/v1/auth/login'), {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
+
+      console.log('[Login] Response status:', response.status);
 
       if (!response.ok) {
         let errorMessage = t.auth.errors.defaultError;
