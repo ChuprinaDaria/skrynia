@@ -3,6 +3,7 @@ Database initialization script.
 Creates admin user and categories.
 """
 from sqlalchemy.orm import Session
+from sqlalchemy import or_, and_
 from app.db.session import SessionLocal, engine
 from app.db.base import Base
 from app.models.user import User
@@ -29,13 +30,16 @@ def init_db(db: Session) -> None:
     else:
         print(f"⚠️  Admin user already exists: {settings.ADMIN_EMAIL}")
 
-    # Create categories
+    # Create categories with full translations
     categories_data = [
         {
-            "name_uk": "Слов'янські",
-            "name_en": "Slavic",
-            "slug": "slavic",
+            "name_uk": "Українські",
+            "name_en": "Ukrainian",
+            "name_de": "Ukrainisch",
+            "name_pl": "Ukraińskie",
+            "slug": "ukrainian",
             "description_uk": "Символи сили та захисту",
+            "description_en": "Symbols of strength and protection",
             "culture_type": "slavic",
             "icon": "alatyr",
             "is_featured": True
@@ -43,8 +47,11 @@ def init_db(db: Session) -> None:
         {
             "name_uk": "Вікінгські",
             "name_en": "Viking",
+            "name_de": "Wikinger",
+            "name_pl": "Wikingowie",
             "slug": "viking",
             "description_uk": "Відвага і доля воїнів",
+            "description_en": "Courage and fate of warriors",
             "culture_type": "viking",
             "icon": "valknut",
             "is_featured": True
@@ -52,8 +59,11 @@ def init_db(db: Session) -> None:
         {
             "name_uk": "Кельтські",
             "name_en": "Celtic",
+            "name_de": "Keltisch",
+            "name_pl": "Celtyckie",
             "slug": "celtic",
             "description_uk": "Триєдність і вічність",
+            "description_en": "Trinity and eternity",
             "culture_type": "celtic",
             "icon": "triquetra",
             "is_featured": True
@@ -61,11 +71,32 @@ def init_db(db: Session) -> None:
     ]
 
     for cat_data in categories_data:
-        category = db.query(Category).filter(Category.slug == cat_data["slug"]).first()
+        # Check by slug first, then by culture_type for backward compatibility
+        category = db.query(Category).filter(
+            or_(
+                Category.slug == cat_data["slug"],
+                and_(
+                    Category.culture_type == cat_data["culture_type"],
+                    Category.is_featured == True
+                )
+            )
+        ).first()
+        
         if not category:
             category = Category(**cat_data)
             db.add(category)
             print(f"✅ Created category: {cat_data['name_uk']}")
+        else:
+            # Update existing category with new translations if needed
+            category.name_uk = cat_data["name_uk"]
+            category.name_en = cat_data.get("name_en")
+            category.name_de = cat_data.get("name_de")
+            category.name_pl = cat_data.get("name_pl")
+            category.description_uk = cat_data.get("description_uk")
+            category.description_en = cat_data.get("description_en")
+            category.slug = cat_data["slug"]
+            category.is_featured = True
+            print(f"🔄 Updated category: {cat_data['name_uk']}")
 
     db.commit()
 

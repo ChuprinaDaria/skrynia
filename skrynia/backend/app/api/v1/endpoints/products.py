@@ -402,13 +402,23 @@ def delete_product(
         )
 
     try:
+        # Delete product images first (cascade should handle this, but being explicit)
+        # Load images to delete them properly
+        images = db.query(ProductImage).filter(ProductImage.product_id == product_id).all()
+        for image in images:
+            db.delete(image)
+        
+        # Delete the product (already loaded above)
         db.delete(product)
         db.commit()
     except Exception as e:
         db.rollback()
+        import traceback
+        error_detail = str(e)
+        traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to delete product: {str(e)}"
+            detail=f"Failed to delete product: {error_detail}"
         )
 
     return None

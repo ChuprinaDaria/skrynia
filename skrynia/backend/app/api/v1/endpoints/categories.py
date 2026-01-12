@@ -178,6 +178,14 @@ def delete_category(
             detail="Category not found"
         )
     
+    # Prevent deletion of main featured collections (Ukrainian/Slavic, Viking, Celtic)
+    main_collections = ['ukrainian', 'slavic', 'viking', 'celtic']
+    if category.slug in main_collections or (category.is_featured and category.culture_type in ['slavic', 'viking', 'celtic']):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete main featured collections. These collections are required for the site to function properly."
+        )
+    
     # Check if category has products
     if category.products:
         raise HTTPException(
