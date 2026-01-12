@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import AdminNav from '@/components/admin/AdminNav';
 import Button from '@/components/ui/Button';
 import { getApiEndpoint } from '@/lib/api';
 
