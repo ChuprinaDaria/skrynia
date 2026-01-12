@@ -972,19 +972,30 @@ function ProductEditorContent() {
               <div>
                 <label className="block text-ivory font-inter mb-2">Ціна</label>
                 <input
-                  type="number"
-                  step="0.01"
-                  value={formData.price}
+                  type="text"
+                  inputMode="decimal"
+                  value={formData.price === 0 ? '' : formData.price.toString()}
                   onChange={(e) => {
                     const value = e.target.value.trim();
-                    setFormData({ 
-                      ...formData, 
-                      price: value && !isNaN(parseFloat(value)) ? parseFloat(value) : 0 
-                    });
+                    if (value === '' || value === '.') {
+                      setFormData({ ...formData, price: 0 });
+                    } else if (!isNaN(parseFloat(value))) {
+                      setFormData({ ...formData, price: parseFloat(value) });
+                    }
+                  }}
+                  onFocus={(e) => {
+                    if (formData.price === 0) {
+                      e.target.value = '';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '' || e.target.value === '.') {
+                      setFormData({ ...formData, price: 0 });
+                    }
                   }}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                   required
-                  min="0"
+                  placeholder="0.00"
                 />
               </div>
               <div>
@@ -1003,34 +1014,53 @@ function ProductEditorContent() {
               <div>
                 <label className="block text-ivory font-inter mb-2">Стара Ціна</label>
                 <input
-                  type="number"
-                  step="0.01"
-                  value={formData.compare_at_price ?? ''}
+                  type="text"
+                  inputMode="decimal"
+                  value={formData.compare_at_price === null ? '' : formData.compare_at_price.toString()}
                   onChange={(e) => {
                     const value = e.target.value.trim();
-                    setFormData({
-                      ...formData,
-                      compare_at_price: value && !isNaN(parseFloat(value)) ? parseFloat(value) : null,
-                    });
+                    if (value === '' || value === '.') {
+                      setFormData({ ...formData, compare_at_price: null });
+                    } else if (!isNaN(parseFloat(value))) {
+                      setFormData({ ...formData, compare_at_price: parseFloat(value) });
+                    }
+                  }}
+                  onFocus={(e) => {
+                    if (formData.compare_at_price === null) {
+                      e.target.value = '';
+                    }
                   }}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
+                  placeholder="Не встановлено"
                 />
               </div>
               <div>
                 <label className="block text-ivory font-inter mb-2">Запас</label>
                 <input
-                  type="number"
-                  value={formData.stock_quantity}
+                  type="text"
+                  inputMode="numeric"
+                  value={formData.stock_quantity === 0 ? '' : formData.stock_quantity.toString()}
                   onChange={(e) => {
                     const value = e.target.value.trim();
-                    setFormData({ 
-                      ...formData, 
-                      stock_quantity: value && !isNaN(parseInt(value)) ? parseInt(value) : 0 
-                    });
+                    if (value === '') {
+                      setFormData({ ...formData, stock_quantity: 0 });
+                    } else if (/^\d+$/.test(value)) {
+                      setFormData({ ...formData, stock_quantity: parseInt(value) });
+                    }
+                  }}
+                  onFocus={(e) => {
+                    if (formData.stock_quantity === 0) {
+                      e.target.value = '';
+                    }
+                  }}
+                  onBlur={(e) => {
+                    if (e.target.value === '') {
+                      setFormData({ ...formData, stock_quantity: 0 });
+                    }
                   }}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                   required
-                  min="0"
+                  placeholder="0"
                 />
               </div>
               <div>
@@ -1418,13 +1448,16 @@ function ProductEditorContent() {
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
-                      <input
-                        type="text"
-                        value={image.alt_text}
-                        onChange={(e) => updateImageAlt(index, e.target.value)}
-                        placeholder="Alt текст..."
-                        className="w-full mt-2 px-2 py-1 bg-deep-black/50 border border-sage/20 text-ivory text-xs rounded-sm focus:border-oxblood focus:outline-none"
-                      />
+                      <div className="p-2 bg-deep-black/50">
+                        <label className="block text-sage text-xs mb-1 font-inter">Alt текст (SEO)</label>
+                        <input
+                          type="text"
+                          value={image.alt_text}
+                          onChange={(e) => updateImageAlt(index, e.target.value)}
+                          placeholder="Опис зображення для пошукових систем..."
+                          className="w-full px-2 py-1.5 bg-footer-black border border-sage/30 text-ivory text-sm rounded-sm focus:border-oxblood focus:outline-none"
+                        />
+                      </div>
                     </div>
                   ))}
                 </div>
