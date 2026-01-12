@@ -284,12 +284,12 @@ export default function AccountPage() {
   }
 
   const defaultAddress = addresses.find((addr) => addr.is_default) || addresses[0];
-  const getLoyaltyStatusName = (status: string | null) => {
+  const getLoyaltyStatusName = (status: string | null): string => {
     switch (status) {
       case 'human': return t.account.loyaltyStatuses.human;
       case 'elf': return t.account.loyaltyStatuses.elf;
       case 'dwarf': return t.account.loyaltyStatuses.dwarf;
-      return t.account.loyaltyStatuses.human;
+      default: return t.account.loyaltyStatuses.human;
     }
   };
 
