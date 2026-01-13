@@ -68,7 +68,7 @@ export default function SettingsPage() {
     return (
       <div className="min-h-screen bg-deep-black">
         <AdminNav />
-        <div className="ml-64 pt-20 pb-20">
+        <div className="ml-0 lg:ml-64 pt-20 pb-20">
           <div className="container mx-auto px-4 md:px-6">
             <div className="text-ivory text-xl font-cinzel">Завантаження...</div>
           </div>
@@ -80,7 +80,7 @@ export default function SettingsPage() {
   return (
     <div className="min-h-screen bg-deep-black">
       <AdminNav />
-      <div className="ml-64 pt-20 pb-20">
+      <div className="ml-0 lg:ml-64 pt-20 pb-20">
         <div className="container mx-auto px-4 md:px-6">
           {/* Header */}
           <div className="mb-8">
