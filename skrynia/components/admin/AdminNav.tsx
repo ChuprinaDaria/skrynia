@@ -116,7 +116,7 @@ export default function AdminNav() {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-[60] p-2 bg-footer-black border border-sage/20 rounded-sm text-sage hover:text-ivory hover:bg-deep-black/50 transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-[70] p-2 bg-footer-black border border-sage/20 rounded-sm text-sage hover:text-ivory hover:bg-deep-black/50 transition-colors pointer-events-auto"
         aria-label="Toggle menu"
       >
         {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -132,7 +132,7 @@ export default function AdminNav() {
 
       {/* Sidebar Navigation */}
       <nav
-        className={`fixed left-0 top-0 h-full w-64 bg-footer-black border-r border-sage/20 pt-20 z-50 transition-transform duration-300 ease-in-out ${
+        className={`fixed left-0 top-0 h-full w-64 bg-footer-black border-r border-sage/20 pt-20 z-[60] transition-transform duration-300 ease-in-out pointer-events-auto ${
           isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
         }`}
       >

@@ -73,7 +73,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
       {/* Backdrop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-deep-black/80 backdrop-blur-sm z-40 animate-fade-in"
+          className="fixed inset-0 bg-deep-black/80 backdrop-blur-sm z-[55] animate-fade-in"
           onClick={onClose}
           aria-hidden="true"
         />
@@ -81,7 +81,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full md:w-[480px] bg-footer-black border-l border-sage/30 z-50 flex flex-col transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 right-0 h-full w-full md:w-[480px] bg-footer-black border-l border-sage/30 z-[60] flex flex-col transition-transform duration-300 ease-in-out pointer-events-auto ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"
@@ -336,13 +336,21 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               <div className="flex gap-2">
                 <Link
                   href="/login"
-                  className="flex-1 px-4 py-2 bg-oxblood/20 hover:bg-oxblood/30 border border-oxblood/50 text-ivory text-sm font-inter text-center rounded-sm transition-colors"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  className="flex-1 px-4 py-2 bg-oxblood/20 hover:bg-oxblood/30 border border-oxblood/50 text-ivory text-sm font-inter text-center rounded-sm transition-colors pointer-events-auto relative z-[70]"
                 >
                   {t.cart.authReminder.login}
                 </Link>
                 <Link
                   href="/register"
-                  className="flex-1 px-4 py-2 bg-oxblood hover:bg-oxblood/90 text-ivory text-sm font-inter text-center rounded-sm transition-colors font-semibold"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  className="flex-1 px-4 py-2 bg-oxblood hover:bg-oxblood/90 text-ivory text-sm font-inter text-center rounded-sm transition-colors font-semibold pointer-events-auto relative z-[70]"
                 >
                   {t.cart.authReminder.register}
                 </Link>
