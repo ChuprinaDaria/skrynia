@@ -43,10 +43,10 @@ const CollectionsPreview: React.FC = () => {
     return [
       {
         id: 1,
-        name: t.collections.ukrainian,
-        tagline: t.collections.ukrainianTagline,
+        name: t.collections.slavic,
+        tagline: t.collections.slavicTagline,
         image: '/images/collections/slavic.png',
-        slug: 'ukrainian',
+        slug: 'slavic',
       },
       {
         id: 2,
@@ -74,7 +74,7 @@ const CollectionsPreview: React.FC = () => {
 
   const getImageBySlug = (slug: string, cultureType?: string): string | undefined => {
     // Map known images for main collections
-    if (slug === 'slavic' || slug === 'ukrainian' || cultureType === 'slavic') {
+    if (slug === 'slavic' || cultureType === 'slavic') {
       return '/images/collections/slavic.png';
     }
     if (slug === 'viking' || cultureType === 'viking') {
@@ -139,7 +139,7 @@ const CollectionsPreview: React.FC = () => {
           const apiCategory = data.find(cat => 
             cat.slug === defaultCol.slug || 
             cat.culture_type === defaultCol.slug ||
-            (defaultCol.slug === 'ukrainian' && (cat.slug === 'slavic' || cat.culture_type === 'slavic'))
+            (defaultCol.slug === 'slavic' && (cat.slug === 'slavic' || cat.culture_type === 'slavic'))
           );
           
           if (apiCategory) {
@@ -158,7 +158,7 @@ const CollectionsPreview: React.FC = () => {
         });
 
         // Additional collections from API (excluding the main three)
-        const mainSlugs = ['ukrainian', 'slavic', 'viking', 'celtic'];
+        const mainSlugs = ['slavic', 'viking', 'celtic'];
         const additional = data
           .filter(cat => !mainSlugs.includes(cat.slug) && cat.culture_type !== 'slavic')
           .filter(cat => !cat.is_featured)

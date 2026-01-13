@@ -148,7 +148,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 price: p.price,
                 currency: p.currency,
                 image: p.primary_image || '/images/products/placeholder.jpg',
-                category: 'ukrainian' as const,
+                category: 'slavic' as const,
                 materials: p.materials || [],
                 isHandmade: p.is_handmade ?? true,
                 slug: p.slug,
@@ -255,7 +255,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   const primaryImage = product.images?.find(img => img.is_primary) || product.images?.[0];
   const displayTitle = getProductTitle(product);
   const displayDescription = getProductDescription(product);
-  const categorySlug = product.category_id ? 'ukrainian' : 'all'; // TODO: Map from category_id
+  const categorySlug = product.category_id ? 'slavic' : 'all'; // TODO: Map from category_id
 
   // Generate JSON-LD for product
   const generateProductJsonLd = () => ({

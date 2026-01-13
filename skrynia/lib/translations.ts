@@ -18,8 +18,8 @@ export interface Translations {
   collections: {
     title: string;
     subtitle: string;
-    ukrainian: string;
-    ukrainianTagline: string;
+    slavic: string;
+    slavicTagline: string;
     viking: string;
     vikingTagline: string;
     celtic: string;
@@ -225,7 +225,7 @@ export interface Translations {
   };
     product: {
       categories: {
-        ukrainian: string;
+        slavic: string;
         viking: string;
         celtic: string;
       };
@@ -598,8 +598,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Колекції Спадщини',
       subtitle: 'Три культури. Одна спадщина. Безліч історій.',
-      ukrainian: 'Українські',
-      ukrainianTagline: 'Символи сили та захисту',
+      slavic: 'Слов\'янські',
+      slavicTagline: 'Символи сили та захисту',
       viking: 'Вікінгські',
       vikingTagline: 'Відвага і доля воїнів',
       celtic: 'Кельтські',
@@ -798,14 +798,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Всі',
-        ukrainian: 'Українські',
+        slavic: 'Слов\'янські',
         viking: 'Вікінгські',
         celtic: 'Кельтські',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Українські',
+        slavic: 'Слов\'янські',
         viking: 'Вікінгські',
         celtic: 'Кельтські',
       },

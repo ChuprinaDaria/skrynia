@@ -72,7 +72,7 @@ export default function HomePage() {
           price: product.price,
           currency: product.currency,
           image: product.primary_image || '/images/products/placeholder.jpg',
-          category: 'ukrainian' as const, // TODO: Map from category_id
+          category: 'slavic' as const, // TODO: Map from category_id
           materials: product.materials || [],
           isHandmade: product.is_handmade ?? true,
           slug: product.slug,

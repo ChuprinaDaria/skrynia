@@ -13,7 +13,7 @@ export interface Product {
   currency: string;
   image: string;
   images?: string[];
-  category: 'ukrainian' | 'viking' | 'celtic';
+  category: 'slavic' | 'viking' | 'celtic';
   materials: string[];
   isHandmade?: boolean;
   slug: string;
@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
             }`}
           >
             <span className="bg-deep-black/80 backdrop-blur-sm text-sage text-xs font-inter px-2 py-1 rounded-sm border border-sage/30">
-              {product.category === 'ukrainian' && t.product.categories.ukrainian}
+              {product.category === 'slavic' && t.product.categories.slavic}
               {product.category === 'viking' && t.product.categories.viking}
               {product.category === 'celtic' && t.product.categories.celtic}
             </span>

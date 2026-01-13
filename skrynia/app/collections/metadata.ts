@@ -4,10 +4,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 export const metadata: Metadata = {
   title: 'Колекції Прикрас | Rune box',
-  description: 'Перегляньте унікальні колекції прикрас: українські, вікінгські та кельтські. Намиста, браслети, сережки та підвіски ручної роботи.',
+  description: 'Перегляньте унікальні колекції прикрас: слов\'янські, вікінгські та кельтські. Намиста, браслети, сережки та підвіски ручної роботи.',
   keywords: [
     'колекції прикрас',
-    'українські прикраси',
+    'слов\'янські прикраси',
     'вікінгські прикраси',
     'кельтські прикраси',
     'намиста',
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   ],
   openGraph: {
     title: 'Collections | Rune Box',
-    description: 'Unique handmade jewelry collections: Ukrainian, Viking and Celtic designs',
+    description: 'Unique handmade jewelry collections: Slavic, Viking and Celtic designs',
     url: `${siteUrl}/collections`,
     type: 'website',
     siteName: 'Rune Box',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Collections | Rune Box',
-    description: 'Unique handmade jewelry collections: Ukrainian, Viking and Celtic designs',
+    description: 'Unique handmade jewelry collections: Slavic, Viking and Celtic designs',
     images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
     creator: '@runebox',
     site: '@runebox',

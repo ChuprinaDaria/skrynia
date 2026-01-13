@@ -55,7 +55,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
 
   const cultureOptions = [
     { id: 'all', label: t.filters.cultures.all },
-    { id: 'ukrainian', label: t.filters.cultures.ukrainian },
+    { id: 'slavic', label: t.filters.cultures.slavic },
     { id: 'viking', label: t.filters.cultures.viking },
     { id: 'celtic', label: t.filters.cultures.celtic },
   ];

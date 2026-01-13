@@ -23,7 +23,7 @@ interface ApiProduct {
   materials?: string[];
 }
 
-const validCategories = ['ukrainian', 'viking', 'celtic'];
+const validCategories = ['slavic', 'viking', 'celtic'];
 
 const CategoryCollectionsPage: React.FC = () => {
   const params = useParams();
@@ -88,7 +88,7 @@ const CategoryCollectionsPage: React.FC = () => {
           price: product.price,
           currency: product.currency,
           image: product.primary_image || '/images/products/placeholder.jpg',
-          category: 'ukrainian' as const, // TODO: Map from category_id
+          category: 'slavic' as const, // TODO: Map from category_id
           materials: product.materials || [],
           isHandmade: product.is_handmade ?? true,
           slug: product.slug,
@@ -166,8 +166,8 @@ const CategoryCollectionsPage: React.FC = () => {
 
   // Get category name
   const categoryName =
-    category === 'ukrainian'
-      ? t.collections.ukrainian
+    category === 'slavic'
+      ? t.collections.slavic
       : category === 'viking'
       ? t.collections.viking
       : t.collections.celtic;
@@ -181,8 +181,8 @@ const CategoryCollectionsPage: React.FC = () => {
             {categoryName}
           </h1>
           <p className="font-inter text-sage text-lg max-w-2xl mx-auto">
-            {category === 'ukrainian'
-              ? t.collections.ukrainianTagline
+            {category === 'slavic'
+              ? t.collections.slavicTagline
               : category === 'viking'
               ? t.collections.vikingTagline
               : t.collections.celticTagline}

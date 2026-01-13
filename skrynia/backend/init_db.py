@@ -33,11 +33,11 @@ def init_db(db: Session) -> None:
     # Create categories with full translations
     categories_data = [
         {
-            "name_uk": "Українські",
-            "name_en": "Ukrainian",
-            "name_de": "Ukrainisch",
-            "name_pl": "Ukraińskie",
-            "slug": "ukrainian",
+            "name_uk": "Слов'янські",
+            "name_en": "Slavic",
+            "name_de": "Slawisch",
+            "name_pl": "Słowiańskie",
+            "slug": "slavic",
             "description_uk": "Символи сили та захисту",
             "description_en": "Symbols of strength and protection",
             "culture_type": "slavic",
