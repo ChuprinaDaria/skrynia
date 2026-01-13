@@ -372,6 +372,26 @@ def delete_product(
     from app.models.order import OrderItem
     from app.models.blog import blog_products
     from sqlalchemy import text
+    import json
+    import os
+    from pathlib import Path
+    
+    # МАРКЕР ДЛЯ ПЕРЕВІРКИ: Перевіряємо чи код потрапив в Docker образ
+    # Шлях: backend/app/api/v1/endpoints/products.py -> backend/BUILD_MARKER.json
+    marker_file = Path(__file__).parent.parent.parent.parent.parent / "BUILD_MARKER.json"
+    build_marker = None
+    if marker_file.exists():
+        try:
+            with open(marker_file, "r", encoding="utf-8") as f:
+                build_data = json.load(f)
+                build_marker = build_data.get("marker", "UNKNOWN")
+        except:
+            build_marker = "MARKER_FILE_EXISTS_BUT_UNREADABLE"
+    else:
+        build_marker = "MARKER_FILE_NOT_FOUND"
+    
+    # Логуємо маркер для перевірки
+    print(f"[SKRYNIA_DELETE_MARKER] Build marker: {build_marker}")
     
     product = db.query(Product).filter(Product.id == product_id).first()
 
@@ -411,11 +431,17 @@ def delete_product(
         # Delete the product (already loaded above)
         db.delete(product)
         db.commit()
+        
+        # МАРКЕР ДЛЯ ПЕРЕВІРКИ: Логуємо успішне видалення з маркером збірки
+        print(f"[SKRYNIA_DELETE_SUCCESS] Product {product_id} deleted successfully. Build marker: {build_marker}")
+        
     except Exception as e:
         db.rollback()
         import traceback
         error_detail = str(e)
         traceback.print_exc()
+        # МАРКЕР ДЛЯ ПЕРЕВІРКИ: Логуємо помилку з маркером збірки
+        print(f"[SKRYNIA_DELETE_ERROR] Failed to delete product {product_id}. Build marker: {build_marker}. Error: {error_detail}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to delete product: {error_detail}"

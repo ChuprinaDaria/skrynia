@@ -72,6 +72,41 @@ def health_check():
     return {"status": "healthy"}
 
 
+@app.get("/build-info")
+def get_build_info():
+    """Повертає інформацію про збірку для перевірки чи код потрапив в Docker образ."""
+    import json
+    import os
+    from pathlib import Path
+    
+    # Шлях: backend/app/main.py -> backend/BUILD_MARKER.json
+    marker_file = Path(__file__).parent.parent / "BUILD_MARKER.json"
+    
+    if marker_file.exists():
+        try:
+            with open(marker_file, "r", encoding="utf-8") as f:
+                build_info = json.load(f)
+            return {
+                "status": "ok",
+                "build_marker_found": True,
+                **build_info
+            }
+        except Exception as e:
+            return {
+                "status": "error",
+                "build_marker_found": True,
+                "error": str(e),
+                "message": "Build marker file exists but could not be read"
+            }
+    else:
+        return {
+            "status": "not_found",
+            "build_marker_found": False,
+            "message": "Build marker file not found. Code may not be in Docker image.",
+            "marker_file_path": str(marker_file)
+        }
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
