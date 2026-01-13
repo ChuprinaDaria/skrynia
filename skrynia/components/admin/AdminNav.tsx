@@ -77,6 +77,11 @@ const navItems = [
     icon: Mail,
   },
   {
+    href: '/admin/about',
+    label: 'Про нас',
+    icon: FileText,
+  },
+  {
     href: '/admin/settings',
     label: 'Налаштування',
     icon: Settings,

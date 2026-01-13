@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import AlatyrIcon from '@/components/ui/icons/AlatyrIcon';
 import { useLanguage } from '@/contexts/LanguageContext';
 import Script from 'next/script';
+import { getApiEndpoint } from '@/lib/api';
 
 // JSON-LD для сторінки "Про нас"
 const aboutJsonLd = {
@@ -33,7 +34,64 @@ const aboutJsonLd = {
 };
 
 export default function AboutPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const [aboutData, setAboutData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Map language codes
+  const langMap: Record<string, string> = {
+    'UA': 'ua',
+    'EN': 'en',
+    'DE': 'de',
+    'PL': 'pl',
+    'SE': 'se',
+    'NO': 'no',
+    'DK': 'dk',
+    'FR': 'fr',
+  };
+
+  const currentLang = langMap[language] || 'ua';
+
+  useEffect(() => {
+    fetchAboutPage();
+  }, []);
+
+  const fetchAboutPage = async () => {
+    try {
+      const res = await fetch(getApiEndpoint('/api/v1/about-page/'));
+      if (res.ok) {
+        const data = await res.json();
+        setAboutData(data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch about page:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Get content for current language, fallback to translations
+  const getContent = (field: string, fallback: string) => {
+    if (aboutData && aboutData[`${field}_${currentLang}`]) {
+      return aboutData[`${field}_${currentLang}`];
+    }
+    return fallback;
+  };
+
+  const title = getContent('title', t.about.title);
+  const subtitle = getContent('subtitle', t.about.subtitle);
+  const historyTitle = getContent('history_title', t.about.history.title);
+  const historyContent = getContent('history_content', t.about.history.content);
+  const missionTitle = getContent('mission_title', t.about.mission.title);
+  const missionContent = getContent('mission_content', t.about.mission.content);
+  const qualityTitle = getContent('quality_title', t.about.quality.title);
+  const qualityIntro = getContent('quality_intro', t.about.quality.intro);
+  const qualityCoral = getContent('quality_coral', t.about.quality.materials.coral);
+  const qualitySilver = getContent('quality_silver', t.about.quality.materials.silver);
+  const qualityAmber = getContent('quality_amber', t.about.quality.materials.amber);
+  const qualityGemstone = getContent('quality_gemstone', t.about.quality.materials.gemstone);
+  const qualityConclusion = getContent('quality_conclusion', t.about.quality.conclusion);
+
   return (
     <>
       <Script
@@ -50,10 +108,10 @@ export default function AboutPage() {
                 <AlatyrIcon size={120} variant="oxblood" />
               </div>
               <h1 className="font-rutenia text-4xl md:text-5xl text-ivory mb-6">
-                {t.about.title}
+                {title}
               </h1>
               <p className="font-inter text-sage text-lg">
-                {t.about.subtitle}
+                {subtitle}
               </p>
             </header>
 
@@ -61,38 +119,38 @@ export default function AboutPage() {
             <article className="space-y-8 font-inter text-ivory leading-relaxed">
               <section aria-labelledby="history-title">
                 <h2 id="history-title" className="font-rutenia text-2xl md:text-3xl text-ivory mb-4">
-                  {t.about.history.title}
+                  {historyTitle}
                 </h2>
                 <p className="text-sage">
-                  {t.about.history.content}
+                  {historyContent}
                 </p>
               </section>
 
               <section aria-labelledby="mission-title">
                 <h2 id="mission-title" className="font-rutenia text-2xl md:text-3xl text-ivory mb-4">
-                  {t.about.mission.title}
+                  {missionTitle}
                 </h2>
                 <p className="text-sage">
-                  {t.about.mission.content}
+                  {missionContent}
                 </p>
               </section>
 
               <section aria-labelledby="quality-title">
                 <h2 id="quality-title" className="font-rutenia text-2xl md:text-3xl text-ivory mb-4">
-                  {t.about.quality.title}
+                  {qualityTitle}
                 </h2>
                 <div className="space-y-4 text-sage">
                   <p>
-                    {t.about.quality.intro}
+                    {qualityIntro}
                   </p>
                   <ul className="list-disc list-inside space-y-2 ml-4">
-                    <li>{t.about.quality.materials.coral}</li>
-                    <li>{t.about.quality.materials.silver}</li>
-                    <li>{t.about.quality.materials.amber}</li>
-                    <li>{t.about.quality.materials.gemstone}</li>
+                    <li>{qualityCoral}</li>
+                    <li>{qualitySilver}</li>
+                    <li>{qualityAmber}</li>
+                    <li>{qualityGemstone}</li>
                   </ul>
                   <p>
-                    {t.about.quality.conclusion}
+                    {qualityConclusion}
                   </p>
                 </div>
               </section>

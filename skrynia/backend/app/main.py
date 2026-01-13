@@ -5,7 +5,7 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.core.middleware import SecurityHeadersMiddleware, RateLimitMiddleware
-from app.api.v1.endpoints import auth, products, orders, payments, upload, admin, shipping, made_to_order, categories, social_links, contact_info, users, user_addresses, beads, necklaces, quote_requests, blog
+from app.api.v1.endpoints import auth, products, orders, payments, upload, admin, shipping, made_to_order, categories, social_links, contact_info, users, user_addresses, beads, necklaces, quote_requests, blog, about_page
 
 # Create FastAPI app
 app = FastAPI(
@@ -44,6 +44,7 @@ app.include_router(products.router, prefix="/api/v1/products", tags=["Products"]
 app.include_router(categories.router, prefix="/api/v1/categories", tags=["Categories"])
 app.include_router(social_links.router, prefix="/api/v1/social-links", tags=["Social Links"])
 app.include_router(contact_info.router, prefix="/api/v1/contact-info", tags=["Contact Info"])
+app.include_router(about_page.router, prefix="/api/v1/about-page", tags=["About Page"])
 app.include_router(orders.router, prefix="/api/v1/orders", tags=["Orders"])
 app.include_router(payments.router, prefix="/api/v1/payments", tags=["Payments"])
 app.include_router(upload.router, prefix="/api/v1/upload", tags=["File Upload"])
