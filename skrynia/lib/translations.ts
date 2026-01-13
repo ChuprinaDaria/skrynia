@@ -218,7 +218,7 @@ export interface Translations {
     };
     cultures: {
       all: string;
-      ukrainian: string;
+      slavic: string;
       viking: string;
       celtic: string;
     };
