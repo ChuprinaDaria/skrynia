@@ -67,6 +67,7 @@ class Product(Base):
     category = relationship("Category", back_populates="products")
     images = relationship("ProductImage", back_populates="product", cascade="all, delete-orphan")
     order_items = relationship("OrderItem", back_populates="product")
+    made_to_order_requests = relationship("MadeToOrderRequest", back_populates="product", cascade="all, delete-orphan")
 
 
 class ProductImage(Base):

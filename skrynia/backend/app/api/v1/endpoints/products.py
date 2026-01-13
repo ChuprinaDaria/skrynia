@@ -370,6 +370,7 @@ def delete_product(
 ):
     """Delete a product (admin only)."""
     from app.models.order import OrderItem
+    from app.models.made_to_order import MadeToOrderRequest
     from app.models.blog import blog_products
     from sqlalchemy import text
     import json
@@ -420,6 +421,13 @@ def delete_product(
             text("DELETE FROM blog_products WHERE product_id = :product_id"),
             {"product_id": product_id}
         )
+
+    # Check and delete made-to-order requests linked to this product
+    made_to_order_count = db.query(MadeToOrderRequest).filter(MadeToOrderRequest.product_id == product_id).count()
+    if made_to_order_count > 0:
+        # Delete all made-to-order requests for this product
+        db.query(MadeToOrderRequest).filter(MadeToOrderRequest.product_id == product_id).delete()
+        print(f"[SKRYNIA_DELETE_INFO] Deleted {made_to_order_count} made-to-order request(s) for product {product_id}")
 
     try:
         # Delete product images first (cascade should handle this, but being explicit)

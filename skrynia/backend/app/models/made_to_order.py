@@ -31,5 +31,5 @@ class MadeToOrderRequest(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     
     # Relationships
-    product = relationship("Product", backref="made_to_order_requests")
+    product = relationship("Product", back_populates="made_to_order_requests")
 
