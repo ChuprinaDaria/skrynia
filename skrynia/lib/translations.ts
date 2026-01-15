@@ -1192,8 +1192,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Heritage Collections',
       subtitle: 'Three cultures. One heritage. Countless stories.',
-      ukrainian: 'Ukrainian',
-      ukrainianTagline: 'Symbols of strength and protection',
+      slavic: 'Slavic',
+      slavicTagline: 'Symbols of strength and protection',
       viking: 'Viking',
       vikingTagline: 'Courage and fate of warriors',
       celtic: 'Celtic',
@@ -1392,14 +1392,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'All',
-        ukrainian: 'Ukrainian',
+        slavic: 'Slavic',
         viking: 'Viking',
         celtic: 'Celtic',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukrainian',
+        slavic: 'Slavic',
         viking: 'Viking',
         celtic: 'Celtic',
       },
@@ -1762,8 +1762,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Erbe-Kollektionen',
       subtitle: 'Drei Kulturen. Ein Erbe. Unzählige Geschichten.',
-      ukrainian: 'Ukrainisch',
-      ukrainianTagline: 'Symbole der Stärke und des Schutzes',
+      slavic: 'Slawisch',
+      slavicTagline: 'Symbole der Stärke und des Schutzes',
       viking: 'Wikinger',
       vikingTagline: 'Mut und Schicksal der Krieger',
       celtic: 'Keltisch',
@@ -1962,14 +1962,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Alle',
-        ukrainian: 'Ukrainisch',
+        slavic: 'Slawisch',
         viking: 'Wikinger',
         celtic: 'Keltisch',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukrainisch',
+        slavic: 'Slawisch',
         viking: 'Wikinger',
         celtic: 'Keltisch',
       },
@@ -2332,8 +2332,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Kolekcje Dziedzictwa',
       subtitle: 'Trzy kultury. Jedno dziedzictwo. Nieskończone historie.',
-      ukrainian: 'Ukraińskie',
-      ukrainianTagline: 'Symbole siły i ochrony',
+      slavic: 'Słowiańskie',
+      slavicTagline: 'Symbole siły i ochrony',
       viking: 'Wikingowie',
       vikingTagline: 'Odwaga i los wojowników',
       celtic: 'Celtyckie',
@@ -2532,14 +2532,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Wszystkie',
-        ukrainian: 'Ukraińskie',
+        slavic: 'Słowiańskie',
         viking: 'Wikingowie',
         celtic: 'Celtyckie',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukraińskie',
+        slavic: 'Słowiańskie',
         viking: 'Wikingowie',
         celtic: 'Celtyckie',
       },
@@ -2900,8 +2900,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Arvskollektioner',
       subtitle: 'Tre kulturer. Ett arv. Otaliga berättelser.',
-      ukrainian: 'Ukrainska',
-      ukrainianTagline: 'Symboler för styrka och skydd',
+      slavic: 'Slaviska',
+      slavicTagline: 'Symboler för styrka och skydd',
       viking: 'Viking',
       vikingTagline: 'Mod och krigarnas öde',
       celtic: 'Keltiska',
@@ -3100,14 +3100,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Alla',
-        ukrainian: 'Ukrainska',
+        slavic: 'Slaviska',
         viking: 'Viking',
         celtic: 'Keltiska',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukrainska',
+        slavic: 'Slaviska',
         viking: 'Viking',
         celtic: 'Keltiska',
       },
@@ -3468,8 +3468,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Arvskolleksjoner',
       subtitle: 'Tre kulturer. Én arv. Utallige historier.',
-      ukrainian: 'Ukrainske',
-      ukrainianTagline: 'Symboler for styrke og beskyttelse',
+      slavic: 'Slaviske',
+      slavicTagline: 'Symboler for styrke og beskyttelse',
       viking: 'Viking',
       vikingTagline: 'Mot og krigerens skjebne',
       celtic: 'Keltiske',
@@ -3668,14 +3668,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Alle',
-        ukrainian: 'Ukrainske',
+        slavic: 'Slaviske',
         viking: 'Viking',
         celtic: 'Keltiske',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukrainske',
+        slavic: 'Slaviske',
         viking: 'Viking',
         celtic: 'Keltiske',
       },
@@ -4036,8 +4036,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Arvskollektioner',
       subtitle: 'Tre kulturer. Én arv. Utallige historier.',
-      ukrainian: 'Ukrainske',
-      ukrainianTagline: 'Symboler for styrke og beskyttelse',
+      slavic: 'Slaviske',
+      slavicTagline: 'Symboler for styrke og beskyttelse',
       viking: 'Viking',
       vikingTagline: 'Mod og krigerens skæbne',
       celtic: 'Keltiske',
@@ -4236,14 +4236,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Alle',
-        ukrainian: 'Ukrainske',
+        slavic: 'Slaviske',
         viking: 'Viking',
         celtic: 'Keltiske',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukrainske',
+        slavic: 'Slaviske',
         viking: 'Viking',
         celtic: 'Keltiske',
       },
@@ -4604,8 +4604,8 @@ const translations: Record<Language, Translations> = {
     collections: {
       title: 'Collections Patrimoniales',
       subtitle: 'Trois cultures. Un patrimoine. D\'innombrables histoires.',
-      ukrainian: 'Ukrainiennes',
-      ukrainianTagline: 'Symboles de force et de protection',
+      slavic: 'Slaves',
+      slavicTagline: 'Symboles de force et de protection',
       viking: 'Viking',
       vikingTagline: 'Courage et destin des guerriers',
       celtic: 'Celtiques',
@@ -4804,14 +4804,14 @@ const translations: Record<Language, Translations> = {
       },
       cultures: {
         all: 'Toutes',
-        ukrainian: 'Ukrainiennes',
+        slavic: 'Slaves',
         viking: 'Viking',
         celtic: 'Celtiques',
       },
     },
     product: {
       categories: {
-        ukrainian: 'Ukrainiennes',
+        slavic: 'Slaves',
         viking: 'Viking',
         celtic: 'Celtiques',
       },
