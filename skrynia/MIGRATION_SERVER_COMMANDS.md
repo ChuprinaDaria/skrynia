@@ -148,3 +148,6 @@ docker exec skrynia_db_prod psql -U postgres -d skrynia -c "SELECT id, title, ti
 - Перевірте що база даних запущена: `docker ps | grep db`
 - Перевірте змінні оточення
 
+
+
+

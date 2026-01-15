@@ -243,6 +243,13 @@ export interface Translations {
       quality: string;
       freeShipping: string;
       viewingNow: string;
+      valueProps: {
+        giftWrap: string;
+        warranty: string;
+        tracking: string;
+        handmadeTooltipLabel: string;
+        handmadeTooltip: string;
+      };
       madeToOrder?: {
         title: string;
         duration: string;
@@ -823,6 +830,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Гарантія якості',
       freeShipping: 'Безкоштовна доставка в ЄС (3-5 днів)',
       viewingNow: 'людей дивляться зараз',
+      valueProps: {
+        giftWrap: 'Безкоштовне подарункове пакування до кожного замовлення',
+        warranty: 'Гарантія оригінальності та ручної роботи',
+        tracking: 'Легкий трекінг кожного етапу доставки',
+        handmadeTooltipLabel: 'Про матеріали',
+        handmadeTooltip: 'Натуральні матеріали: корал, срібло 925 та інше. Кожен виріб збирається вручну.',
+      },
       madeToOrder: {
         title: 'Під замовлення',
         duration: 'Строк виготовлення',
@@ -1403,6 +1417,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Quality Guarantee',
       freeShipping: 'Free shipping in EU (3-5 days)',
       viewingNow: 'people viewing now',
+      valueProps: {
+        giftWrap: 'Free gift wrapping with every order',
+        warranty: 'Authenticity & handmade craftsmanship guarantee',
+        tracking: 'Easy tracking at every delivery stage',
+        handmadeTooltipLabel: 'About materials',
+        handmadeTooltip: 'Natural materials: coral, 925 silver and more. Each piece is assembled by hand.',
+      },
     },
     cart: {
       title: 'Cart',
@@ -1966,6 +1987,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Qualitätsgarantie',
       freeShipping: 'Kostenloser Versand in der EU (3-5 Tage)',
       viewingNow: 'Personen sehen sich das gerade an',
+      valueProps: {
+        giftWrap: 'Kostenlose Geschenkverpackung zu jeder Bestellung',
+        warranty: 'Garantie für Originalität & Handarbeit',
+        tracking: 'Einfaches Tracking jeder Lieferphase',
+        handmadeTooltipLabel: 'Über Materialien',
+        handmadeTooltip: 'Natürliche Materialien: Koralle, 925er Silber und mehr. Jedes Stück wird von Hand gefertigt.',
+      },
     },
     cart: {
       title: 'Warenkorb',
@@ -2529,6 +2557,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Gwarancja jakości',
       freeShipping: 'Darmowa dostawa w UE (3-5 dni)',
       viewingNow: 'osób ogląda teraz',
+      valueProps: {
+        giftWrap: 'Darmowe pakowanie prezentowe do każdego zamówienia',
+        warranty: 'Gwarancja oryginalności i ręcznego wykonania',
+        tracking: 'Łatwe śledzenie każdego etapu dostawy',
+        handmadeTooltipLabel: 'O materiałach',
+        handmadeTooltip: 'Naturalne materiały: koral, srebro 925 i inne. Każdy wyrób powstaje ręcznie.',
+      },
     },
     cart: {
       title: 'Koszyk',
@@ -3090,6 +3125,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Kvalitetsgaranti',
       freeShipping: 'Fri frakt i EU (3-5 dagar)',
       viewingNow: 'personer tittar nu',
+      valueProps: {
+        giftWrap: 'Gratis presentinslagning med varje beställning',
+        warranty: 'Garanti för äkthet och handgjort hantverk',
+        tracking: 'Enkel spårning i varje leveranssteg',
+        handmadeTooltipLabel: 'Om material',
+        handmadeTooltip: 'Naturliga material: korall, 925 silver och mer. Varje smycke sätts ihop för hand.',
+      },
     },
     cart: {
       title: 'Varukorg',
@@ -3651,6 +3693,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Kvalitetsgaranti',
       freeShipping: 'Gratis frakt i EU (3-5 dager)',
       viewingNow: 'personer ser nå',
+      valueProps: {
+        giftWrap: 'Gratis gaveinnpakning med hver bestilling',
+        warranty: 'Garanti for originalitet og håndlaget arbeid',
+        tracking: 'Enkel sporing i hvert leveringssteg',
+        handmadeTooltipLabel: 'Om materialer',
+        handmadeTooltip: 'Naturlige materialer: korall, 925 sølv og mer. Hvert smykke settes sammen for hånd.',
+      },
     },
     cart: {
       title: 'Handlekurv',
@@ -4212,6 +4261,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Kvalitetsgaranti',
       freeShipping: 'Gratis fragt i EU (3-5 dage)',
       viewingNow: 'personer ser nu',
+      valueProps: {
+        giftWrap: 'Gratis gaveindpakning til hver bestilling',
+        warranty: 'Garanti for originalitet og håndlavet arbejde',
+        tracking: 'Nem tracking af hvert trin i leveringen',
+        handmadeTooltipLabel: 'Om materialer',
+        handmadeTooltip: 'Naturlige materialer: koral, 925 sølv og mere. Hvert smykke samles i hånden.',
+      },
     },
     cart: {
       title: 'Kurv',
@@ -4773,6 +4829,13 @@ const translations: Record<Language, Translations> = {
       quality: 'Garantie de Qualité',
       freeShipping: 'Livraison gratuite dans l\'UE (3-5 jours)',
       viewingNow: 'personnes regardent maintenant',
+      valueProps: {
+        giftWrap: 'Emballage cadeau offert pour chaque commande',
+        warranty: 'Garantie d’authenticité et de fabrication artisanale',
+        tracking: 'Suivi facile à chaque étape de la livraison',
+        handmadeTooltipLabel: 'À propos des matériaux',
+        handmadeTooltip: 'Matériaux naturels : corail, argent 925 et plus. Chaque pièce est assemblée à la main.',
+      },
     },
     cart: {
       title: 'Panier',

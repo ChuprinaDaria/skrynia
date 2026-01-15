@@ -293,7 +293,7 @@ function BlogEditorContent() {
   return (
     <div className="min-h-screen bg-deep-black">
       <AdminNav />
-      <div className="ml-64 pt-20 pb-20">
+      <div className="ml-0 lg:ml-64 pt-20 pb-20">
         <div className="container mx-auto px-4 md:px-6 max-w-7xl">
           {/* Header */}
           <div className="mb-8 flex items-center justify-between">
@@ -575,7 +575,7 @@ export default function BlogEditor() {
     <Suspense fallback={
       <div className="min-h-screen bg-deep-black">
         <AdminNav />
-        <div className="ml-64 pt-20 pb-20">
+        <div className="ml-0 lg:ml-64 pt-20 pb-20">
           <div className="container mx-auto px-4 md:px-6 max-w-7xl">
             <div className="text-ivory">Завантаження...</div>
           </div>

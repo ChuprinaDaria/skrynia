@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Script from 'next/script';
 import Button from '@/components/ui/Button';
 import ProductCard, { Product } from '@/components/product/ProductCard';
+import ProductValueProps from '@/components/product/ProductValueProps';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
@@ -625,37 +626,13 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                     </>
                   )}
 
-                  {/* Trust Signals */}
-                  <ul className="space-y-2 text-sm font-inter text-sage" aria-label="Переваги покупки">
-                    <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                        <path
-                          fillRule="evenodd"
-                          d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span>Безпечна оплата</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" />
-                        <path
-                          fillRule="evenodd"
-                          d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      <span>{t.product.quality}</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                        <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" />
-                        <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" />
-                      </svg>
-                      <span>{t.product.freeShipping}</span>
-                    </li>
-                  </ul>
+                  <ProductValueProps
+                    giftWrapText={t.product.valueProps.giftWrap}
+                    warrantyText={t.product.valueProps.warranty}
+                    trackingText={t.product.valueProps.tracking}
+                    handmadeTooltipLabel={t.product.valueProps.handmadeTooltipLabel}
+                    handmadeTooltipText={t.product.valueProps.handmadeTooltip}
+                  />
                 </div>
               </div>
             </div>
