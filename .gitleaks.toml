@@ -1,0 +1,44 @@
+# Gitleaks configuration
+# https://github.com/gitleaks/gitleaks
+
+title = "Skrynia Gitleaks Config"
+
+[extend]
+# Use the default gitleaks config as a base
+useDefault = true
+
+# Paths to ignore
+[allowlist]
+paths = [
+  '''\.env\.example$''',
+  '''\.env\.sample$''',
+  '''docker-compose\.yml$''',
+  '''docker-compose\.prod\.yml$''',
+  '''.*\.md$''',
+  '''.*\.json$''',
+  '''package-lock\.json$''',
+  '''requirements\.txt$''',
+  '''.*\.postman_.*\.json$''',
+]
+
+# Regex patterns to allow (false positives)
+regexes = [
+  '''sk_test_dummy''',
+  '''pk_test_dummy''',
+  '''whsec_dummy''',
+  '''dummy_crc''',
+  '''dummy_key''',
+  '''super-secret-key-change-in-production''',
+]
+
+# Stop words that are not secrets
+stopwords = [
+  "CHANGEME",
+  "REPLACE_ME",
+  "dummy",
+  "example",
+  "placeholder",
+  "your_",
+  "xxx",
+]
+
