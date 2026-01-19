@@ -11,7 +11,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = '20260119_multilang_products'
-down_revision = None
+down_revision = 'add_multilingual_blog'
 branch_labels = None
 depends_on = None
 
