@@ -4933,7 +4933,7 @@ const translations: Record<Language, Translations> = {
       viewingNow: 'personnes regardent maintenant',
       valueProps: {
         giftWrap: 'Emballage cadeau offert pour chaque commande',
-        warranty: 'Garantie d'authenticité et de fabrication artisanale',
+        warranty: 'Garantie d\'authenticité et de fabrication artisanale',
         tracking: 'Suivi facile à chaque étape de la livraison',
         handmadeTooltipLabel: 'À propos des matériaux',
         handmadeTooltip: 'Matériaux naturels : corail, argent 925 et plus. Chaque pièce est assemblée à la main.',
