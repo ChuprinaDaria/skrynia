@@ -53,8 +53,8 @@ services:
       INPOST_GEOWIDGET_TOKEN: ${INPOST_GEOWIDGET_TOKEN}
       INPOST_SANDBOX: ${INPOST_SANDBOX:-true}
     volumes:
-      - ./backend/static:/app/static
-      - ./skrynia/backend/static:/app/static
+      # Named volume for persistent uploads (survives container recreation)
+      - uploads_data:/app/static/uploads
     networks:
       - skrynia_network
     ports:
@@ -102,6 +102,8 @@ services:
 
 volumes:
   postgres_data:
+    driver: local
+  uploads_data:
     driver: local
 
 networks:
