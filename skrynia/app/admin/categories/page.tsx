@@ -11,9 +11,19 @@ interface Category {
   name_en?: string;
   name_de?: string;
   name_pl?: string;
+  name_se?: string;
+  name_no?: string;
+  name_dk?: string;
+  name_fr?: string;
   slug: string;
   description_uk?: string;
   description_en?: string;
+  description_de?: string;
+  description_pl?: string;
+  description_se?: string;
+  description_no?: string;
+  description_dk?: string;
+  description_fr?: string;
   icon?: string;
   culture_type: string;
   is_featured: boolean;
@@ -24,27 +34,61 @@ interface CategoryFormData {
   name_en: string;
   name_de: string;
   name_pl: string;
+  name_se: string;
+  name_no: string;
+  name_dk: string;
+  name_fr: string;
   slug: string;
   description_uk: string;
   description_en: string;
+  description_de: string;
+  description_pl: string;
+  description_se: string;
+  description_no: string;
+  description_dk: string;
+  description_fr: string;
   icon: string;
   culture_type: string;
   is_featured: boolean;
 }
+
+type LanguageCode = 'uk' | 'en' | 'de' | 'pl' | 'se' | 'no' | 'dk' | 'fr';
+
+const LANGUAGES: { code: LanguageCode; name: string }[] = [
+  { code: 'uk', name: 'UA' },
+  { code: 'en', name: 'EN' },
+  { code: 'de', name: 'DE' },
+  { code: 'pl', name: 'PL' },
+  { code: 'se', name: 'SE' },
+  { code: 'no', name: 'NO' },
+  { code: 'dk', name: 'DK' },
+  { code: 'fr', name: 'FR' },
+];
 
 export default function CategoriesManagement() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [activeLang, setActiveLang] = useState<LanguageCode>('uk');
   const [formData, setFormData] = useState<CategoryFormData>({
     name_uk: '',
     name_en: '',
     name_de: '',
     name_pl: '',
+    name_se: '',
+    name_no: '',
+    name_dk: '',
+    name_fr: '',
     slug: '',
     description_uk: '',
     description_en: '',
+    description_de: '',
+    description_pl: '',
+    description_se: '',
+    description_no: '',
+    description_dk: '',
+    description_fr: '',
     icon: '',
     culture_type: 'slavic',
     is_featured: false,
@@ -77,14 +121,25 @@ export default function CategoriesManagement() {
 
   const handleCreate = () => {
     setEditingCategory(null);
+    setActiveLang('uk');
     setFormData({
       name_uk: '',
       name_en: '',
       name_de: '',
       name_pl: '',
+      name_se: '',
+      name_no: '',
+      name_dk: '',
+      name_fr: '',
       slug: '',
       description_uk: '',
       description_en: '',
+      description_de: '',
+      description_pl: '',
+      description_se: '',
+      description_no: '',
+      description_dk: '',
+      description_fr: '',
       icon: '',
       culture_type: 'slavic',
       is_featured: false,
@@ -94,14 +149,25 @@ export default function CategoriesManagement() {
 
   const handleEdit = (category: Category) => {
     setEditingCategory(category);
+    setActiveLang('uk');
     setFormData({
       name_uk: category.name_uk || '',
       name_en: category.name_en || '',
       name_de: category.name_de || '',
       name_pl: category.name_pl || '',
+      name_se: category.name_se || '',
+      name_no: category.name_no || '',
+      name_dk: category.name_dk || '',
+      name_fr: category.name_fr || '',
       slug: category.slug || '',
       description_uk: category.description_uk || '',
       description_en: category.description_en || '',
+      description_de: category.description_de || '',
+      description_pl: category.description_pl || '',
+      description_se: category.description_se || '',
+      description_no: category.description_no || '',
+      description_dk: category.description_dk || '',
+      description_fr: category.description_fr || '',
       icon: category.icon || '',
       culture_type: category.culture_type || 'slavic',
       is_featured: category.is_featured || false,
@@ -258,51 +324,58 @@ export default function CategoriesManagement() {
                 </h2>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
+                  {/* Language Tabs */}
+                  <div className="flex flex-wrap gap-1 mb-4 border-b border-sage/20 pb-2">
+                    {LANGUAGES.map((lang) => (
+                      <button
+                        key={lang.code}
+                        type="button"
+                        onClick={() => setActiveLang(lang.code)}
+                        className={`px-3 py-1.5 text-sm font-medium rounded-t transition-colors ${
+                          activeLang === lang.code
+                            ? 'bg-oxblood text-ivory'
+                            : 'text-sage hover:text-ivory hover:bg-sage/20'
+                        }`}
+                      >
+                        {lang.name}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Name field for active language */}
                   <div>
-                    <label className="block text-sage mb-2">Назва (UA) *</label>
+                    <label className="block text-sage mb-2">
+                      Назва ({activeLang.toUpperCase()}) {activeLang === 'uk' && '*'}
+                    </label>
                     <input
                       type="text"
-                      value={formData.name_uk}
+                      value={formData[`name_${activeLang}` as keyof CategoryFormData] as string || ''}
                       onChange={(e) => {
-                        setFormData({ ...formData, name_uk: e.target.value });
-                        if (!editingCategory && !formData.slug) {
-                          setFormData({ ...formData, name_uk: e.target.value, slug: generateSlug(e.target.value) });
+                        const newFormData = { ...formData, [`name_${activeLang}`]: e.target.value };
+                        if (activeLang === 'uk' && !editingCategory && !formData.slug) {
+                          newFormData.slug = generateSlug(e.target.value);
                         }
+                        setFormData(newFormData);
                       }}
                       className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
-                      required
+                      required={activeLang === 'uk'}
                     />
                   </div>
 
+                  {/* Description field for active language */}
                   <div>
-                    <label className="block text-sage mb-2">Назва (EN)</label>
-                    <input
-                      type="text"
-                      value={formData.name_en}
-                      onChange={(e) => setFormData({ ...formData, name_en: e.target.value })}
+                    <label className="block text-sage mb-2">
+                      Опис ({activeLang.toUpperCase()})
+                    </label>
+                    <textarea
+                      value={formData[`description_${activeLang}` as keyof CategoryFormData] as string || ''}
+                      onChange={(e) => setFormData({ ...formData, [`description_${activeLang}`]: e.target.value })}
                       className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
+                      rows={3}
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sage mb-2">Назва (DE)</label>
-                    <input
-                      type="text"
-                      value={formData.name_de}
-                      onChange={(e) => setFormData({ ...formData, name_de: e.target.value })}
-                      className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sage mb-2">Назва (PL)</label>
-                    <input
-                      type="text"
-                      value={formData.name_pl}
-                      onChange={(e) => setFormData({ ...formData, name_pl: e.target.value })}
-                      className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
-                    />
-                  </div>
+                  <hr className="border-sage/20" />
 
                   <div>
                     <label className="block text-sage mb-2">Slug *</label>
@@ -312,26 +385,6 @@ export default function CategoriesManagement() {
                       onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
                       className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
                       required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sage mb-2">Опис (UA)</label>
-                    <textarea
-                      value={formData.description_uk}
-                      onChange={(e) => setFormData({ ...formData, description_uk: e.target.value })}
-                      className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
-                      rows={3}
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sage mb-2">Опис (EN)</label>
-                    <textarea
-                      value={formData.description_en}
-                      onChange={(e) => setFormData({ ...formData, description_en: e.target.value })}
-                      className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
-                      rows={3}
                     />
                   </div>
 
@@ -354,7 +407,7 @@ export default function CategoriesManagement() {
                       className="w-full bg-deep-black border border-sage/20 rounded-sm px-4 py-2 text-ivory"
                       required
                     >
-                      <option value="slavic">Слов'янська</option>
+                      <option value="slavic">Слов&apos;янська</option>
                       <option value="viking">Вікінгська</option>
                       <option value="celtic">Кельтська</option>
                     </select>

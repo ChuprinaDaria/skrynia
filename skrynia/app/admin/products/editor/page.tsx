@@ -26,6 +26,13 @@ import { getApiEndpoint } from '@/lib/api';
 // Dynamically import MDEditor to avoid SSR issues
 const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
+// Helper function to handle 401 errors and redirect to login
+const handleAuthError = () => {
+  localStorage.removeItem('admin_token');
+  alert('Сесія закінчилася. Будь ласка, увійдіть знову.');
+  window.location.href = '/admin/login';
+};
+
 // Payment methods
 const PAYMENT_METHODS = [
   { id: 'stripe', label: 'Stripe', icon: 'CreditCard' },
@@ -243,9 +250,19 @@ function ProductEditorContent() {
   const fetchProduct = async () => {
     try {
       const token = localStorage.getItem('admin_token');
+      if (!token) {
+        handleAuthError();
+        return;
+      }
       const res = await fetch(getApiEndpoint(`/api/v1/products/by-id/${productId}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      if (res.status === 401) {
+        handleAuthError();
+        return;
+      }
+      
       if (res.ok) {
         const data = await res.json();
         setFormData({
@@ -321,7 +338,7 @@ function ProductEditorContent() {
     try {
       const token = localStorage.getItem('admin_token');
       if (!token) {
-        alert('Помилка: Не знайдено токен авторизації. Будь ласка, увійдіть знову.');
+        handleAuthError();
         setLoading(false);
         return;
       }
@@ -340,6 +357,11 @@ function ProductEditorContent() {
         },
         body: JSON.stringify(formData),
       });
+
+      if (res.status === 401) {
+        handleAuthError();
+        return;
+      }
 
       if (res.ok) {
         router.push('/admin/products');
@@ -567,7 +589,7 @@ function ProductEditorContent() {
     try {
       const token = localStorage.getItem('admin_token');
       if (!token) {
-        alert('Помилка: Не знайдено токен авторизації. Будь ласка, увійдіть знову.');
+        handleAuthError();
         return;
       }
 
@@ -621,6 +643,11 @@ function ProductEditorContent() {
         },
         body: uploadFormData,
       });
+
+      if (res.status === 401) {
+        handleAuthError();
+        return;
+      }
 
       if (res.ok) {
         const data = await res.json();
@@ -711,6 +738,10 @@ function ProductEditorContent() {
     setUploadingVideo(true);
     try {
       const token = localStorage.getItem('admin_token');
+      if (!token) {
+        handleAuthError();
+        return;
+      }
       const uploadFormData = new FormData();
       uploadFormData.append('file', file);
 
@@ -721,6 +752,11 @@ function ProductEditorContent() {
         },
         body: uploadFormData,
       });
+
+      if (res.status === 401) {
+        handleAuthError();
+        return;
+      }
 
       if (res.ok) {
         const data = await res.json();

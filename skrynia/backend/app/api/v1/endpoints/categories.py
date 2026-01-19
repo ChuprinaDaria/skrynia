@@ -16,9 +16,19 @@ class CategorySchema(BaseModel):
     name_en: str | None
     name_de: str | None
     name_pl: str | None
+    name_se: str | None  # Swedish
+    name_no: str | None  # Norwegian
+    name_dk: str | None  # Danish
+    name_fr: str | None  # French
     slug: str
     description_uk: str | None
     description_en: str | None
+    description_de: str | None
+    description_pl: str | None
+    description_se: str | None  # Swedish
+    description_no: str | None  # Norwegian
+    description_dk: str | None  # Danish
+    description_fr: str | None  # French
     icon: str | None
     culture_type: str
     is_featured: bool = False
@@ -32,9 +42,19 @@ class CategoryCreate(BaseModel):
     name_en: Optional[str] = None
     name_de: Optional[str] = None
     name_pl: Optional[str] = None
+    name_se: Optional[str] = None  # Swedish
+    name_no: Optional[str] = None  # Norwegian
+    name_dk: Optional[str] = None  # Danish
+    name_fr: Optional[str] = None  # French
     slug: Optional[str] = None
     description_uk: Optional[str] = None
     description_en: Optional[str] = None
+    description_de: Optional[str] = None
+    description_pl: Optional[str] = None
+    description_se: Optional[str] = None  # Swedish
+    description_no: Optional[str] = None  # Norwegian
+    description_dk: Optional[str] = None  # Danish
+    description_fr: Optional[str] = None  # French
     icon: Optional[str] = None
     culture_type: str
     is_featured: bool = False
@@ -45,9 +65,19 @@ class CategoryUpdate(BaseModel):
     name_en: Optional[str] = None
     name_de: Optional[str] = None
     name_pl: Optional[str] = None
+    name_se: Optional[str] = None  # Swedish
+    name_no: Optional[str] = None  # Norwegian
+    name_dk: Optional[str] = None  # Danish
+    name_fr: Optional[str] = None  # French
     slug: Optional[str] = None
     description_uk: Optional[str] = None
     description_en: Optional[str] = None
+    description_de: Optional[str] = None
+    description_pl: Optional[str] = None
+    description_se: Optional[str] = None  # Swedish
+    description_no: Optional[str] = None  # Norwegian
+    description_dk: Optional[str] = None  # Danish
+    description_fr: Optional[str] = None  # French
     icon: Optional[str] = None
     culture_type: Optional[str] = None
     is_featured: Optional[bool] = None

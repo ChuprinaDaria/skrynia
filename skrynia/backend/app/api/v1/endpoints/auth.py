@@ -88,7 +88,12 @@ def login(user_credentials: Login2FA, db: Session = Depends(get_db)):
                 detail="Invalid 2FA token"
             )
 
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    # For admin users, use longer token expiration (24 hours), for regular users use default (30 minutes)
+    if user.is_admin:
+        access_token_expires = timedelta(hours=24)
+    else:
+        access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
     access_token = create_access_token(
         data={"sub": user.email},
         expires_delta=access_token_expires
