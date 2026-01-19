@@ -516,16 +516,37 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                         </div>
                       )}
                       
-                      {/* Order Button */}
+                      {/* Deposit Info */}
+                      <div className="bg-sage/20 border border-sage/50 rounded-sm p-4 mb-4">
+                        <p className="text-ivory font-inter font-semibold mb-1">
+                          {t.product.madeToOrder?.depositTitle || 'Передоплата'}: 50%
+                        </p>
+                        <p className="text-sage text-sm">
+                          {t.product.madeToOrder?.depositDescription || 'Оплата 50% від вартості при замовленні, решта - при готовності'}
+                        </p>
+                      </div>
+                      
+                      {/* Order Buttons */}
                       {!showOrderForm ? (
-                        <Button 
-                          onClick={() => setShowOrderForm(true)} 
-                          size="lg" 
-                          fullWidth 
-                          className="text-lg"
-                        >
-                          {t.product.madeToOrder?.orderButton || 'Замовити під замовлення'}
-                        </Button>
+                        <div className="space-y-3">
+                          <Button 
+                            onClick={handleAddToCart}
+                            size="lg" 
+                            fullWidth 
+                            className="text-lg"
+                          >
+                            {t.product.madeToOrder?.orderWithPayment || 'Замовити з оплатою 50%'}
+                          </Button>
+                          <Button 
+                            onClick={() => setShowOrderForm(true)} 
+                            size="lg" 
+                            fullWidth 
+                            variant="ghost"
+                            className="text-lg"
+                          >
+                            {t.product.madeToOrder?.orderButton || 'Замовити без оплати'}
+                          </Button>
+                        </div>
                       ) : (
                         /* Order Form */
                         <form onSubmit={handleMadeToOrderSubmit} className="space-y-4 bg-footer-black/50 border border-sage/20 rounded-sm p-6">

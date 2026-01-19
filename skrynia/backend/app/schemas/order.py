@@ -90,6 +90,10 @@ class Order(OrderBase):
     tracking_number: Optional[str]
     tracking_url: Optional[str]
     admin_notes: Optional[str]
+    
+    # Made to Order
+    is_made_to_order: bool = False
+    deposit_amount: Optional[float] = None
 
     items: List[OrderItem] = []
     shipment: Optional[ShipmentInfo] = None

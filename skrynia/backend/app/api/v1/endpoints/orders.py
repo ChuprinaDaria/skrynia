@@ -58,6 +58,7 @@ def create_order(
     # Validate products and calculate totals
     subtotal = 0.0
     order_items_data = []
+    has_made_to_order = False  # Track if order contains made-to-order items
 
     for item_data in order_in.items:
         product = db.query(Product).filter(Product.id == item_data.product_id).first()
@@ -74,11 +75,16 @@ def create_order(
                 detail=f"Product '{product.title_uk}' is not available"
             )
 
-        if product.stock_quantity < item_data.quantity:
+        # Skip stock check for made-to-order products
+        if not product.is_made_to_order and product.stock_quantity < item_data.quantity:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail=f"Insufficient stock for '{product.title_uk}'"
             )
+
+        # Track if order contains made-to-order items
+        if product.is_made_to_order:
+            has_made_to_order = True
 
         item_subtotal = product.price * item_data.quantity
         subtotal += item_subtotal
@@ -133,7 +139,14 @@ def create_order(
     shipping_cost = calculate_shipping(subtotal, order_in.shipping_country)
 
     # Calculate total
-    total = subtotal + shipping_cost
+    # For made-to-order items, customer pays 50% deposit
+    deposit_amount = None
+    if has_made_to_order:
+        # Calculate 50% of subtotal + shipping
+        deposit_amount = (subtotal + shipping_cost) * 0.5
+        total = deposit_amount  # Customer pays only 50% now
+    else:
+        total = subtotal + shipping_cost
 
     # Create order
     order_data = order_in.model_dump(exclude={"items", "bonus_points_used"})
@@ -147,7 +160,9 @@ def create_order(
         "total": total,
         "currency": "PLN",
         "status": OrderStatus.PENDING,
-        "payment_status": PaymentStatus.PENDING
+        "payment_status": PaymentStatus.PENDING,
+        "is_made_to_order": has_made_to_order,
+        "deposit_amount": deposit_amount
     })
 
     new_order = Order(**order_data)

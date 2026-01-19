@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, JSON, Enum
+from sqlalchemy import Column, Integer, String, Text, Float, DateTime, ForeignKey, JSON, Enum, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 import enum
@@ -63,6 +63,10 @@ class Order(Base):
     bonus_points_earned = Column(Float, default=0.0)  # Бонуси нараховані за замовлення
     total = Column(Float, nullable=False)
     currency = Column(String, default="PLN")
+    
+    # Made to Order
+    is_made_to_order = Column(Boolean, default=False)  # Is this a made-to-order order?
+    deposit_amount = Column(Float, nullable=True)  # 50% deposit for made-to-order items
 
     # Payment
     payment_method = Column(Enum(PaymentMethod), nullable=False)
