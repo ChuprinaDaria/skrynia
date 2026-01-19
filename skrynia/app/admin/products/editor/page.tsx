@@ -1598,44 +1598,15 @@ function ProductEditorContent() {
             {/* Meta Keywords */}
             <div className="mt-6">
               <label className="block text-ivory font-inter mb-2">Meta Keywords</label>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {formData.meta_keywords.map((keyword) => (
-                  <span
-                    key={keyword}
-                    className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-oxblood rounded-sm text-sm flex items-center gap-2"
-                  >
-                    {keyword}
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setFormData({
-                          ...formData,
-                          meta_keywords: formData.meta_keywords.filter((k) => k !== keyword),
-                        })
-                      }
-                      className="hover:text-oxblood/70"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </span>
-                ))}
-              </div>
+              <p className="text-sage/70 text-sm mb-2">Введіть ключові слова через кому (наприклад: слов&apos;янські прикраси, лунниця, оберіг)</p>
               <input
                 type="text"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const keyword = e.currentTarget.value.trim();
-                    if (keyword && !formData.meta_keywords.includes(keyword)) {
-                      setFormData({
-                        ...formData,
-                        meta_keywords: [...formData.meta_keywords, keyword],
-                      });
-                      e.currentTarget.value = '';
-                    }
-                  }
-                }}
-                placeholder="Введіть ключове слово і натисніть Enter"
+                value={formData.meta_keywords.join(', ')}
+                onChange={(e) => setFormData({ 
+                  ...formData, 
+                  meta_keywords: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                })}
+                placeholder="слов'янські прикраси, лунниця, оберіг, етно, бохо"
                 className="w-full px-4 py-2 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none text-sm"
               />
             </div>
