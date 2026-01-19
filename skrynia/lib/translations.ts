@@ -254,6 +254,9 @@ export interface Translations {
         title: string;
         duration: string;
         orderButton: string;
+        orderWithPayment: string;
+        depositTitle: string;
+        depositDescription: string;
         formTitle: string;
         name: string;
         email: string;
