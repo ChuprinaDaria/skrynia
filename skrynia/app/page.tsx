@@ -10,7 +10,7 @@ import BonusSystem from '@/components/layout/BonusSystem';
 import BlogSection from '@/components/home/BlogSection';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getApiEndpoint } from '@/lib/api';
+import { getApiEndpoint, normalizeImageUrl } from '@/lib/api';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
@@ -71,7 +71,7 @@ export default function HomePage() {
           titleEn: product.title_en,
           price: product.price,
           currency: product.currency,
-          image: product.primary_image || '/images/products/placeholder.jpg',
+          image: normalizeImageUrl(product.primary_image) || '/images/products/placeholder.jpg',
           category: 'slavic' as const, // TODO: Map from category_id
           materials: product.materials || [],
           isHandmade: product.is_handmade ?? true,

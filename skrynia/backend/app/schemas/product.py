@@ -28,17 +28,33 @@ class ProductBase(BaseModel):
     title_en: Optional[str] = None
     title_de: Optional[str] = None
     title_pl: Optional[str] = None
+    title_se: Optional[str] = None  # Swedish
+    title_no: Optional[str] = None  # Norwegian
+    title_dk: Optional[str] = None  # Danish
+    title_fr: Optional[str] = None  # French
     slug: str
 
     description_uk: Optional[str] = None
     description_en: Optional[str] = None
     description_de: Optional[str] = None
     description_pl: Optional[str] = None
+    description_se: Optional[str] = None  # Swedish
+    description_no: Optional[str] = None  # Norwegian
+    description_dk: Optional[str] = None  # Danish
+    description_fr: Optional[str] = None  # French
 
     legend_title_uk: Optional[str] = None
     legend_title_en: Optional[str] = None
+    legend_title_se: Optional[str] = None  # Swedish
+    legend_title_no: Optional[str] = None  # Norwegian
+    legend_title_dk: Optional[str] = None  # Danish
+    legend_title_fr: Optional[str] = None  # French
     legend_content_uk: Optional[str] = None
     legend_content_en: Optional[str] = None
+    legend_content_se: Optional[str] = None  # Swedish
+    legend_content_no: Optional[str] = None  # Norwegian
+    legend_content_dk: Optional[str] = None  # Danish
+    legend_content_fr: Optional[str] = None  # French
 
     price: float
     currency: str = "zł"
@@ -52,7 +68,14 @@ class ProductBase(BaseModel):
     is_handmade: bool = True
 
     category_id: Optional[int] = None
-    tags: Optional[List[str]] = None
+    tags_uk: Optional[List[str]] = None
+    tags_en: Optional[List[str]] = None
+    tags_de: Optional[List[str]] = None
+    tags_pl: Optional[List[str]] = None
+    tags_se: Optional[List[str]] = None
+    tags_no: Optional[List[str]] = None
+    tags_dk: Optional[List[str]] = None
+    tags_fr: Optional[List[str]] = None
     symbols: Optional[List[str]] = None
 
     is_active: bool = True
@@ -75,12 +98,32 @@ class ProductUpdate(BaseModel):
     title_en: Optional[str] = None
     title_de: Optional[str] = None
     title_pl: Optional[str] = None
+    title_se: Optional[str] = None  # Swedish
+    title_no: Optional[str] = None  # Norwegian
+    title_dk: Optional[str] = None  # Danish
+    title_fr: Optional[str] = None  # French
 
     description_uk: Optional[str] = None
     description_en: Optional[str] = None
+    description_de: Optional[str] = None
+    description_pl: Optional[str] = None
+    description_se: Optional[str] = None  # Swedish
+    description_no: Optional[str] = None  # Norwegian
+    description_dk: Optional[str] = None  # Danish
+    description_fr: Optional[str] = None  # French
 
     legend_title_uk: Optional[str] = None
+    legend_title_en: Optional[str] = None
+    legend_title_se: Optional[str] = None  # Swedish
+    legend_title_no: Optional[str] = None  # Norwegian
+    legend_title_dk: Optional[str] = None  # Danish
+    legend_title_fr: Optional[str] = None  # French
     legend_content_uk: Optional[str] = None
+    legend_content_en: Optional[str] = None
+    legend_content_se: Optional[str] = None  # Swedish
+    legend_content_no: Optional[str] = None  # Norwegian
+    legend_content_dk: Optional[str] = None  # Danish
+    legend_content_fr: Optional[str] = None  # French
 
     price: Optional[float] = None
     stock_quantity: Optional[int] = None
@@ -89,7 +132,14 @@ class ProductUpdate(BaseModel):
     specifications: Optional[Dict[str, str]] = None
 
     category_id: Optional[int] = None
-    tags: Optional[List[str]] = None
+    tags_uk: Optional[List[str]] = None
+    tags_en: Optional[List[str]] = None
+    tags_de: Optional[List[str]] = None
+    tags_pl: Optional[List[str]] = None
+    tags_se: Optional[List[str]] = None
+    tags_no: Optional[List[str]] = None
+    tags_dk: Optional[List[str]] = None
+    tags_fr: Optional[List[str]] = None
     symbols: Optional[List[str]] = None
 
     is_active: Optional[bool] = None

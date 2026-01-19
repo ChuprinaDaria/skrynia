@@ -93,3 +93,4 @@ PGPASSWORD=skrynia_password psql -h localhost -p 5433 -U skrynia_user -d skrynia
 
 
 
+

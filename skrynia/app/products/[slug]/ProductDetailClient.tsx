@@ -5,11 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import Script from 'next/script';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import Button from '@/components/ui/Button';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import ProductValueProps from '@/components/product/ProductValueProps';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getApiEndpoint } from '@/lib/api';
+import { getApiEndpoint, normalizeImageUrl } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
@@ -20,11 +22,19 @@ interface ApiProduct {
   title_en?: string;
   title_de?: string;
   title_pl?: string;
+  title_se?: string;
+  title_no?: string;
+  title_dk?: string;
+  title_fr?: string;
   slug: string;
   description_uk?: string;
   description_en?: string;
   description_de?: string;
   description_pl?: string;
+  description_se?: string;
+  description_no?: string;
+  description_dk?: string;
+  description_fr?: string;
   price: number;
   currency: string;
   stock_quantity?: number;
@@ -64,8 +74,10 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewingNow, setViewingNow] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     fetchProduct();
   }, [slug, language]);
 
@@ -78,11 +90,13 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       case 'PL':
         return product.title_pl || product.title_en || product.title_uk;
       case 'SE':
+        return product.title_se || product.title_en || product.title_uk;
       case 'NO':
+        return product.title_no || product.title_en || product.title_uk;
       case 'DK':
-        return product.title_en || product.title_uk;
+        return product.title_dk || product.title_en || product.title_uk;
       case 'FR':
-        return product.title_en || product.title_uk;
+        return product.title_fr || product.title_en || product.title_uk;
       default:
         return product.title_uk;
     }
@@ -97,17 +111,22 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       case 'PL':
         return product.description_pl || product.description_en || product.description_uk || '';
       case 'SE':
+        return product.description_se || product.description_en || product.description_uk || '';
       case 'NO':
+        return product.description_no || product.description_en || product.description_uk || '';
       case 'DK':
-        return product.description_en || product.description_uk || '';
+        return product.description_dk || product.description_en || product.description_uk || '';
       case 'FR':
-        return product.description_en || product.description_uk || '';
+        return product.description_fr || product.description_en || product.description_uk || '';
       default:
         return product.description_uk || '';
     }
   };
 
   useEffect(() => {
+    // Only run on client to avoid hydration mismatch
+    if (typeof window === 'undefined') return;
+    
     // Generate random viewing count
     const count = Math.floor(Math.random() * 21) + 5;
     setViewingNow(count);
@@ -148,7 +167,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 titleEn: p.title_en,
                 price: p.price,
                 currency: p.currency,
-                image: p.primary_image || '/images/products/placeholder.jpg',
+                image: normalizeImageUrl(p.primary_image) || '/images/products/placeholder.jpg',
                 category: 'slavic' as const,
                 materials: p.materials || [],
                 isHandmade: p.is_handmade ?? true,
@@ -180,7 +199,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       price: product.price,
       currency: product.currency,
       quantity: quantity,
-      image: primaryImage?.image_url || '/images/products/placeholder.jpg',
+      image: normalizeImageUrl(primaryImage?.image_url) || '/images/products/placeholder.jpg',
       slug: product.slug,
     });
   };
@@ -252,7 +271,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     );
   }
 
-  const productImages = product.images?.map(img => img.image_url) || ['/images/products/placeholder.jpg'];
+  const productImages = product.images?.map(img => normalizeImageUrl(img.image_url)) || ['/images/products/placeholder.jpg'];
   const primaryImage = product.images?.find(img => img.is_primary) || product.images?.[0];
   const displayTitle = getProductTitle(product);
   const displayDescription = getProductDescription(product);
@@ -264,7 +283,13 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     '@type': 'Product',
     name: displayTitle,
     description: displayDescription.substring(0, 200),
-    image: productImages.map((img) => `${siteUrl}${img.startsWith('/') ? '' : '/'}${img}`),
+    image: productImages.map((img) => {
+      // If already absolute URL, use as is; otherwise prepend siteUrl
+      if (img.startsWith('http://') || img.startsWith('https://')) {
+        return img;
+      }
+      return `${siteUrl}${img.startsWith('/') ? '' : '/'}${img}`;
+    }),
     sku: product.slug,
     mpn: product.id.toString(),
     brand: {
@@ -401,7 +426,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 </h1>
 
                 {/* Social Proof - Viewing Now */}
-                {viewingNow > 0 && (
+                {isClient && viewingNow > 0 && (
                   <div className="flex items-center gap-2 text-sage/80 animate-fade-in">
                     <div className="flex items-center gap-1.5">
                       <svg className="w-4 h-4 text-oxblood animate-pulse" fill="currentColor" viewBox="0 0 20 20">
@@ -428,9 +453,27 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
 
                 {/* Description */}
                 {displayDescription && (
-                  <p className="text-ivory font-inter leading-relaxed" itemProp="description">
-                    {displayDescription}
-                  </p>
+                  <div className="text-ivory font-inter leading-relaxed prose prose-invert prose-sage max-w-none" itemProp="description">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h1: ({ children }) => <h1 className="font-rutenia text-2xl text-ivory mt-6 mb-3">{children}</h1>,
+                        h2: ({ children }) => <h2 className="font-rutenia text-xl text-ivory mt-5 mb-2">{children}</h2>,
+                        h3: ({ children }) => <h3 className="font-rutenia text-lg text-ivory mt-4 mb-2">{children}</h3>,
+                        h4: ({ children }) => <h4 className="font-rutenia text-base text-ivory mt-3 mb-1">{children}</h4>,
+                        p: ({ children }) => <p className="text-ivory/90 mb-3">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc list-inside text-ivory/90 mb-3 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside text-ivory/90 mb-3 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li className="text-ivory/90">{children}</li>,
+                        strong: ({ children }) => <strong className="font-semibold text-ivory">{children}</strong>,
+                        em: ({ children }) => <em className="italic text-sage">{children}</em>,
+                        blockquote: ({ children }) => <blockquote className="border-l-4 border-oxblood pl-4 italic text-sage my-3">{children}</blockquote>,
+                        hr: () => <hr className="border-sage/20 my-4" />,
+                      }}
+                    >
+                      {displayDescription}
+                    </ReactMarkdown>
+                  </div>
                 )}
 
                 {/* Materials */}

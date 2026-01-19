@@ -114,7 +114,14 @@ interface ProductFormData {
 
   // Category & Tags
   category_id: number | null;
-  tags: string[];
+  tags_uk: string[];
+  tags_en: string[];
+  tags_de: string[];
+  tags_pl: string[];
+  tags_se: string[];
+  tags_no: string[];
+  tags_dk: string[];
+  tags_fr: string[];
   symbols: string[];
 
   // Status
@@ -194,7 +201,14 @@ function ProductEditorContent() {
     specifications: {},
     is_handmade: true,
     category_id: null,
-    tags: [],
+    tags_uk: [],
+    tags_en: [],
+    tags_de: [],
+    tags_pl: [],
+    tags_se: [],
+    tags_no: [],
+    tags_dk: [],
+    tags_fr: [],
     symbols: [],
     is_active: true,
     is_featured: false,
@@ -238,7 +252,14 @@ function ProductEditorContent() {
           ...formData,
           ...data,
           materials: data.materials || [],
-          tags: data.tags || [],
+          tags_uk: data.tags_uk || [],
+          tags_en: data.tags_en || [],
+          tags_de: data.tags_de || [],
+          tags_pl: data.tags_pl || [],
+          tags_se: data.tags_se || [],
+          tags_no: data.tags_no || [],
+          tags_dk: data.tags_dk || [],
+          tags_fr: data.tags_fr || [],
           symbols: data.symbols || [],
           meta_keywords: data.meta_keywords || [],
           payment_methods: data.payment_methods || [],
@@ -268,11 +289,28 @@ function ProductEditorContent() {
   };
 
   const generateSlug = (title: string) => {
+    // Transliteration map for Cyrillic to Latin
+    const cyrillicToLatin: Record<string, string> = {
+      'а': 'a', 'б': 'b', 'в': 'v', 'г': 'h', 'ґ': 'g', 'д': 'd', 'е': 'e', 'є': 'ye',
+      'ж': 'zh', 'з': 'z', 'и': 'y', 'і': 'i', 'ї': 'yi', 'й': 'y', 'к': 'k', 'л': 'l',
+      'м': 'm', 'н': 'n', 'о': 'o', 'п': 'p', 'р': 'r', 'с': 's', 'т': 't', 'у': 'u',
+      'ф': 'f', 'х': 'kh', 'ц': 'ts', 'ч': 'ch', 'ш': 'sh', 'щ': 'shch', 'ь': '', 'ю': 'yu',
+      'я': 'ya', 'ы': 'y', 'э': 'e', 'ё': 'yo', 'ъ': '',
+      // Polish characters
+      'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l', 'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z', 'ż': 'z',
+      // German characters
+      'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss',
+    };
+    
     return title
       .toLowerCase()
+      .split('')
+      .map(char => cyrillicToLatin[char] || char)
+      .join('')
       .replace(/[^\w\s-]/g, '')
       .replace(/\s+/g, '-')
       .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
       .trim();
   };
 
@@ -327,24 +365,22 @@ function ProductEditorContent() {
     }
   };
 
-  const addMaterial = () => {
-    setFormData({
-      ...formData,
-      materials: [...formData.materials, ''],
-    });
+  // Parse comma-separated materials from input
+  const parseMaterials = (input: string): string[] => {
+    return input
+      .split(',')
+      .map(m => m.trim())
+      .filter(m => m.length > 0);
   };
 
-  const updateMaterial = (index: number, value: string) => {
-    const newMaterials = [...formData.materials];
-    newMaterials[index] = value;
-    setFormData({ ...formData, materials: newMaterials });
+  // Get materials as comma-separated string for display
+  const getMaterialsString = (): string => {
+    return formData.materials.join(', ');
   };
 
-  const removeMaterial = (index: number) => {
-    setFormData({
-      ...formData,
-      materials: formData.materials.filter((_, i) => i !== index),
-    });
+  const updateMaterialsFromString = (value: string) => {
+    const materials = parseMaterials(value);
+    setFormData({ ...formData, materials });
   };
 
   const addSpecification = () => {
@@ -369,14 +405,25 @@ function ProductEditorContent() {
     setFormData({ ...formData, specifications: newSpecs });
   };
 
-  const addTag = (tag: string) => {
-    if (tag && !formData.tags.includes(tag)) {
-      setFormData({ ...formData, tags: [...formData.tags, tag] });
-    }
+  // Parse comma-separated tags from input
+  const parseTags = (input: string): string[] => {
+    return input
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
   };
 
-  const removeTag = (tag: string) => {
-    setFormData({ ...formData, tags: formData.tags.filter((t) => t !== tag) });
+  // Get tags as comma-separated string for display
+  const getTagsString = (lang: string): string => {
+    const key = `tags_${lang}` as keyof ProductFormData;
+    const tags = formData[key] as string[] || [];
+    return tags.join(', ');
+  };
+
+  const updateTagsFromString = (lang: string, value: string) => {
+    const key = `tags_${lang}` as keyof ProductFormData;
+    const tags = parseTags(value);
+    setFormData({ ...formData, [key]: tags });
   };
 
   const togglePaymentMethod = (method: string) => {
@@ -1117,37 +1164,27 @@ function ProductEditorContent() {
 
             {/* Materials */}
             <div className="mb-6">
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-ivory font-inter">Матеріали</label>
-                <button
-                  type="button"
-                  onClick={addMaterial}
-                  className="px-3 py-1.5 bg-oxblood/20 border border-oxblood/50 text-oxblood hover:bg-oxblood/30 rounded-sm text-sm flex items-center gap-2 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Додати
-                </button>
-              </div>
-              <div className="space-y-2">
-                {formData.materials.map((material, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      type="text"
-                      value={material}
-                      onChange={(e) => updateMaterial(index, e.target.value)}
-                      className="flex-1 px-4 py-2 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
-                      placeholder="Назва матеріалу"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeMaterial(index)}
-                      className="px-3 py-2 bg-oxblood/20 border border-oxblood/50 text-oxblood hover:bg-oxblood/30 rounded-sm transition-colors"
+              <label className="block text-ivory font-inter mb-2">Матеріали</label>
+              <p className="text-sage text-sm mb-2">Введіть матеріали через кому. Наприклад: натуральні річкові перли, металевий сплав (лунниця), посріблена фурнітура</p>
+              <textarea
+                value={getMaterialsString()}
+                onChange={(e) => updateMaterialsFromString(e.target.value)}
+                className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none resize-none"
+                placeholder="натуральні річкові перли, металевий сплав, посріблена фурнітура"
+                rows={3}
+              />
+              {formData.materials.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {formData.materials.map((material, index) => (
+                    <span
+                      key={index}
+                      className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-sage text-sm rounded-full"
                     >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      {material}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Specifications */}
@@ -1306,38 +1343,33 @@ function ProductEditorContent() {
                 </select>
               </div>
 
-              {/* Tags */}
+              {/* Tags - Per Language */}
               <div>
-                <label className="block text-ivory font-inter mb-2">Теги</label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {formData.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-oxblood rounded-sm text-sm flex items-center gap-2"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="hover:text-oxblood/70"
-                      >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-                <input
-                  type="text"
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      addTag(e.currentTarget.value);
-                      e.currentTarget.value = '';
-                    }
-                  }}
-                  placeholder="Введіть тег і натисніть Enter"
-                  className="w-full px-4 py-2 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none text-sm"
+                <label className="block text-ivory font-inter mb-2">Теги ({activeLang.toUpperCase()})</label>
+                <p className="text-sage text-sm mb-2">Введіть теги через кому. Наприклад: слов'янський оберіг, лунниця, перли</p>
+                <textarea
+                  value={getTagsString(activeLang)}
+                  onChange={(e) => updateTagsFromString(activeLang, e.target.value)}
+                  className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none resize-none"
+                  placeholder="слов'янський оберіг, лунниця, перли, ручна робота"
+                  rows={2}
                 />
+                {(() => {
+                  const key = `tags_${activeLang}` as keyof ProductFormData;
+                  const tags = formData[key] as string[] || [];
+                  return tags.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {tags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-sage text-sm rounded-full"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
 
               {/* Symbols */}

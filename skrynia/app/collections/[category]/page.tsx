@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import FilterSidebar, { Filters } from '@/components/product/FilterSidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getApiEndpoint } from '@/lib/api';
+import { getApiEndpoint, normalizeImageUrl } from '@/lib/api';
 
 interface ApiProduct {
   id: number;
@@ -87,7 +87,7 @@ const CategoryCollectionsPage: React.FC = () => {
           titleEn: product.title_en,
           price: product.price,
           currency: product.currency,
-          image: product.primary_image || '/images/products/placeholder.jpg',
+          image: normalizeImageUrl(product.primary_image) || '/images/products/placeholder.jpg',
           category: 'slavic' as const, // TODO: Map from category_id
           materials: product.materials || [],
           isHandmade: product.is_handmade ?? true,

@@ -14,6 +14,10 @@ class Product(Base):
     title_en = Column(String, nullable=True)
     title_de = Column(String, nullable=True)
     title_pl = Column(String, nullable=True)
+    title_se = Column(String, nullable=True)  # Swedish
+    title_no = Column(String, nullable=True)  # Norwegian
+    title_dk = Column(String, nullable=True)  # Danish
+    title_fr = Column(String, nullable=True)  # French
     slug = Column(String, unique=True, index=True, nullable=False)
 
     # Description (supports Markdown)
@@ -21,12 +25,24 @@ class Product(Base):
     description_en = Column(Text, nullable=True)
     description_de = Column(Text, nullable=True)
     description_pl = Column(Text, nullable=True)
+    description_se = Column(Text, nullable=True)  # Swedish
+    description_no = Column(Text, nullable=True)  # Norwegian
+    description_dk = Column(Text, nullable=True)  # Danish
+    description_fr = Column(Text, nullable=True)  # French
 
     # Legend Section
     legend_title_uk = Column(String, nullable=True)
     legend_title_en = Column(String, nullable=True)
+    legend_title_se = Column(String, nullable=True)  # Swedish
+    legend_title_no = Column(String, nullable=True)  # Norwegian
+    legend_title_dk = Column(String, nullable=True)  # Danish
+    legend_title_fr = Column(String, nullable=True)  # French
     legend_content_uk = Column(Text, nullable=True)
     legend_content_en = Column(Text, nullable=True)
+    legend_content_se = Column(Text, nullable=True)  # Swedish
+    legend_content_no = Column(Text, nullable=True)  # Norwegian
+    legend_content_dk = Column(Text, nullable=True)  # Danish
+    legend_content_fr = Column(Text, nullable=True)  # French
 
     # Pricing
     price = Column(Float, nullable=False)
@@ -44,7 +60,14 @@ class Product(Base):
 
     # Category & Tags
     category_id = Column(Integer, ForeignKey("categories.id"), nullable=True)
-    tags = Column(JSON, nullable=True)  # List of tags
+    tags_uk = Column(JSON, nullable=True)  # List of tags in Ukrainian
+    tags_en = Column(JSON, nullable=True)  # List of tags in English
+    tags_de = Column(JSON, nullable=True)  # List of tags in German
+    tags_pl = Column(JSON, nullable=True)  # List of tags in Polish
+    tags_se = Column(JSON, nullable=True)  # List of tags in Swedish
+    tags_no = Column(JSON, nullable=True)  # List of tags in Norwegian
+    tags_dk = Column(JSON, nullable=True)  # List of tags in Danish
+    tags_fr = Column(JSON, nullable=True)  # List of tags in French
     symbols = Column(JSON, nullable=True)  # love, protection, wealth, wisdom
 
     # Status
