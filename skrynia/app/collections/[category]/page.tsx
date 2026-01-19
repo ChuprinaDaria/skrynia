@@ -14,6 +14,10 @@ interface ApiProduct {
   title_en?: string;
   title_de?: string;
   title_pl?: string;
+  title_se?: string;  // Swedish
+  title_no?: string;  // Norwegian
+  title_dk?: string;  // Danish
+  title_fr?: string;  // French
   slug: string;
   price: number;
   currency: string;
@@ -50,11 +54,13 @@ const CategoryCollectionsPage: React.FC = () => {
       case 'PL':
         return product.title_pl || product.title_en || product.title_uk;
       case 'SE':
+        return product.title_se || product.title_en || product.title_uk;
       case 'NO':
+        return product.title_no || product.title_en || product.title_uk;
       case 'DK':
-        return product.title_en || product.title_uk;
+        return product.title_dk || product.title_en || product.title_uk;
       case 'FR':
-        return product.title_en || product.title_uk;
+        return product.title_fr || product.title_en || product.title_uk;
       default:
         return product.title_uk;
     }
