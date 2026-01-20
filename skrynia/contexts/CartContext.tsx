@@ -28,7 +28,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Load cart on mount
+  // Load cart on mount - only on client side to avoid hydration mismatch
   useEffect(() => {
     setItems(CartManager.getItems());
 
@@ -111,7 +111,40 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const closeCart = () => setIsCartOpen(false);
 
   // Calculate totals - recalculate when items change
-  const totals = React.useMemo(() => CartManager.getTotals(), [items]);
+  // Use items directly instead of CartManager.getTotals() to avoid hydration mismatch
+  const totals = React.useMemo(() => {
+    const subtotalBeforeDiscount = items.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0
+    );
+
+    const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+    // Calculate progressive discount
+    let discountPercent = 0;
+    if (itemCount >= 3) {
+      discountPercent = 15;
+    } else if (itemCount >= 2) {
+      discountPercent = 10;
+    }
+
+    const discountAmount = (subtotalBeforeDiscount * discountPercent) / 100;
+    const subtotal = subtotalBeforeDiscount - discountAmount;
+
+    // Calculate shipping (free over 1000 PLN after discount)
+    const shipping = subtotal >= 1000 ? 0 : 50;
+    const total = subtotal + shipping;
+
+    return {
+      subtotal,
+      subtotalBeforeDiscount,
+      itemCount,
+      discountPercent,
+      discountAmount,
+      shipping,
+      total,
+    };
+  }, [items]);
 
   return (
     <CartContext.Provider
