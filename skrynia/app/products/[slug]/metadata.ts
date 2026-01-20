@@ -277,7 +277,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         title: `Product ${slug} | Rune Box`,
         description: 'Product details are being loaded.',
         url: `${siteUrl}/products/${slug}`,
-        type: 'product',
+        type: 'website', // Next.js Metadata doesn't support 'product' type, but we set 'og:type': 'product' in 'other' field
         siteName: 'Rune Box',
         locale: 'en_US',
         images: [
