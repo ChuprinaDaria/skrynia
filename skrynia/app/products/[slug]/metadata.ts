@@ -45,6 +45,28 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         .trim();
       
       const title = product.title_en || product.title_uk || 'Product';
+      const price = product.price || 0;
+      const currency = product.currency || 'EUR';
+      const priceCurrency = currency === 'zł' ? 'PLN' : currency;
+      
+      // Generate multilingual titles and descriptions
+      const titleUk = product.title_uk || title;
+      const titleEn = product.title_en || titleUk;
+      const titleDe = product.title_de || titleEn;
+      const titlePl = product.title_pl || titleEn;
+      const titleSe = product.title_se || titleEn;
+      const titleNo = product.title_no || titleEn;
+      const titleDk = product.title_dk || titleEn;
+      const titleFr = product.title_fr || titleEn;
+
+      const descUk = product.description_uk || description;
+      const descEn = product.description_en || descUk;
+      const descDe = product.description_de || descEn;
+      const descPl = product.description_pl || descEn;
+      const descSe = product.description_se || descEn;
+      const descNo = product.description_no || descEn;
+      const descDk = product.description_dk || descEn;
+      const descFr = product.description_fr || descEn;
 
       return {
         title: `${title} | Rune Box`,
@@ -62,7 +84,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
           url: `${siteUrl}/products/${slug}`,
-          type: 'website',
+          type: 'product', // Changed from 'website' to 'product'
           siteName: 'Rune Box',
           locale: 'en_US',
           images: [
@@ -73,6 +95,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
               alt: title,
             },
           ],
+          // Product-specific OG tags
+          ...(price > 0 && {
+            // Note: Next.js Metadata API doesn't directly support og:price
+            // We'll add it via 'other' field
+          }),
         },
         twitter: {
           card: 'summary_large_image',
@@ -82,8 +109,42 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           creator: '@runebox',
           site: '@runebox',
         },
+        // Threads support (uses same OG tags as Facebook, but we add explicit see_also)
         alternates: {
           canonical: `${siteUrl}/products/${slug}`,
+          languages: {
+            'uk': `${siteUrl}/products/${slug}`,
+            'en': `${siteUrl}/products/${slug}`,
+            'de': `${siteUrl}/products/${slug}`,
+            'pl': `${siteUrl}/products/${slug}`,
+            'sv': `${siteUrl}/products/${slug}`, // Swedish
+            'no': `${siteUrl}/products/${slug}`, // Norwegian
+            'da': `${siteUrl}/products/${slug}`, // Danish
+            'fr': `${siteUrl}/products/${slug}`, // French
+          },
+        },
+        robots: {
+          index: true,
+          follow: true,
+          googleBot: {
+            index: true,
+            follow: true,
+            'max-image-preview': 'large',
+            'max-snippet': -1,
+            'max-video-preview': -1,
+          },
+        },
+        // Additional meta tags for product-specific OG properties
+        other: {
+          // Product price and currency for OG
+          ...(price > 0 && {
+            'product:price:amount': price.toFixed(2),
+            'product:price:currency': priceCurrency,
+            'product:availability': product.stock_quantity ? 'in stock' : 'preorder',
+            'product:condition': 'new',
+          }),
+          // Threads-specific (uses OG but can add see_also)
+          'og:see_also': siteUrl,
         },
       };
     }
@@ -99,7 +160,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: 'Product | Rune Box',
       description: 'Unique handmade jewelry from Rune Box',
       url: `${siteUrl}/products/${slug}`,
-      type: 'website',
+      type: 'product',
       siteName: 'Rune Box',
       locale: 'en_US',
       images: [
@@ -118,6 +179,19 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
       creator: '@runebox',
       site: '@runebox',
+    },
+    alternates: {
+      canonical: `${siteUrl}/products/${slug}`,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
     },
   };
 }

@@ -2,11 +2,15 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import { useParams } from 'next/navigation';
 import ProductCard, { Product } from '@/components/product/ProductCard';
 import FilterSidebar, { Filters } from '@/components/product/FilterSidebar';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint, normalizeImageUrl } from '@/lib/api';
+import { generateCollectionJsonLd } from '@/lib/seo';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 interface ApiProduct {
   id: number;
@@ -178,8 +182,63 @@ const CategoryCollectionsPage: React.FC = () => {
       ? t.collections.viking
       : t.collections.celtic;
 
+  // Generate JSON-LD for category collection
+  const categoryJsonLd = generateCollectionJsonLd(
+    categoryName,
+    category === 'slavic'
+      ? t.collections.slavicTagline
+      : category === 'viking'
+      ? t.collections.vikingTagline
+      : t.collections.celticTagline,
+    category,
+    sortedProducts.map((product) => ({
+      name: product.title,
+      price: product.price,
+      image: product.image,
+      slug: product.slug,
+    }))
+  );
+
+  // Generate Breadcrumb JSON-LD
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Головна',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Колекції',
+        item: `${siteUrl}/collections`,
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: categoryName,
+        item: `${siteUrl}/collections/${category}`,
+      },
+    ],
+  };
+
   return (
-    <div className="min-h-screen bg-deep-black pt-24 pb-20">
+    <>
+      {/* JSON-LD структуровані дані */}
+      <Script
+        id="category-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }}
+      />
+      <Script
+        id="breadcrumb-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <div className="min-h-screen bg-deep-black pt-24 pb-20">
       <div className="container mx-auto px-4 md:px-6">
         {/* Page Header */}
         <div className="mb-12 text-center">
@@ -322,6 +381,7 @@ const CategoryCollectionsPage: React.FC = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 
