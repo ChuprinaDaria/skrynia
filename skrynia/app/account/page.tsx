@@ -429,7 +429,7 @@ export default function AccountPage() {
                   onClick={() => handleOpenAddressModal(defaultAddress || undefined)}
                   className="text-xs"
                 >
-                  {defaultAddress ? (t.account.editAddress || 'Редагувати') : (t.account.addAddress || 'Додати адресу')}
+                  {defaultAddress ? 'Редагувати' : 'Додати адресу'}
                 </Button>
               </div>
               {defaultAddress ? (
