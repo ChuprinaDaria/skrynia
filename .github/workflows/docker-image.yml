@@ -68,4 +68,8 @@ jobs:
             NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu' }}
             NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN=${{ secrets.INPOST_GEOWIDGET_TOKEN }}
             NEXT_PUBLIC_INPOST_SANDBOX=${{ secrets.INPOST_SANDBOX || 'true' }}
+            FACEBOOK_PIXEL_ID=${{ secrets.FACEBOOK_PIXEL_ID }}
+            FACEBOOK_ACCESS_TOKEN=${{ secrets.FACEBOOK_ACCESS_TOKEN }}
+            FACEBOOK_DATASET_QUALITY_TOKEN=${{ secrets.FACEBOOK_DATASET_QUALITY_TOKEN }}
+            FACEBOOK_API_VERSION=${{ secrets.FACEBOOK_API_VERSION || 'v18.0' }}
 

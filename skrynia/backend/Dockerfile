@@ -16,6 +16,18 @@ COPY requirements.txt .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Build args for Facebook variables (optional, for build-time validation)
+ARG FACEBOOK_PIXEL_ID
+ARG FACEBOOK_ACCESS_TOKEN
+ARG FACEBOOK_DATASET_QUALITY_TOKEN
+ARG FACEBOOK_API_VERSION=v18.0
+
+# Set environment variables for build (optional, for validation)
+ENV FACEBOOK_PIXEL_ID=${FACEBOOK_PIXEL_ID}
+ENV FACEBOOK_ACCESS_TOKEN=${FACEBOOK_ACCESS_TOKEN}
+ENV FACEBOOK_DATASET_QUALITY_TOKEN=${FACEBOOK_DATASET_QUALITY_TOKEN}
+ENV FACEBOOK_API_VERSION=${FACEBOOK_API_VERSION}
+
 # Copy application code
 COPY . .
 
