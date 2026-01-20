@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from slugify import slugify
+from datetime import datetime
 
 from app.db.session import get_db
 from app.models.category import Category
@@ -32,6 +33,7 @@ class CategorySchema(BaseModel):
     icon: str | None
     culture_type: str
     is_featured: bool = False
+    updated_at: datetime | None = None
 
     class Config:
         from_attributes = True

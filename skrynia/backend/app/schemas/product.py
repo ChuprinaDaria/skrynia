@@ -171,6 +171,7 @@ class ProductList(BaseModel):
     category_id: Optional[int] = None
     is_handmade: bool
     is_featured: bool
+    updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True

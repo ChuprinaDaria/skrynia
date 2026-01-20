@@ -3,6 +3,7 @@ from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from slugify import slugify
+from datetime import datetime
 import csv
 import io
 import re
@@ -71,7 +72,8 @@ def _get_products_impl(
             primary_image=primary_image,
             category_id=product.category_id,
             is_handmade=product.is_handmade,
-            is_featured=product.is_featured
+            is_featured=product.is_featured,
+            updated_at=product.updated_at
         ))
 
     return result

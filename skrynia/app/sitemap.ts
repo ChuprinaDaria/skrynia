@@ -5,7 +5,8 @@ export const dynamic = 'force-dynamic';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
-const languages = ['', '/en', '/de', '/pl'];
+// Багатомовність реалізована через клієнтський контекст, не через окремі маршрути
+// Тому не створюємо окремі URL для кожної мови, а використовуємо alternates для hreflang
 
 // Fetch products from API
 async function getProducts() {
@@ -22,7 +23,9 @@ async function getProducts() {
     const products = await response.json();
     return products.map((product: any) => ({
       slug: product.slug,
-      lastModified: product.updated_at || new Date().toISOString(),
+      lastModified: product.updated_at 
+        ? new Date(product.updated_at).toISOString()
+        : new Date().toISOString(),
     }));
   } catch (error) {
     console.error('Error fetching products for sitemap:', error);
@@ -45,7 +48,9 @@ async function getCollections() {
     const categories = await response.json();
     return categories.map((category: any) => ({
       slug: category.slug,
-      lastModified: category.updated_at || new Date().toISOString(),
+      lastModified: category.updated_at 
+        ? new Date(category.updated_at).toISOString()
+        : new Date().toISOString(),
     }));
   } catch (error) {
     console.error('Error fetching categories for sitemap:', error);
@@ -120,26 +125,28 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  // Генеруємо версії для всіх мов
-  const allPages: MetadataRoute.Sitemap = [];
-  
-  [...staticPages, ...collectionPages, ...productPages].forEach((page) => {
-    languages.forEach((lang) => {
-      allPages.push({
-        ...page,
-        url: lang ? `${page.url}${lang}` : page.url,
-        alternates: {
-          languages: {
-            uk: page.url,
-            en: `${page.url}/en`,
-            de: `${page.url}/de`,
-            pl: `${page.url}/pl`,
-          },
-        },
-      });
-    });
-  });
+  // Об'єднуємо всі сторінки (без дублікатів для мов, оскільки багатомовність через клієнтський контекст)
+  const allPages: MetadataRoute.Sitemap = [
+    ...staticPages,
+    ...collectionPages,
+    ...productPages,
+  ];
 
-  return allPages;
+  // Додаємо alternates для hreflang (для пошукових систем, але не створюємо окремі URL)
+  return allPages.map((page) => ({
+    ...page,
+    alternates: {
+      languages: {
+        uk: page.url,
+        en: page.url, // Той самий URL, мова визначається клієнтським контекстом
+        de: page.url,
+        pl: page.url,
+        sv: page.url, // Swedish
+        no: page.url, // Norwegian
+        da: page.url, // Danish
+        fr: page.url, // French
+      },
+    },
+  }));
 }
 
