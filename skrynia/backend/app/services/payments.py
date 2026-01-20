@@ -101,7 +101,7 @@ def create_checkout_session(
             'payment_stage': str(stage),
             'shipping_country': order.shipping_country,
         },
-        success_url=f"{base_url}/order-success?session_id={{CHECKOUT_SESSION_ID}}",
+        success_url=f"{base_url}/order-success?order={order.order_number}",
         cancel_url=f"{base_url}/checkout?canceled=true",
     )
     

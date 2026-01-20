@@ -1,134 +1,67 @@
 import { ImageResponse } from 'next/og';
-import { getApiEndpoint, getApiUrl } from '@/lib/api';
 
 export const runtime = 'nodejs';
-
-export const size = {
-  width: 1600,
-  height: 840,
-};
-
+export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
-function resolveImageUrl(imageUrl: string | undefined | null): string | null {
-  if (!imageUrl) return null;
-  if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) return imageUrl;
-
-  if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
-    const backendBase = getApiUrl().replace(/\/api$/, '').replace(/\/$/, '');
-    return `${backendBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-  }
-
-  return `${siteUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-}
-
 export default async function OpenGraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-
-  // In Docker, prefer internal service name (faster, no SSL needed)
-  let apiEndpoint: string;
-  if (process.env.BACKEND_URL) {
-    apiEndpoint = `${process.env.BACKEND_URL}/api/v1/products/${slug}`;
-  } else if (process.env.NODE_ENV === 'production') {
-    // Try Docker service name (internal network)
-    apiEndpoint = `http://backend:8000/api/v1/products/${slug}`;
-  } else {
-    // Development: use siteUrl (nginx proxy) or localhost
-    apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
-  }
+  const apiEndpoint = `${process.env.BACKEND_URL || 'http://backend:8000'}/api/v1/products/${slug}`;
 
   let title = 'Rune Box';
-  let imageUrl: string | null = null;
+  let bg = `${siteUrl}/images/logo/logo-white-pink-1.png`;
 
   try {
     const res = await fetch(apiEndpoint, { next: { revalidate: 3600 } });
     if (res.ok) {
       const product = await res.json();
       title = product.title_en || product.title_uk || title;
-      const firstImage = product.images?.find((img: any) => img.is_primary) || product.images?.[0];
-      imageUrl = resolveImageUrl(firstImage?.image_url || product.primary_image);
+      const imgPath = product.images?.find((i: any) => i.is_primary)?.image_url || product.primary_image;
+      if (imgPath) {
+        bg = imgPath.startsWith('http') ? imgPath : `${siteUrl}${imgPath.startsWith('/') ? '' : '/'}${imgPath}`;
+      }
     }
-  } catch {
-    // ignore and render fallback
+  } catch (e) {
+    console.error('OG Fetch Error:', e);
   }
-
-  const bg = imageUrl || `${siteUrl}/images/logo/logo-white-pink-1.png`;
 
   return new ImageResponse(
     (
-      <div
-        style={{
+      <div style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        position: 'relative',
+        backgroundColor: '#0a0a0a',
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        padding: '72px'
+      }}>
+        <img src={bg} alt="" style={{
+          position: 'absolute',
+          inset: 0,
           width: '100%',
           height: '100%',
-          display: 'flex',
-          position: 'relative',
-          backgroundColor: '#0a0a0a',
-          overflow: 'hidden',
-        }}
-      >
-        <img
-          src={bg}
-          alt=""
-          style={{
-            position: 'absolute',
-            inset: 0,
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: 'contrast(1.05) saturate(1.05)',
-          }}
-        />
-
-        {/* dark gradient overlay for readability */}
-        <div
-          style={{
-            position: 'absolute',
-            inset: 0,
-            background:
-              'linear-gradient(90deg, rgba(0,0,0,0.78) 0%, rgba(0,0,0,0.20) 55%, rgba(0,0,0,0.65) 100%)',
-          }}
-        />
-
-        <div
-          style={{
-            position: 'absolute',
-            left: 72,
-            right: 72,
-            bottom: 72,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 16,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 26,
-              letterSpacing: 2,
-              color: 'rgba(255,255,255,0.85)',
-              textTransform: 'uppercase',
-            }}
-          >
+          objectFit: 'cover',
+          opacity: 0.8
+        }} />
+        <div style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(90deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.8) 100%)'
+        }} />
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', position: 'relative' }}>
+          <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: '24px', letterSpacing: '2px', textTransform: 'uppercase' }}>
             Rune Box
-          </div>
-          <div
-            style={{
-              fontSize: 64,
-              fontWeight: 700,
-              lineHeight: 1.05,
-              color: '#fff',
-              textShadow: '0 10px 40px rgba(0,0,0,0.55)',
-              maxWidth: 1250,
-            }}
-          >
+          </span>
+          <h1 style={{ color: '#fff', fontSize: '64px', fontWeight: 700, margin: 0, lineHeight: 1.1 }}>
             {title}
-          </div>
+          </h1>
         </div>
       </div>
     ),
     size
   );
 }
-
-

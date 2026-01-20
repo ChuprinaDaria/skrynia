@@ -89,9 +89,16 @@ function OrderSuccessContent() {
         const data = await response.json();
         setOrder(data);
         
-        // Clear cart only when order is confirmed (paid or completed)
+        // Clear cart when payment is successful (check both status and payment_status)
         // This ensures cart is cleared after successful payment
-        if (data.status === 'paid' || data.status === 'completed' || data.status === 'processing') {
+        const isPaid = data.payment_status === 'paid_partially' || 
+                       data.payment_status === 'paid_fully' || 
+                       data.payment_status === 'completed' ||
+                       data.status === 'paid' || 
+                       data.status === 'completed' || 
+                       data.status === 'processing';
+        
+        if (isPaid) {
           clearCart();
           // Clear pending order number from sessionStorage
           if (typeof window !== 'undefined') {

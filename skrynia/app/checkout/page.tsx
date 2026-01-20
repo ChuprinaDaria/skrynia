@@ -11,7 +11,6 @@ import { getApiEndpoint } from '@/lib/api';
 import { InPostGeowidget, InPostPoint } from '@/components/shipping/InPostGeowidget';
 import { trackInitiateCheckout } from '@/lib/facebook-conversions';
 
-type PaymentMethod = 'stripe' | 'przelewy24' | 'blik' | 'bank_transfer';
 type DeliveryMethod = 'inpost' | 'novaposhta' | 'poczta' | 'courier';
 
 // InPost supported countries (including international)
@@ -89,7 +88,7 @@ export default function CheckoutPage() {
     billing_city: '',
     billing_postal_code: '',
     billing_country: 'PL',
-    payment_method: 'przelewy24' as PaymentMethod,
+    payment_method: 'stripe', // Only Stripe is supported
     customer_notes: '',
     bonus_points_used: 0,
   });
@@ -145,12 +144,17 @@ export default function CheckoutPage() {
   const shipping = calculateShippingCost();
   const checkoutTotal = subtotal + shipping;
 
-  // Redirect if cart is empty
+  // Redirect if cart is empty (but not during checkout process or if there's an error)
   useEffect(() => {
-    if (items.length === 0) {
+    // Don't redirect if:
+    // 1. Currently processing checkout (loading)
+    // 2. There's an error (user should see the error)
+    // 3. We have a pending order (checkout in progress)
+    const hasPendingOrder = typeof window !== 'undefined' && sessionStorage.getItem('pendingOrderNumber');
+    if (items.length === 0 && !loading && !error && !hasPendingOrder) {
       router.push('/cart');
     }
-  }, [items, router]);
+  }, [items, router, loading, error]);
 
   // Load user profile data if logged in
   useEffect(() => {
@@ -217,6 +221,9 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    
+    // Log for debugging
+    console.log('[Checkout] Starting checkout process, items count:', items.length);
 
     try {
       // Prepare order items
@@ -279,28 +286,51 @@ export default function CheckoutPage() {
       }
 
       const order = await response.json();
+      console.log('[Checkout] Order created:', order.order_number, 'Items count before checkout session:', items.length);
 
-      // Only clear cart if order doesn't require payment (e.g., bank transfer)
-      // For payment methods that require payment gateway, clear cart on success page
-      if (!order.payment_intent_id && order.payment_method === 'bank_transfer') {
-        // Bank transfer - order is created, clear cart
-        clearCart();
-        router.push(`/order-success?order=${order.order_number}`);
-      } else if (order.payment_intent_id) {
-        // Payment required - store order number and redirect to payment
-        // Cart will be cleared after successful payment
-        if (typeof window !== 'undefined') {
-          sessionStorage.setItem('pendingOrderNumber', order.order_number);
-        }
-        router.push(`/payment/${order.payment_intent_id}`);
+      // NEVER clear cart in checkout - only after successful payment
+      // Store order number for cart clearing after payment
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('pendingOrderNumber', order.order_number);
+      }
+
+      // Create Stripe checkout session
+      const checkoutResponse = await fetch(getApiEndpoint('/api/v1/payments/create-checkout-session'), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(userToken ? { 'Authorization': `Bearer ${userToken}` } : {}),
+        },
+        body: JSON.stringify({ order_id: order.id }),
+      });
+
+      if (!checkoutResponse.ok) {
+        const errorData = await checkoutResponse.json();
+        throw new Error(errorData.detail || 'Failed to create payment session');
+      }
+
+      const { checkout_url } = await checkoutResponse.json();
+      console.log('[Checkout] Checkout session created, redirecting to:', checkout_url);
+      console.log('[Checkout] Items count before redirect:', items.length);
+      
+      // Redirect to Stripe checkout
+      // Use window.location.replace to prevent back button issues
+      if (checkout_url) {
+        // Small delay to ensure state is saved
+        setTimeout(() => {
+          window.location.replace(checkout_url);
+        }, 100);
       } else {
-        // Other payment methods - clear cart and redirect to success
-        clearCart();
-        router.push(`/order-success?order=${order.order_number}`);
+        throw new Error('No checkout URL received');
       }
     } catch (err) {
+      // On error, don't clear cart and show error message
       setError(err instanceof Error ? err.message : t.checkout.errors.defaultError);
       console.error('Checkout error:', err);
+      // Clear pending order flag on error
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('pendingOrderNumber');
+      }
     } finally {
       setLoading(false);
     }
@@ -798,56 +828,7 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              {/* Payment Method */}
-              <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
-                <h2 className="font-rutenia text-2xl text-ivory mb-6">{t.checkout.paymentMethod}</h2>
-                <div className="space-y-3">
-                  <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="przelewy24"
-                      checked={formData.payment_method === 'przelewy24'}
-                      onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
-                      className="w-5 h-5 accent-oxblood"
-                    />
-                    <span className="text-ivory font-inter">{t.checkout.paymentP24}</span>
-                  </label>
-                  <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="stripe"
-                      checked={formData.payment_method === 'stripe'}
-                      onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
-                      className="w-5 h-5 accent-oxblood"
-                    />
-                    <span className="text-ivory font-inter">{t.checkout.paymentStripe}</span>
-                  </label>
-                  <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="blik"
-                      checked={formData.payment_method === 'blik'}
-                      onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
-                      className="w-5 h-5 accent-oxblood"
-                    />
-                    <span className="text-ivory font-inter">{t.checkout.paymentBLIK}</span>
-                  </label>
-                  <label className="flex items-center gap-3 p-4 border border-sage/30 rounded-sm cursor-pointer hover:border-oxblood/50 transition-colors">
-                    <input
-                      type="radio"
-                      name="payment_method"
-                      value="bank_transfer"
-                      checked={formData.payment_method === 'bank_transfer'}
-                      onChange={(e) => setFormData({ ...formData, payment_method: e.target.value as PaymentMethod })}
-                      className="w-5 h-5 accent-oxblood"
-                    />
-                    <span className="text-ivory font-inter">{t.checkout.paymentBankTransfer}</span>
-                  </label>
-                </div>
-              </div>
+              {/* Payment Method - Stripe only, no UI needed */}
 
               {/* Notes */}
               <div className="bg-footer-black border border-sage/20 rounded-sm p-6">
