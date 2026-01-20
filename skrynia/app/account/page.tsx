@@ -317,8 +317,8 @@ export default function AccountPage() {
       if (!token) return;
 
       const url = editingAddress
-        ? getApiEndpoint(`/api/v1/users/me/addresses/${editingAddress.id}`)
-        : getApiEndpoint('/api/v1/users/me/addresses');
+        ? getApiEndpoint(`/api/v1/users/addresses/${editingAddress.id}`)
+        : getApiEndpoint('/api/v1/users/addresses');
       
       const method = editingAddress ? 'PATCH' : 'POST';
 

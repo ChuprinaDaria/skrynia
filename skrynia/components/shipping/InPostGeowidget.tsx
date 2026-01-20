@@ -125,14 +125,45 @@ export function InPostGeowidget({
   useEffect(() => {
     if (!onPointSelect) return;
 
-    const handlePointSelect = (event: CustomEvent) => {
-      onPointSelect(event.detail);
+    // Handle point selection event according to Geowidget International documentation
+    // The event can be either CustomEvent with details or a direct function call
+    const handlePointSelect = (event: Event | any) => {
+      let pointData: any;
+      
+      // Check if it's a CustomEvent (from addEventListener)
+      if (event instanceof CustomEvent) {
+        pointData = (event as any).detail || (event as any).details;
+      } 
+      // Check if it's a direct function call (from onpoint parameter)
+      else if (event && typeof event === 'object') {
+        pointData = event;
+      }
+      
+      if (pointData) {
+        // Map the point data to our InPostPoint interface
+        // Geowidget International returns point data in different formats
+        const point: InPostPoint = {
+          name: pointData.name || pointData.location?.name || pointData.location_name || '',
+          location: {
+            latitude: pointData.location?.latitude || pointData.latitude || pointData.location?.lat || 0,
+            longitude: pointData.location?.longitude || pointData.longitude || pointData.location?.lng || 0,
+          },
+          address: {
+            street: pointData.address?.street || pointData.street || pointData.address_line1 || '',
+            city: pointData.address?.city || pointData.city || '',
+            post_code: pointData.address?.post_code || pointData.post_code || pointData.postal_code || pointData.address?.postal_code || '',
+            country_code: pointData.address?.country_code || pointData.country_code || pointData.country || '',
+          },
+        };
+        onPointSelect(point);
+      }
     };
 
-    document.addEventListener('onpointselect', handlePointSelect as EventListener);
+    // Listen for the onpointselect event on document (for complete integration)
+    document.addEventListener('onpointselect', handlePointSelect);
 
     return () => {
-      document.removeEventListener('onpointselect', handlePointSelect as EventListener);
+      document.removeEventListener('onpointselect', handlePointSelect);
     };
   }, [onPointSelect]);
 
@@ -146,8 +177,8 @@ export function InPostGeowidget({
     onpoint: 'onpointselect'
   };
 
-  // Country prop only for International version
-  if (version === 'international') {
+  // Country prop only for International version (v5 does NOT use country parameter)
+  if (version === 'international' && country) {
     widgetProps.country = country;
   }
 

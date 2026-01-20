@@ -165,7 +165,7 @@ export default function CheckoutPage() {
           
           // Load default address
           try {
-            const addressResponse = await fetch(getApiEndpoint('/api/v1/users/me/addresses/default'), {
+            const addressResponse = await fetch(getApiEndpoint('/api/v1/users/addresses/default'), {
               headers: {
                 'Authorization': `Bearer ${userToken}`,
               },
@@ -577,14 +577,29 @@ export default function CheckoutPage() {
                                     <InPostGeowidget
                                       token={inpostToken}
                                       version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
-                                      country={formData.shipping_country === 'PL' ? undefined : formData.shipping_country}
-                                      language={language === 'UA' ? 'uk' : language === 'EN' ? 'en' : language === 'FR' ? 'fr' : language === 'PL' ? 'pl' : language === 'DE' ? 'en' : language === 'SE' ? 'en' : language === 'NO' ? 'en' : language === 'DK' ? 'en' : 'pl'}
+                                      country={formData.shipping_country === 'PL' ? undefined : INPOST_SUPPORTED_COUNTRIES.join(',')}
+                                      language={
+                                        language === 'UA' ? 'uk' : 
+                                        language === 'EN' ? 'en' : 
+                                        language === 'FR' ? 'fr' : 
+                                        language === 'PL' ? 'pl' : 
+                                        ['IT', 'ES', 'PT'].includes(language as string) ? (language as string).toLowerCase() as 'it' | 'es' | 'pt' :
+                                        language === 'DE' ? 'en' : 
+                                        language === 'SE' ? 'en' : 
+                                        language === 'NO' ? 'en' : 
+                                        language === 'DK' ? 'en' : 
+                                        'pl'
+                                      }
                                       config="parcelCollect"
                                       sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
                                       onPointSelect={(point: InPostPoint) => {
                                         setSelectedInPostPoint(point);
                                         // Extract point code from name (e.g., "WAW01M" from "Paczkomat InPost WAW01M")
-                                        const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] || point.name;
+                                        // Try different patterns for different countries
+                                        const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] 
+                                          || point.name.match(/[A-Z]{2,4}\d{2,3}[A-Z]?/)?.[0] 
+                                          || point.name.split(' ').pop() 
+                                          || point.name;
                                         setSelectedPickupPoint(pointCode);
                                         setShowInPostMap(false);
                                       }}
