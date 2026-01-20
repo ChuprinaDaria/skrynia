@@ -26,6 +26,8 @@ class PaymentMethod(str, enum.Enum):
 class PaymentStatus(str, enum.Enum):
     PENDING = "pending"
     COMPLETED = "completed"
+    PAID_PARTIALLY = "paid_partially"
+    PAID_FULLY = "paid_fully"
     FAILED = "failed"
     REFUNDED = "refunded"
 

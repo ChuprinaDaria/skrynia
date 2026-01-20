@@ -17,6 +17,7 @@ from app.services.shipping_novaposhta import NovaPoshtaService
 from app.services.shipping_dhl import DHLService
 from app.services.shipping_poczta import PocztaPolskaService
 from app.services.order_notifications import send_order_status_email
+from app.services.inpost_webhook import InPostWebhookVerifier
 
 logger = logging.getLogger(__name__)
 
@@ -185,11 +186,34 @@ async def create_shipment(
                 )
 
             inpost = InPostService(sandbox=getattr(settings, "INPOST_SANDBOX", True))
+            
+            receiver = {
+                "email": order.customer_email,
+                "phone": order.customer_phone or "",
+                "address": {
+                    "street": order.shipping_address_line1,
+                    "building_number": order.shipping_address_line2 or "",
+                    "city": order.shipping_city,
+                    "post_code": order.shipping_postal_code,
+                    "country_code": order.shipping_country
+                }
+            }
+            
+            name_parts = order.customer_name.split(maxsplit=1)
+            if len(name_parts) == 2:
+                receiver["first_name"] = name_parts[0]
+                receiver["last_name"] = name_parts[1]
+            else:
+                receiver["name"] = order.customer_name
+            
+            service = "inpost_locker_standard"
+            if order.shipping_country != "PL":
+                service = "inpost_locker_standard_international"
+            
             result = inpost.create_shipment(
-                receiver_email=order.customer_email,
-                receiver_phone=order.customer_phone or "",
-                receiver_name=order.customer_name,
+                receiver=receiver,
                 target_point=request.paczkomat_id,
+                service=service,
                 reference=order.order_number
             )
 
@@ -547,9 +571,57 @@ def _validate_inpost_ip(ip_address: str) -> bool:
         return False
 
 
+def _map_event_code_to_shipping_status(event_code: str) -> Optional[ShippingStatus]:
+    """
+    Map InPost event code to ShippingStatus enum.
+    
+    Event codes mapping:
+    - CRE.* -> LABEL_CREATED
+    - FMD.1002, FMD.1004, FMD.1005 -> PICKED_UP
+    - FMD.1003, MMD.1004, LMD.1001 -> IN_TRANSIT
+    - MMD.1003 -> IN_TRANSIT (dispatched)
+    - LMD.1002, LMD.1003, LMD.1004, LMD.1005, LMD.1006 -> OUT_FOR_DELIVERY
+    - EOL.1001, EOL.1002, EOL.1003, EOL.1004, EOL.1005 -> DELIVERED
+    - RTS.* -> RETURNED
+    - EOL.9001, EOL.9002, EOL.9003, EOL.9004, LMD.9002, LMD.9005 -> EXCEPTION
+    """
+    if not event_code:
+        return None
+    
+    event_code_upper = event_code.upper()
+    
+    if event_code_upper.startswith("CRE."):
+        return ShippingStatus.LABEL_CREATED
+    
+    if event_code_upper in ["FMD.1002", "FMD.1004", "FMD.1005"]:
+        return ShippingStatus.PICKED_UP
+    
+    if event_code_upper in ["FMD.1003", "MMD.1004", "LMD.1001", "MMD.1003"]:
+        return ShippingStatus.IN_TRANSIT
+    
+    if event_code_upper in ["LMD.1002", "LMD.1003", "LMD.1004", "LMD.1005", "LMD.1006", "LMD.9001"]:
+        return ShippingStatus.OUT_FOR_DELIVERY
+    
+    if event_code_upper in ["EOL.1001", "EOL.1002", "EOL.1003", "EOL.1004", "EOL.1005"]:
+        return ShippingStatus.DELIVERED
+    
+    if event_code_upper.startswith("RTS."):
+        return ShippingStatus.RETURNED
+    
+    if event_code_upper in [
+        "EOL.9001", "EOL.9002", "EOL.9003", "EOL.9004",
+        "LMD.9002", "LMD.9005", "LMD.9006", "LMD.9007", "LMD.9008",
+        "LMD.9009", "LMD.9010", "LMD.9011", "FMD.9001", "FMD.9002",
+        "MMD.9001", "LMD.9003", "LMD.9004"
+    ]:
+        return ShippingStatus.EXCEPTION
+    
+    return None
+
+
 def _map_inpost_status_to_shipping_status(inpost_status: str) -> ShippingStatus:
     """
-    Map InPost status to our ShippingStatus enum.
+    Map InPost status to our ShippingStatus enum (legacy support).
     
     InPost statuses:
     - created, confirmed -> LABEL_CREATED
@@ -815,3 +887,185 @@ async def handle_inpost_webhook(
             "message": str(e),
             "event": event.event
         }
+
+
+@router.post("/inpost/webhook/v2")
+async def handle_inpost_webhook_v2(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db)
+):
+    """
+    Handle InPost Global API v2 webhook events.
+    
+    Supports:
+    - Shipment.Tracking events
+    - Signature verification (HMAC, Digital, Basic Auth, API Key)
+    - Automatic shipment status updates
+    
+    Headers:
+    - x-inpost-api-version: API version (e.g., "2024-06-01")
+    - x-inpost-topic: Event topic (e.g., "Shipment.Tracking")
+    - x-inpost-event-id: Unique event ID
+    - x-inpost-timestamp: Event timestamp
+    - x-inpost-signature: Webhook signature (if using signature auth)
+    """
+    if not settings.INPOST_USE_GLOBAL_API:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Global API v2 webhooks require INPOST_USE_GLOBAL_API=true"
+        )
+    
+    payload = await request.body()
+    headers_dict = dict(request.headers)
+    
+    api_version = headers_dict.get("x-inpost-api-version")
+    topic = headers_dict.get("x-inpost-topic")
+    event_id = headers_dict.get("x-inpost-event-id")
+    timestamp = headers_dict.get("x-inpost-timestamp")
+    
+    logger.info(f"InPost Global API v2 webhook: topic={topic}, event_id={event_id}, version={api_version}")
+    
+    try:
+        if settings.INPOST_WEBHOOK_SIGNATURE_TYPE or settings.INPOST_WEBHOOK_HMAC_SECRET:
+            verified = InPostWebhookVerifier.verify_webhook(payload, headers_dict)
+            if not verified:
+                logger.warning(f"Webhook signature verification failed for event_id={event_id}")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid webhook signature"
+                )
+        
+        data = await request.json()
+        
+        if topic == "Shipment.Tracking":
+            tracking_number = data.get("trackingNumber")
+            customer_reference = data.get("customerReference")
+            event_code = data.get("eventCode")
+            event_timestamp = data.get("timestamp")
+            location = data.get("location")
+            delivery = data.get("delivery")
+            shipment_info = data.get("shipment", {})
+            return_to_sender = data.get("returnToSender")
+            new_destination = data.get("newDestination")
+            
+            if not tracking_number:
+                logger.warning(f"Tracking number missing in webhook event_id={event_id}")
+                return {"status": "received", "message": "Tracking number missing"}
+            
+            shipment = db.query(Shipment).filter(
+                Shipment.tracking_number == tracking_number,
+                Shipment.provider == ShippingProvider.INPOST
+            ).first()
+            
+            if not shipment and customer_reference:
+                order = db.query(Order).filter(Order.order_number == customer_reference).first()
+                if order:
+                    shipment = db.query(Shipment).filter(
+                        Shipment.order_id == order.id,
+                        Shipment.provider == ShippingProvider.INPOST
+                    ).first()
+            
+            if not shipment:
+                logger.warning(f"Shipment not found for tracking_number={tracking_number}, customer_reference={customer_reference}")
+                return {"status": "received", "message": "Shipment not found"}
+            
+            tracking_events = shipment.tracking_events or []
+            event_data = {
+                "eventTimestamp": event_timestamp,
+                "eventCode": event_code,
+                "eventId": event_id,
+                "location": location,
+                "delivery": delivery,
+                "shipment": shipment_info,
+                "returnToSender": return_to_sender,
+                "newDestination": new_destination
+            }
+            tracking_events.append(event_data)
+            shipment.tracking_events = tracking_events
+            
+            shipping_status = _map_event_code_to_shipping_status(event_code)
+            
+            if shipping_status:
+                shipment.status = shipping_status
+                
+                provider_data = shipment.provider_data or {}
+                
+                if location:
+                    provider_data["last_location"] = {
+                        "id": location.get("id"),
+                        "type": location.get("type"),
+                        "name": location.get("name"),
+                        "address": location.get("address"),
+                        "city": location.get("city"),
+                        "country": location.get("country"),
+                        "postalCode": location.get("postalCode")
+                    }
+                
+                if new_destination:
+                    provider_data["new_destination"] = {
+                        "id": new_destination.get("id"),
+                        "type": new_destination.get("type"),
+                        "name": new_destination.get("name"),
+                        "address": new_destination.get("address"),
+                        "city": new_destination.get("city"),
+                        "country": new_destination.get("country"),
+                        "postalCode": new_destination.get("postalCode")
+                    }
+                
+                if return_to_sender:
+                    rts_tracking = return_to_sender.get("trackingNumber")
+                    if rts_tracking:
+                        provider_data["return_tracking_number"] = rts_tracking
+                        shipment.status = ShippingStatus.RETURNED
+                        shipping_status = ShippingStatus.RETURNED
+                
+                shipment.provider_data = provider_data
+                
+                order = db.query(Order).filter(Order.id == shipment.order_id).first()
+                if order:
+                    order_status = _map_shipping_status_to_order_status(shipping_status)
+                    if order_status:
+                        order.status = order_status
+                        
+                        if shipping_status == ShippingStatus.DELIVERED:
+                            order.delivered_at = datetime.utcnow()
+                        elif shipping_status == ShippingStatus.PICKED_UP:
+                            order.shipped_at = datetime.utcnow()
+                        elif shipping_status == ShippingStatus.RETURNED:
+                            order.status = OrderStatus.CANCELLED
+                        
+                        background_tasks.add_task(
+                            send_order_status_email,
+                            order=order,
+                            status=order.status,
+                            db=db
+                        )
+                
+                logger.info(f"Updated shipment {tracking_number} status to {shipping_status.value} (event_code={event_code}, event_id={event_id})")
+            
+            if delivery:
+                recipient_name = delivery.get("recipientName")
+                delivery_notes = delivery.get("deliveryNotes")
+                provider_data = shipment.provider_data or {}
+                if "delivery" not in provider_data:
+                    provider_data["delivery"] = {}
+                provider_data["delivery"].update({
+                    "recipientName": recipient_name,
+                    "deliveryNotes": delivery_notes
+                })
+                shipment.provider_data = provider_data
+            
+            db.commit()
+            logger.info(f"Updated shipment {tracking_number} from webhook event_id={event_id}")
+        
+        return {"status": "ok", "event_id": event_id}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing InPost webhook v2: {str(e)}", exc_info=True)
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Webhook processing failed: {str(e)}"
+        )

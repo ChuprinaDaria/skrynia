@@ -50,7 +50,11 @@ class InPostService:
     API_URL = "https://api-shipx-pl.easypack24.net/v1"
     SANDBOX_URL = "https://sandbox-api-shipx-pl.easypack24.net/v1"
     
-    # Client identification
+    GLOBAL_API_URL = "https://api.inpost-group.com"
+    GLOBAL_API_SANDBOX_URL = "https://stage-api.inpost-group.com"
+    GLOBAL_API_OAUTH_URL = "https://api.inpost-group.com/oauth2/token"
+    GLOBAL_API_OAUTH_SANDBOX_URL = "https://stage-api.inpost-group.com/oauth2/token"
+    
     CLIENT_NAME = "Skrynia"
     CLIENT_VERSION = "1.0.0"
     
@@ -61,7 +65,10 @@ class InPostService:
         sandbox: bool = True,
         user_agent: str = None,
         user_agent_version: str = None,
-        accept_language: str = "pl_PL"
+        accept_language: str = "pl_PL",
+        use_global_api: bool = None,
+        client_id: str = None,
+        client_secret: str = None
     ):
         """
         Initialize InPost service.
@@ -76,25 +83,76 @@ class InPostService:
         """
         self.api_token = api_token or getattr(settings, "INPOST_API_TOKEN", "")
         self.organization_id = organization_id or getattr(settings, "INPOST_ORGANIZATION_ID", "")
-        self.base_url = self.SANDBOX_URL if sandbox else self.API_URL
         self.sandbox = sandbox
         self.accept_language = accept_language
         
-        # User agent headers
+        self.use_global_api = use_global_api if use_global_api is not None else getattr(settings, "INPOST_USE_GLOBAL_API", False)
+        self.client_id = client_id or getattr(settings, "INPOST_CLIENT_ID", "")
+        self.client_secret = client_secret or getattr(settings, "INPOST_CLIENT_SECRET", "")
+        
+        if self.use_global_api:
+            self.base_url = self.GLOBAL_API_SANDBOX_URL if sandbox else self.GLOBAL_API_URL
+            self.oauth_url = self.GLOBAL_API_OAUTH_SANDBOX_URL if sandbox else self.GLOBAL_API_OAUTH_URL
+        else:
+            self.base_url = self.SANDBOX_URL if sandbox else self.API_URL
+            self.oauth_url = None
+        
         self.user_agent = user_agent or self.CLIENT_NAME
         self.user_agent_version = user_agent_version or self.CLIENT_VERSION
         
-        # Base headers (will be extended per request with X-Request-ID)
-        self.base_headers = {
-            "Authorization": f"Bearer {self.api_token}",
-            "Content-Type": "application/json",
-            "X-User-Agent": self.user_agent,
-            "X-User-Agent-Version": self.user_agent_version,
-            "Accept-Language": self.accept_language
-        }
+        if self.use_global_api:
+            self.base_headers = {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            }
+            self._access_token = None
+            self._token_expires_at = None
+        else:
+            self.base_headers = {
+                "Authorization": f"Bearer {self.api_token}",
+                "Content-Type": "application/json",
+                "X-User-Agent": self.user_agent,
+                "X-User-Agent-Version": self.user_agent_version,
+                "Accept-Language": self.accept_language
+            }
         
-        # Cache for organization data
         self._organization_cache = None
+    
+    def _get_oauth_token(self) -> str:
+        """Get OAuth 2.0 access token for Global API."""
+        import time
+        from base64 import b64encode
+        
+        if self._access_token and self._token_expires_at and time.time() < self._token_expires_at:
+            return self._access_token
+        
+        if not self.client_id or not self.client_secret:
+            raise InPostAPIError("OAuth credentials (client_id, client_secret) are required for Global API")
+        
+        auth_header = b64encode(f"{self.client_id}:{self.client_secret}".encode()).decode()
+        
+        response = requests.post(
+            self.oauth_url,
+            headers={
+                "Content-Type": "application/x-www-form-urlencoded",
+                "Authorization": f"Basic {auth_header}"
+            },
+            data={
+                "grant_type": "client_credentials",
+                "scope": "openid api:points:read api:shipments:read api:shipments:write"
+            },
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        data = response.json()
+        self._access_token = data["access_token"]
+        expires_in = data.get("expires_in", 599)
+        self._token_expires_at = time.time() + expires_in - 60
+        
+        return self._access_token
     
     def _get_headers(self, request_id: str = None) -> Dict[str, str]:
         """
@@ -107,11 +165,16 @@ class InPostService:
             Headers dictionary
         """
         headers = self.base_headers.copy()
+        
+        if self.use_global_api:
+            token = self._get_oauth_token()
+            headers["Authorization"] = f"Bearer {token}"
+        
         if request_id:
             headers["X-Request-ID"] = request_id
         else:
-            # Generate UUID for request tracking
             headers["X-Request-ID"] = str(uuid.uuid4())
+        
         return headers
     
     def _handle_error(self, response: requests.Response) -> None:
@@ -648,6 +711,34 @@ class InPostService:
                 raise InPostAPIError("MPK name must be max 255 characters")
             payload["mpk"] = mpk
         
+        if self.use_global_api:
+            receiver_data = receiver
+            if not receiver_data and (receiver_email or receiver_phone or receiver_name):
+                receiver_data = {}
+                if receiver_email:
+                    receiver_data["email"] = receiver_email
+                if receiver_phone:
+                    receiver_data["phone"] = receiver_phone
+                if receiver_name:
+                    name_parts = receiver_name.split(maxsplit=1)
+                    if len(name_parts) == 2:
+                        receiver_data["first_name"] = name_parts[0]
+                        receiver_data["last_name"] = name_parts[1]
+                    else:
+                        receiver_data["name"] = receiver_name
+                if receiver and isinstance(receiver, dict) and "address" in receiver:
+                    receiver_data["address"] = receiver["address"]
+            
+            return self.create_shipment_v2(
+                receiver=receiver_data,
+                sender=sender,
+                target_point=target_point,
+                reference=reference,
+                organization_id=org_id,
+                destination_country=receiver_data.get("address", {}).get("country_code") if receiver_data else None,
+                request_id=request_id
+            )
+        
         data = self._make_request(
             "POST",
             f"/organizations/{org_id}/shipments",
@@ -673,6 +764,132 @@ class InPostService:
             "receiver": data.get("receiver"),
             "created_at": data.get("created_at"),
             "updated_at": data.get("updated_at")
+        }
+    
+    def create_shipment_v2(
+        self,
+        receiver: Dict[str, Any],
+        sender: Dict[str, Any] = None,
+        target_point: str = None,
+        reference: str = None,
+        organization_id: str = None,
+        origin_country: str = "PL",
+        destination_country: str = None,
+        parcel_weight: float = 0.2,
+        parcel_dimensions: Dict[str, Any] = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Create shipment using Global API v2.
+        
+        Args:
+            receiver: Receiver information with address
+            sender: Sender information (optional, uses organization data)
+            target_point: Target point ID (e.g., "KRA108")
+            reference: Order reference
+            organization_id: Organization ID
+            origin_country: Origin country code (default: PL)
+            destination_country: Destination country code (from receiver address)
+            parcel_weight: Parcel weight in kg
+            parcel_dimensions: Parcel dimensions dict with length, width, height, unit
+            request_id: Optional request ID
+            
+        Returns:
+            Shipment data with tracking number
+        """
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        if not receiver:
+            raise InPostAPIError("Receiver information is required")
+        
+        receiver_address = receiver.get("address", {})
+        dest_country = destination_country or receiver_address.get("country_code", "PL")
+        
+        payload = {
+            "sender": sender or {},
+            "recipient": {
+                "email": receiver.get("email"),
+                "phone": receiver.get("phone")
+            },
+            "origin": {
+                "countryCode": origin_country
+            },
+            "destination": {
+                "countryCode": dest_country
+            },
+            "parcels": [{
+                "type": "STANDARD",
+                "weight": {
+                    "amount": str(int(parcel_weight * 1000)),
+                    "unit": "G"
+                }
+            }]
+        }
+        
+        if "first_name" in receiver and "last_name" in receiver:
+            payload["recipient"]["firstName"] = receiver["first_name"]
+            payload["recipient"]["lastName"] = receiver["last_name"]
+        elif "name" in receiver:
+            name_parts = receiver["name"].split(maxsplit=1)
+            if len(name_parts) == 2:
+                payload["recipient"]["firstName"] = name_parts[0]
+                payload["recipient"]["lastName"] = name_parts[1]
+            else:
+                payload["recipient"]["name"] = receiver["name"]
+        
+        if target_point:
+            payload["destination"]["pointId"] = target_point
+        elif receiver_address:
+            payload["destination"]["address"] = {
+                "countryCode": receiver_address.get("country_code", dest_country),
+                "street": receiver_address.get("street", ""),
+                "houseNumber": receiver_address.get("building_number", ""),
+                "city": receiver_address.get("city", ""),
+                "postalCode": receiver_address.get("post_code", "")
+            }
+        
+        if receiver_address and not target_point:
+            payload["origin"]["address"] = {
+                "countryCode": origin_country,
+                "street": receiver_address.get("street", ""),
+                "houseNumber": receiver_address.get("building_number", ""),
+                "city": receiver_address.get("city", ""),
+                "postalCode": receiver_address.get("post_code", "")
+            }
+        
+        if parcel_dimensions:
+            payload["parcels"][0]["dimensions"] = parcel_dimensions
+        
+        if reference:
+            payload["references"] = {
+                "custom": {
+                    "orderNumber": reference
+                }
+            }
+        
+        deduplication_id = request_id or str(uuid.uuid4())
+        headers = self._get_headers(request_id)
+        headers["X-Deduplication-Id"] = deduplication_id
+        
+        response = requests.post(
+            f"{self.base_url}/shipping/v2/organizations/{org_id}/shipments",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        if response.status_code not in [200, 201]:
+            self._handle_error(response)
+        
+        data = response.json()
+        
+        return {
+            "tracking_number": data.get("trackingNumber"),
+            "shipment_id": data.get("trackingNumber"),
+            "parcels": data.get("parcels", []),
+            "routing": data.get("routing", {})
         }
     
     def get_shipment(self, shipment_id: str, organization_id: str = None, request_id: str = None) -> Dict[str, Any]:
@@ -1647,3 +1864,434 @@ class InPostService:
             json_data=payload,
             request_id=request_id
         )
+    
+    # ==================== Pickup Orders (Global API v2) ====================
+    
+    def create_pickup_order(
+        self,
+        address: Dict[str, Any],
+        contact_person: Dict[str, Any],
+        pickup_time: Dict[str, Any],
+        volume: Dict[str, Any],
+        organization_id: str = None,
+        references: Dict[str, Any] = None,
+        tracking_numbers: List[str] = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Create a one-time pickup order.
+        
+        Args:
+            address: Pickup address with countryCode, city, postalCode, street, houseNumber, etc.
+            contact_person: Contact person details with firstName, lastName, email, phone
+            pickup_time: Pickup time window with 'from' and 'to' ISO datetime strings
+            volume: Volume information with itemType (PARCEL or RECYCLABLE_PACKAGING), count, totalWeight/totalVolume
+            organization_id: Organization ID
+            references: Optional custom references
+            tracking_numbers: Optional list of tracking numbers
+            request_id: Optional request ID
+            
+        Returns:
+            Pickup order data with id, carrierReference, createdTime, etc.
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Pickup orders are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        payload = {
+            "address": address,
+            "contactPerson": contact_person,
+            "pickupTime": pickup_time,
+            "volume": volume
+        }
+        
+        if references:
+            payload["references"] = references
+        
+        if tracking_numbers:
+            payload["trackingNumbers"] = tracking_numbers
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.post(
+            f"{self.base_url}/pickups/v1/organizations/{org_id}/one-time-pickups",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        if response.status_code not in [200, 201]:
+            self._handle_error(response)
+        
+        return response.json()
+    
+    def get_pickup_orders(
+        self,
+        organization_id: str = None,
+        page: int = 0,
+        size: int = 20,
+        sort: List[str] = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Get paginated list of pickup orders.
+        
+        Args:
+            organization_id: Organization ID
+            page: Zero-based page index
+            size: Page size (default: 20)
+            sort: Sorting criteria in format ["property,asc", "property,desc"]
+            request_id: Optional request ID
+            
+        Returns:
+            Paginated pickup orders list
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Pickup orders are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        params = {
+            "page": page,
+            "size": size
+        }
+        
+        if sort:
+            params["sort"] = sort
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.get(
+            f"{self.base_url}/pickups/v1/organizations/{org_id}/one-time-pickups",
+            headers=headers,
+            params=params,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        return response.json()
+    
+    def get_pickup_order(
+        self,
+        order_id: str,
+        organization_id: str = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Get pickup order details by ID.
+        
+        Args:
+            order_id: Pickup order ID
+            organization_id: Organization ID
+            request_id: Optional request ID
+            
+        Returns:
+            Pickup order details
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Pickup orders are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.get(
+            f"{self.base_url}/pickups/v1/organizations/{org_id}/one-time-pickups/{order_id}",
+            headers=headers,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        return response.json()
+    
+    def cancel_pickup_order(
+        self,
+        order_id: str,
+        organization_id: str = None,
+        request_id: str = None
+    ) -> None:
+        """
+        Cancel a pickup order.
+        
+        Args:
+            order_id: Pickup order ID
+            organization_id: Organization ID
+            request_id: Optional request ID
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Pickup orders are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.put(
+            f"{self.base_url}/pickups/v1/organizations/{org_id}/one-time-pickups/{order_id}/cancel",
+            headers=headers,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+    
+    def get_pickup_cutoff_time(
+        self,
+        postal_code: str,
+        country_code: str,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Get cutoff time for pickup order creation for given postal code.
+        
+        Args:
+            postal_code: Postal code in country specific format
+            country_code: ISO 3166-1 alpha-2 country code
+            request_id: Optional request ID
+            
+        Returns:
+            Cutoff time information
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Pickup orders are only available in Global API v2")
+        
+        params = {
+            "postalCode": postal_code,
+            "countryCode": country_code
+        }
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.get(
+            f"{self.base_url}/pickups/v1/cutoff-time",
+            headers=headers,
+            params=params,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        return response.json() if response.content else {}
+    
+    # ==================== Return Shipments (Global API v2) ====================
+    
+    def create_return_shipment(
+        self,
+        sender: Dict[str, Any],
+        organization_id: str = None,
+        recipient: Dict[str, Any] = None,
+        origin: Dict[str, Any] = None,
+        destination: Dict[str, Any] = None,
+        references: Dict[str, Any] = None,
+        enable_drop_off_code: bool = True,
+        parcels: List[Dict[str, Any]] = None,
+        expiration_date: str = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Create a return shipment.
+        
+        Args:
+            sender: Sender information (required) with firstName, lastName, email, phone, companyName
+            organization_id: Organization ID
+            recipient: Recipient information (optional)
+            origin: Origin information with countryCode (required for GB, optional for others)
+            destination: Destination address (optional)
+            references: Custom references like clientId, orderNumber (optional)
+            enable_drop_off_code: Enable drop-off code (default: True)
+            parcels: List of parcel details (optional, defaults to organization settings)
+            expiration_date: Expiration date in ISO format (optional, min 24h from now)
+            request_id: Optional request ID
+            
+        Returns:
+            Return shipment data with id, expirationDate, parcels with trackingNumber and dropOffCode
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Return shipments are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        if not sender:
+            raise InPostAPIError("Sender information is required")
+        
+        payload = {
+            "sender": sender,
+            "enableDropOffCode": enable_drop_off_code
+        }
+        
+        if recipient:
+            payload["recipient"] = recipient
+        
+        if origin:
+            payload["origin"] = origin
+        
+        if destination:
+            payload["destination"] = destination
+        
+        if references:
+            payload["references"] = references
+        
+        if parcels:
+            if len(parcels) != 1:
+                raise InPostAPIError("Parcels list must contain exactly 1 parcel")
+            payload["parcels"] = parcels
+        
+        if expiration_date:
+            payload["expirationDate"] = expiration_date
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.post(
+            f"{self.base_url}/returns/v1/organizations/{org_id}/shipments",
+            headers=headers,
+            json=payload,
+            timeout=30
+        )
+        
+        if response.status_code not in [200, 201]:
+            self._handle_error(response)
+        
+        return response.json()
+    
+    def get_return_shipment(
+        self,
+        shipment_id: str,
+        organization_id: str = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Get return shipment information by ID.
+        
+        Args:
+            shipment_id: Return shipment ID
+            organization_id: Organization ID
+            request_id: Optional request ID
+            
+        Returns:
+            Return shipment details with id, expirationDate, parcels, etc.
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Return shipments are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        headers = self._get_headers(request_id)
+        
+        response = requests.get(
+            f"{self.base_url}/returns/v1/organizations/{org_id}/shipments/{shipment_id}",
+            headers=headers,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        return response.json()
+    
+    def get_return_shipment_label(
+        self,
+        tracking_number: str,
+        organization_id: str = None,
+        label_format: str = "application/pdf;format=A4",
+        request_id: str = None
+    ) -> bytes:
+        """
+        Get label for return shipment parcel.
+        
+        Args:
+            tracking_number: Parcel tracking number
+            organization_id: Organization ID
+            label_format: Label format (default: application/pdf;format=A4)
+            request_id: Optional request ID
+            
+        Returns:
+            Label file content as bytes
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Return shipments are only available in Global API v2")
+        
+        org_id = organization_id or self.organization_id
+        if not org_id:
+            raise InPostAPIError("Organization ID is required")
+        
+        headers = self._get_headers(request_id)
+        headers["Accept"] = label_format
+        
+        response = requests.get(
+            f"{self.base_url}/returns/v1/organizations/{org_id}/shipments/{tracking_number}/label",
+            headers=headers,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        return response.content
+    
+    # ==================== Tracking (Global API v2) ====================
+    
+    def get_tracking_history(
+        self,
+        tracking_numbers: List[str],
+        event_version: str = None,
+        request_id: str = None
+    ) -> Dict[str, Any]:
+        """
+        Retrieve parcel tracking event history using tracking numbers.
+        
+        Args:
+            tracking_numbers: List of tracking numbers (max 10 per request)
+            event_version: Optional event version (e.g., "V1"). If empty, latest version is used
+            request_id: Optional request ID
+            
+        Returns:
+            Tracking history with events, origin, destination, delivery info for each parcel
+        """
+        if not self.use_global_api:
+            raise InPostAPIError("Tracking API is only available in Global API v2")
+        
+        if not tracking_numbers:
+            raise InPostAPIError("At least one tracking number is required")
+        
+        if len(tracking_numbers) > 10:
+            raise InPostAPIError("Maximum 10 tracking numbers per request")
+        
+        from urllib.parse import urlencode
+        
+        params_list = [("trackingNumbers", tn) for tn in tracking_numbers]
+        query_string = urlencode(params_list)
+        
+        headers = self._get_headers(request_id)
+        
+        if event_version:
+            headers["x-inpost-event-version"] = event_version
+        
+        url = f"{self.base_url}/tracking/v1/parcels?{query_string}"
+        
+        response = requests.get(
+            url,
+            headers=headers,
+            timeout=30
+        )
+        
+        if response.status_code != 200:
+            self._handle_error(response)
+        
+        return response.json()

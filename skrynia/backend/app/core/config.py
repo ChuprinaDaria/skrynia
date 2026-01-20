@@ -33,10 +33,23 @@ class Settings(BaseSettings):
     P24_TEST_MODE: bool = True
 
     # InPost
-    INPOST_API_TOKEN: str = ""  # ShipX API token (Bearer token)
+    INPOST_API_TOKEN: str = ""  # ShipX API token (Bearer token) - Legacy API
     INPOST_ORGANIZATION_ID: str = ""  # Organization ID (optional, can be fetched from API)
     INPOST_SANDBOX: bool = True  # Use sandbox environment
     INPOST_GEOWIDGET_TOKEN: str = ""  # Geowidget PUBLIC token (for frontend widget)
+    # Global API v2 (OAuth 2.0)
+    INPOST_CLIENT_ID: str = ""  # OAuth 2.0 Client ID
+    INPOST_CLIENT_SECRET: str = ""  # OAuth 2.0 Client Secret
+    INPOST_USE_GLOBAL_API: bool = False  # Use new Global API v2 instead of legacy ShipX API
+    # Webhook authentication (Global API v2)
+    INPOST_WEBHOOK_HMAC_SECRET: str = ""  # HMAC shared secret for webhook signature verification
+    INPOST_WEBHOOK_API_KEY: str = ""  # API key for webhook authentication (optional)
+    INPOST_WEBHOOK_API_KEY_HEADER: str = "x-api-key"  # Custom header name for API key
+    INPOST_WEBHOOK_BASIC_AUTH_USER: str = ""  # Basic auth username (optional)
+    INPOST_WEBHOOK_BASIC_AUTH_PASSWORD: str = ""  # Basic auth password (optional)
+    INPOST_WEBHOOK_SIGNATURE_TYPE: str = "HMAC"  # HMAC, DIGITAL, BASIC, or API_KEY
+    INPOST_WEBHOOK_SIGNATURE_BODY: str = "timestamp_body"  # body or timestamp_body
+    INPOST_WEBHOOK_CERTIFICATE_PATH: str = ""  # Path to InPost public certificate (.pem file)
 
     # Nova Poshta
     NOVA_POSHTA_API_KEY: str = ""

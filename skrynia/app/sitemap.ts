@@ -2,25 +2,50 @@ import { MetadataRoute } from 'next';
 import { getApiEndpoint } from '@/lib/api';
 
 export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 // Багатомовність реалізована через клієнтський контекст, не через окремі маршрути
-// Тому не створюємо окремі URL для кожної мови, а використовуємо alternates для hreflang
+// Тому не створюємо окремі URL для кожної мови
 
 // Fetch products from API
+// IMPORTANT: crawlers hit the public site; they cannot resolve Docker-internal names.
+// Use public domain fallback for sitemap generation
 async function getProducts() {
   try {
-    const response = await fetch(getApiEndpoint('/api/v1/products?is_active=true&limit=1000'), {
-      next: { revalidate: 3600 } // Revalidate every hour
-    });
+    // Priority order: BACKEND_URL (internal) -> getApiEndpoint -> public domain
+    const candidateEndpoints: string[] = [];
+    if (process.env.BACKEND_URL) {
+      candidateEndpoints.push(`${process.env.BACKEND_URL.replace(/\/+$/, '')}/api/v1/products?is_active=true&limit=1000`);
+    }
+    candidateEndpoints.push(getApiEndpoint('/api/v1/products?is_active=true&limit=1000'));
+    // Always include public-domain fallback (works for bots even if internal networking doesn't)
+    candidateEndpoints.push(`${siteUrl}/api/v1/products?is_active=true&limit=1000`);
     
-    if (!response.ok) {
-      console.error('Failed to fetch products for sitemap');
+    let products: any[] = [];
+    for (const endpoint of candidateEndpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          next: { revalidate: 3600 }, // Revalidate every hour
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        });
+        
+        if (response.ok) {
+          products = await response.json();
+          break; // Success, exit loop
+        }
+      } catch (error) {
+        // Try next endpoint
+        continue;
+      }
+    }
+    
+    if (products.length === 0) {
+      console.error('Failed to fetch products for sitemap from all endpoints');
       return [];
     }
     
-    const products = await response.json();
     return products.map((product: any) => ({
       slug: product.slug,
       lastModified: product.updated_at 
@@ -36,16 +61,38 @@ async function getProducts() {
 // Fetch categories/collections from API
 async function getCollections() {
   try {
-    const response = await fetch(getApiEndpoint('/api/v1/categories'), {
-      next: { revalidate: 3600 } // Revalidate every hour
-    });
+    // Priority order: BACKEND_URL (internal) -> getApiEndpoint -> public domain
+    const candidateEndpoints: string[] = [];
+    if (process.env.BACKEND_URL) {
+      candidateEndpoints.push(`${process.env.BACKEND_URL.replace(/\/+$/, '')}/api/v1/categories`);
+    }
+    candidateEndpoints.push(getApiEndpoint('/api/v1/categories'));
+    // Always include public-domain fallback (works for bots even if internal networking doesn't)
+    candidateEndpoints.push(`${siteUrl}/api/v1/categories`);
     
-    if (!response.ok) {
-      console.error('Failed to fetch categories for sitemap');
+    let categories: any[] = [];
+    for (const endpoint of candidateEndpoints) {
+      try {
+        const response = await fetch(endpoint, {
+          next: { revalidate: 3600 }, // Revalidate every hour
+          signal: AbortSignal.timeout(10000), // 10 second timeout
+        });
+        
+        if (response.ok) {
+          categories = await response.json();
+          break; // Success, exit loop
+        }
+      } catch (error) {
+        // Try next endpoint
+        continue;
+      }
+    }
+    
+    if (categories.length === 0) {
+      console.error('Failed to fetch categories for sitemap from all endpoints');
       return [];
     }
     
-    const categories = await response.json();
     return categories.map((category: any) => ({
       slug: category.slug,
       lastModified: category.updated_at 
@@ -132,21 +179,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...productPages,
   ];
 
-  // Додаємо alternates для hreflang (для пошукових систем, але не створюємо окремі URL)
-  return allPages.map((page) => ({
-    ...page,
-    alternates: {
-      languages: {
-        uk: page.url,
-        en: page.url, // Той самий URL, мова визначається клієнтським контекстом
-        de: page.url,
-        pl: page.url,
-        sv: page.url, // Swedish
-        no: page.url, // Norwegian
-        da: page.url, // Danish
-        fr: page.url, // French
-      },
-    },
-  }));
+  // Повертаємо sitemap без alternates, оскільки всі мови використовують той самий URL
+  // Hreflang буде оброблятися через мета-теги на сторінках
+  return allPages;
 }
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime
@@ -22,7 +22,9 @@ from app.services.bonus_service import (
     update_user_loyalty_status
 )
 from app.services.order_notifications import send_order_status_email
-from fastapi import BackgroundTasks
+from app.services.payments import create_checkout_session
+from app.services.email_service import fm
+from fastapi_mail import MessageSchema
 
 router = APIRouter()
 
@@ -323,3 +325,71 @@ async def update_order(
         )
 
     return order
+
+
+@router.post("/{order_id}/trigger-second-payment")
+async def trigger_second_payment(
+    order_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_admin_user)
+):
+    """Generate second payment link for preorder and send email to customer (admin only)."""
+    order = db.query(Order).filter(Order.id == order_id).first()
+
+    if not order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found"
+        )
+
+    if order.payment_status != PaymentStatus.PAID_PARTIALLY:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Order must be partially paid to trigger second payment"
+        )
+
+    try:
+        checkout_url = create_checkout_session(order, stage=2, db=db)
+
+        from app.core.config import settings
+        html_content = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                .button {{ display: inline-block; padding: 12px 30px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h2>Finalize Your Preorder Payment</h2>
+                <p>Hello {order.customer_name},</p>
+                <p>Your preorder #{order.order_number} is ready for final payment.</p>
+                <p>Please complete the remaining 50% payment:</p>
+                <a href="{checkout_url}" class="button">Pay Now</a>
+                <p>If you have any questions, please contact us.</p>
+            </div>
+        </body>
+        </html>
+        """
+
+        message = MessageSchema(
+            subject=f"Complete Payment for Order #{order.order_number}",
+            recipients=[order.customer_email],
+            body=html_content,
+            subtype="html"
+        )
+
+        background_tasks.add_task(fm.send_message, message)
+
+        return {"checkout_url": checkout_url, "message": "Payment link generated and email sent"}
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to trigger second payment: {str(e)}"
+        )

@@ -14,6 +14,8 @@ import { trackInitiateCheckout } from '@/lib/facebook-conversions';
 type PaymentMethod = 'stripe' | 'przelewy24' | 'blik' | 'bank_transfer';
 type DeliveryMethod = 'inpost' | 'novaposhta' | 'poczta' | 'courier';
 
+const INPOST_SUPPORTED_COUNTRIES = ['PL', 'BE', 'IT', 'FR', 'LU', 'PT', 'ES', 'NL'];
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart, total } = useCart();
@@ -302,10 +304,12 @@ export default function CheckoutPage() {
                         const newCountry = e.target.value;
                         setFormData({ ...formData, shipping_country: newCountry });
                         // Auto-select appropriate delivery method for country
-                        if (newCountry === 'PL' && deliveryMethod !== 'inpost' && deliveryMethod !== 'poczta' && deliveryMethod !== 'courier') {
+                        if (INPOST_SUPPORTED_COUNTRIES.includes(newCountry) && !['inpost', 'poczta', 'courier'].includes(deliveryMethod)) {
                           setDeliveryMethod('inpost');
                         } else if (newCountry === 'UA' && deliveryMethod !== 'novaposhta' && deliveryMethod !== 'courier') {
                           setDeliveryMethod('novaposhta');
+                        } else if (!INPOST_SUPPORTED_COUNTRIES.includes(newCountry) && deliveryMethod === 'inpost') {
+                          setDeliveryMethod('courier');
                         }
                       }}
                       className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
@@ -352,7 +356,7 @@ export default function CheckoutPage() {
                     </label>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                       {/* InPost Paczkomat */}
-                      {formData.shipping_country === 'PL' && (
+                      {INPOST_SUPPORTED_COUNTRIES.includes(formData.shipping_country) && (
                         <button
                           type="button"
                           onClick={() => setDeliveryMethod('inpost')}
@@ -375,7 +379,10 @@ export default function CheckoutPage() {
                             <div className="flex-1">
                               <p className="text-ivory font-semibold mb-1">InPost Paczkomat</p>
                               <p className="text-sage text-xs">
-                                Odbiór z paczkomatu • {calculatePackageSize() === 'small' ? '13.99' : calculatePackageSize() === 'medium' ? '15.99' : '18.99'} zł
+                                {formData.shipping_country === 'PL' 
+                                  ? `Odbiór z paczkomatu • ${calculatePackageSize() === 'small' ? '13.99' : calculatePackageSize() === 'medium' ? '15.99' : '18.99'} zł`
+                                  : `InPost pickup point • ${calculateShippingCost()} ${formData.shipping_country === 'GB' ? 'GBP' : 'EUR'}`
+                                }
                               </p>
                             </div>
                           </div>
@@ -501,9 +508,9 @@ export default function CheckoutPage() {
                                   <div style={{ height: '100%', width: '100%' }}>
                                     <InPostGeowidget
                                       token={inpostToken}
-                                      version="international"
-                                      country="PL"
-                                      language="pl"
+                                      version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
+                                      country={formData.shipping_country === 'PL' ? undefined : formData.shipping_country}
+                                      language={t.language === 'uk' ? 'uk' : t.language === 'en' ? 'en' : t.language === 'es' ? 'es' : t.language === 'fr' ? 'fr' : t.language === 'pt' ? 'pt' : t.language === 'it' ? 'it' : 'pl'}
                                       config="parcelCollect"
                                       sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
                                       onPointSelect={(point: InPostPoint) => {
