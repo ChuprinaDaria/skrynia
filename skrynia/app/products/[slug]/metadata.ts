@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
 import { getApiEndpoint } from '@/lib/api';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
@@ -268,106 +269,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       };
     }
     
-    // Якщо продукт не знайдено або API не повернув OK, повертаємо мінімальні метадані
-    console.error(`[Metadata] ⚠️ Product ${slug} not found or API error - returning minimal metadata WITHOUT layout fallback`);
-    return {
-      title: `Product ${slug} | Rune Box`,
-      description: 'Product details are being loaded. Please check back soon.',
-      openGraph: {
-        title: `Product ${slug} | Rune Box`,
-        description: 'Product details are being loaded.',
-        url: `${siteUrl}/products/${slug}`,
-        type: 'website', // Next.js Metadata doesn't support 'product' type, but we set 'og:type': 'product' in 'other' field
-        siteName: 'Rune Box',
-        locale: 'en_US',
-        images: [
-          {
-            // Використовуємо динамічний opengraph-image, який сам обробить fallback
-            url: `${siteUrl}/products/${slug}/opengraph-image`,
-            width: 1600,
-            height: 840,
-            alt: `Product ${slug}`,
-          },
-        ],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: `Product ${slug} | Rune Box`,
-        description: 'Product details are being loaded.',
-        images: [`${siteUrl}/products/${slug}/opengraph-image`],
-        creator: '@runebox',
-        site: '@runebox',
-      },
-      alternates: {
-        canonical: `${siteUrl}/products/${slug}`,
-      },
-      robots: {
-        index: false, // Не індексуємо сторінки без продукту
-        follow: true,
-        googleBot: {
-          index: false,
-          follow: true,
-        },
-      },
-      other: {
-        'og:see_also': siteUrl,
-        'article:publisher': 'https://www.facebook.com/runebox',
-        'og:type': 'product',
-      },
-    };
+    // ВАЖЛИВО: Якщо продукт не знайдено, використовуємо notFound() - БЕЗ fallback метаданих
+    // Всі дані мають братися динамічно з продукту, без fallback
+    console.error(`[Metadata] ❌ Product ${slug} not found - calling notFound()`);
+    notFound();
   } catch (error) {
-    // ВАЖЛИВО: Якщо продукт не знайдено або помилка, НЕ використовуємо fallback з layout
-    // Краще повернути notFound() або мінімальні метадані БЕЗ зображення з layout
+    // ВАЖЛИВО: Якщо помилка при отриманні продукту, використовуємо notFound() - БЕЗ fallback метаданих
+    // Всі дані мають братися динамічно з продукту, без fallback
     console.error(`[Metadata] ❌ Failed to fetch product ${slug} metadata:`, error);
-    console.error(`[Metadata] ⚠️ Product ${slug} not found or API error - returning minimal metadata WITHOUT layout fallback`);
-    
-    // Мінімальні метадані БЕЗ fallback на layout зображення
-    // Використовуємо тільки динамічний opengraph-image, який може мати fallback в самому opengraph-image.tsx
-    return {
-      title: `Product ${slug} | Rune Box`,
-      description: 'Product details are being loaded. Please check back soon.',
-      openGraph: {
-        title: `Product ${slug} | Rune Box`,
-        description: 'Product details are being loaded.',
-        url: `${siteUrl}/products/${slug}`,
-        type: 'website', // Next.js Metadata doesn't support 'product' type, but we set 'og:type': 'product' in 'other' field
-        siteName: 'Rune Box',
-        locale: 'en_US',
-        images: [
-          {
-            // Використовуємо динамічний opengraph-image, який сам обробить fallback
-            url: `${siteUrl}/products/${slug}/opengraph-image`,
-            width: 1600,
-            height: 840,
-            alt: `Product ${slug}`,
-          },
-        ],
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: `Product ${slug} | Rune Box`,
-        description: 'Product details are being loaded.',
-        images: [`${siteUrl}/products/${slug}/opengraph-image`],
-        creator: '@runebox',
-        site: '@runebox',
-      },
-      alternates: {
-        canonical: `${siteUrl}/products/${slug}`,
-      },
-      robots: {
-        index: false, // Не індексуємо сторінки без продукту
-        follow: true,
-        googleBot: {
-          index: false,
-          follow: true,
-        },
-      },
-      other: {
-        'og:see_also': siteUrl,
-        'article:publisher': 'https://www.facebook.com/runebox',
-        'og:type': 'product',
-      },
-    };
+    console.error(`[Metadata] ❌ Product ${slug} error - calling notFound()`);
+    notFound();
   }
 }
 
