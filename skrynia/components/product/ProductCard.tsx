@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 import { useLanguage } from '@/contexts/LanguageContext';
 
 export interface Product {
@@ -28,13 +29,54 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
   const { t } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
+  const productUrl = `${siteUrl}/products/${product.slug}`;
+  
+  // Generate JSON-LD structured data for SEO
+  const productJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.title,
+    description: `${product.title} - ${product.materials.join(', ')}. ${product.isHandmade ? t.common.handmade : ''}`,
+    image: product.image,
+    sku: product.slug,
+    brand: {
+      '@type': 'Brand',
+      name: 'Rune Box',
+    },
+    category: product.category === 'slavic' ? 'Slavic Jewelry' : 
+              product.category === 'viking' ? 'Viking Jewelry' : 
+              'Celtic Jewelry',
+    material: product.materials.join(', '),
+    offers: {
+      '@type': 'Offer',
+      url: productUrl,
+      priceCurrency: product.currency === 'zł' ? 'PLN' : product.currency,
+      price: product.price.toString(),
+      availability: 'https://schema.org/InStock',
+      itemCondition: 'https://schema.org/NewCondition',
+      seller: {
+        '@type': 'Organization',
+        name: 'Rune Box',
+      },
+    },
+  };
+
   return (
-    <Link href={`/products/${product.slug}`}>
-      <article
-        className="group card-lift cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
+    <>
+      {/* JSON-LD structured data for SEO */}
+      <Script
+        id={`product-jsonld-${product.id}`}
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productJsonLd) }}
+        strategy="afterInteractive"
+      />
+      <Link href={`/products/${product.slug}`}>
+        <article
+          className="group card-lift cursor-pointer"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
         {/* Image Container */}
         <div className="relative aspect-square bg-deep-black overflow-hidden rounded-sm border border-transparent group-hover:border-oxblood transition-all duration-300">
           <Image
@@ -127,6 +169,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
         </div>
       </article>
     </Link>
+    </>
   );
 };
 

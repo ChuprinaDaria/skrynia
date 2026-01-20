@@ -86,25 +86,44 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   useEffect(() => {
     if (product && isClient) {
       const displayTitle = getProductTitle(product);
+      const currency = product.currency || 'PLN';
+      const priceCurrency = currency === 'zł' ? 'PLN' : currency;
       
-      // Client-side tracking (Meta Pixel)
+      // Facebook Pixel: ViewContent event
       if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
         (window as any).fbq('track', 'ViewContent', {
           content_name: displayTitle,
           content_ids: [product.id.toString()],
           content_type: 'product',
           value: product.price,
-          currency: product.currency || 'PLN',
+          currency: priceCurrency,
         });
       }
       
-      // Server-side tracking (Conversions API)
+      // Google Analytics: view_item event
+      if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+        (window as any).gtag('event', 'view_item', {
+          currency: priceCurrency,
+          value: product.price,
+          items: [{
+            item_id: product.id.toString(),
+            item_name: displayTitle,
+            item_category: product.category_id === 1 ? 'slavic' : 
+                          product.category_id === 2 ? 'viking' : 
+                          product.category_id === 3 ? 'celtic' : 'jewelry',
+            price: product.price,
+            quantity: 1,
+          }],
+        });
+      }
+      
+      // Server-side tracking (Facebook Conversions API)
       trackViewContent({
         content_ids: [product.id.toString()],
         content_name: displayTitle,
         content_type: 'product',
         value: product.price,
-        currency: product.currency || 'PLN',
+        currency: priceCurrency,
       }).catch(() => {
         // Fail silently
       });

@@ -84,9 +84,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         console.log(`[Metadata] Product has ${product.images?.length || 0} images`);
       }
       
-      // Get first image (primary or first in array)
+      // Get first image (primary or first in array) - ВАЖЛИВО: використовуємо зображення продукту, НЕ fallback
       const firstImage = product.images?.find((img: any) => img.is_primary) || product.images?.[0];
-      let ogImage = `${siteUrl}/images/logo/logo-white-pink-1.png`; // Fallback to logo
+      let ogImage: string | null = null;
       
       if (firstImage?.image_url) {
         const imageUrl = firstImage.image_url;
@@ -99,27 +99,66 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           const apiBase = getApiEndpoint('/api/v1/health').replace(/\/api\/v1\/health$/, '');
           ogImage = `${apiBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         }
+      } else if (product.primary_image) {
+        // Fallback to primary_image if images array is empty
+        const imageUrl = product.primary_image;
+        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+          ogImage = imageUrl;
+        } else {
+          const apiBase = getApiEndpoint('/api/v1/health').replace(/\/api\/v1\/health$/, '');
+          ogImage = `${apiBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+        }
       }
-
-      // Use English description if available, otherwise Ukrainian
-      // Remove markdown formatting for cleaner description
-      let description = product.description_en || product.description_uk || 'Unique handmade jewelry from Rune Box';
-      description = description
-        .replace(/\*\*/g, '')
-        .replace(/\*/g, '')
-        .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-        .replace(/#+\s*/g, '')
-        .trim();
+      
+      // ВАЖЛИВО: Всі дані беруться БЕЗПОСЕРЕДНЬО з продукту, БЕЗ fallback на layout
+      
+      // Title - з продукту
+      const title = product.title_en || product.title_uk;
+      if (!title) {
+        console.error(`[Metadata] Product ${slug} has no title`);
+        throw new Error(`Product ${slug} has no title`);
+      }
+      
+      // Description - з продукту, очищаємо markdown
+      let description = product.description_en || product.description_uk;
+      if (!description) {
+        // Якщо немає опису, створюємо базовий на основі назви та матеріалів
+        const materials = product.materials?.join(', ') || 'premium materials';
+        description = `${title}. Handmade jewelry with ${materials}. Unique design inspired by ancient cultures.`;
+      } else {
+        // Очищаємо markdown
+        description = description
+          .replace(/\*\*/g, '')
+          .replace(/\*/g, '')
+          .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
+          .replace(/#+\s*/g, '')
+          .trim();
+      }
 
       // Facebook/Meta warning: keep description >= 100 chars
       if (description.length < 100) {
-        description = `${description} Discover authentic handmade jewelry by Rune Box: premium materials, unique symbolism, and fast EU delivery.`;
+        const materials = product.materials?.join(', ') || 'premium materials';
+        description = `${description} Handmade jewelry with ${materials}. Authentic design by Rune Box.`;
       }
       
-      const title = product.title_en || product.title_uk || 'Product';
-      const price = product.price || 0;
+      // Price та currency - з продукту
+      const price = product.price ?? 0;
       const currency = product.currency || 'EUR';
       const priceCurrency = currency === 'zł' ? 'PLN' : currency;
+      
+      // Keywords - з продукту (meta_keywords або tags)
+      const productKeywords = product.meta_keywords || 
+        (product.tags_en && Array.isArray(product.tags_en) ? product.tags_en : []) ||
+        (product.tags_uk && Array.isArray(product.tags_uk) ? product.tags_uk : []) ||
+        [];
+      
+      // Materials - з продукту
+      const materials = product.materials || [];
+      
+      // Category - з продукту
+      const categoryName = product.category_id === 1 ? 'slavic' : 
+                          product.category_id === 2 ? 'viking' : 
+                          product.category_id === 3 ? 'celtic' : 'jewelry';
       
       // Generate multilingual titles and descriptions
       const titleUk = product.title_uk || title;
@@ -140,19 +179,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const descDk = product.description_dk || descEn;
       const descFr = product.description_fr || descEn;
 
+      // ВАЖЛИВО: Використовуємо динамічний opengraph-image, який генерується на основі зображення продукту
+      // Це гарантує, що зображення береться з продукту, а не з layout fallback
       const ogImageUrl = `${siteUrl}/products/${slug}/opengraph-image`;
+      
+      // ВАЖЛИВО: Всі метадані беруться з продукту, БЕЗ fallback на layout
       return {
         title: `${title} | Rune Box`,
         description: description.substring(0, 160), // Limit to 160 chars for SEO
         keywords: [
+          ...productKeywords,
           'handmade jewelry',
-          'slavic jewelry',
-          'viking jewelry',
-          'celtic jewelry',
-          'silver jewelry',
-          'coral necklace',
-          product.title_en || product.title_uk,
-        ],
+          categoryName === 'slavic' ? 'slavic jewelry' : '',
+          categoryName === 'viking' ? 'viking jewelry' : '',
+          categoryName === 'celtic' ? 'celtic jewelry' : '',
+          ...(materials.includes('silver') || materials.includes('срібло') ? ['silver jewelry'] : []),
+          ...(materials.includes('coral') || materials.includes('корал') ? ['coral necklace'] : []),
+          title,
+        ].filter(Boolean),
         openGraph: {
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
@@ -218,63 +262,65 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           }),
           // Threads-specific (uses OG but can add see_also)
           'og:see_also': siteUrl,
+          // Facebook & LinkedIn support
+          'article:publisher': 'https://www.facebook.com/runebox',
+          'og:type': 'product', // Explicit OG type
         },
       };
     }
   } catch (error) {
-    // Log error but don't throw - always return fallback metadata
-    console.error(`[Metadata] Failed to fetch product ${slug} metadata:`, error);
-    console.error(`[Metadata] Using fallback metadata for ${slug}`);
-    // Continue to fallback metadata below
-  }
-
-  // Fallback metadata if product not found
-  console.error(`[Metadata] ⚠️ Using FALLBACK metadata for ${slug} - API request failed or product not found`);
-  const fallbackDescription =
-    'Unique handmade jewelry from Rune Box. Explore authentic designs inspired by Slavic, Viking and Celtic cultures with premium natural materials.';
-  return {
-    title: 'Product | Rune Box',
-    description: fallbackDescription,
-    openGraph: {
-      title: 'Product | Rune Box',
-      description: fallbackDescription,
-      url: `${siteUrl}/products/${slug}`,
-      type: 'product',
-      siteName: 'Rune Box',
-      locale: 'en_US',
-      images: [
-        {
-          url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
-          width: 1600,
-          height: 840,
-          alt: 'Rune Box',
-        },
-      ],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: 'Product | Rune Box',
-      description: fallbackDescription,
-      images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
-      creator: '@runebox',
-      site: '@runebox',
-    },
-    alternates: {
-      canonical: `${siteUrl}/products/${slug}`,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
+    // ВАЖЛИВО: Якщо продукт не знайдено або помилка, НЕ використовуємо fallback з layout
+    // Краще повернути notFound() або мінімальні метадані БЕЗ зображення з layout
+    console.error(`[Metadata] ❌ Failed to fetch product ${slug} metadata:`, error);
+    console.error(`[Metadata] ⚠️ Product ${slug} not found or API error - returning minimal metadata WITHOUT layout fallback`);
+    
+    // Мінімальні метадані БЕЗ fallback на layout зображення
+    // Використовуємо тільки динамічний opengraph-image, який може мати fallback в самому opengraph-image.tsx
+    return {
+      title: `Product ${slug} | Rune Box`,
+      description: 'Product details are being loaded. Please check back soon.',
+      openGraph: {
+        title: `Product ${slug} | Rune Box`,
+        description: 'Product details are being loaded.',
+        url: `${siteUrl}/products/${slug}`,
+        type: 'product',
+        siteName: 'Rune Box',
+        locale: 'en_US',
+        images: [
+          {
+            // Використовуємо динамічний opengraph-image, який сам обробить fallback
+            url: `${siteUrl}/products/${slug}/opengraph-image`,
+            width: 1600,
+            height: 840,
+            alt: `Product ${slug}`,
+          },
+        ],
       },
-    },
-    other: {
-      'og:see_also': siteUrl,
-    },
-  };
+      twitter: {
+        card: 'summary_large_image',
+        title: `Product ${slug} | Rune Box`,
+        description: 'Product details are being loaded.',
+        images: [`${siteUrl}/products/${slug}/opengraph-image`],
+        creator: '@runebox',
+        site: '@runebox',
+      },
+      alternates: {
+        canonical: `${siteUrl}/products/${slug}`,
+      },
+      robots: {
+        index: false, // Не індексуємо сторінки без продукту
+        follow: true,
+        googleBot: {
+          index: false,
+          follow: true,
+        },
+      },
+      other: {
+        'og:see_also': siteUrl,
+        'article:publisher': 'https://www.facebook.com/runebox',
+        'og:type': 'product',
+      },
+    };
+  }
 }
 

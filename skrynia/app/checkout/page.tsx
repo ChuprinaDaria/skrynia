@@ -136,7 +136,7 @@ export default function CheckoutPage() {
   };
 
   const shipping = calculateShippingCost();
-  const total = subtotal + shipping;
+  const checkoutTotal = subtotal + shipping;
 
   // Redirect if cart is empty
   useEffect(() => {
@@ -819,7 +819,7 @@ export default function CheckoutPage() {
                   <div className="h-px bg-sage/20" />
                   <div className="flex justify-between font-inter text-lg">
                     <span className="text-ivory font-semibold">{t.checkout.total}</span>
-                    <span className="text-ivory font-bold">{total} zł</span>
+                    <span className="text-ivory font-bold">{checkoutTotal} zł</span>
                   </div>
                 </div>
 

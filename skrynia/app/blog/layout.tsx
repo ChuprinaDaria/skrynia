@@ -60,6 +60,12 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+
+  other: {
+    'og:see_also': siteUrl, // Threads support
+    'article:publisher': 'https://www.facebook.com/runebox', // Facebook & LinkedIn
+    'og:type': 'website', // Explicit OG type
+  },
 };
 
 export default function BlogLayout({

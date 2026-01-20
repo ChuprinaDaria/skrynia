@@ -62,29 +62,48 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
   const title = `${categoryInfo.en} | Rune Box`;
   const description = categoryDesc.en;
 
-  // Try to get a representative product image for the category
-  let ogImage = `${siteUrl}/images/logo/logo-white-pink-1.png`;
+  // ВАЖЛИВО: Отримуємо зображення з продуктів категорії, НЕ fallback з layout
+  let ogImage: string | null = null;
   try {
-    const apiEndpoint = getApiEndpoint(`/api/v1/products?is_active=true&limit=1`);
+    // Спробуємо отримати продукт з конкретної категорії
+    const categoryMap: Record<string, number> = {
+      slavic: 1,
+      viking: 2,
+      celtic: 3,
+    };
+    const categoryId = categoryMap[category];
+    const apiEndpoint = getApiEndpoint(`/api/v1/products?is_active=true&category_id=${categoryId}&limit=1`);
     const res = await fetch(apiEndpoint, {
       next: { revalidate: 3600 },
     });
     if (res.ok) {
       const products = await res.json();
-      if (products.length > 0 && products[0].primary_image) {
-        const imageUrl = products[0].primary_image;
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-          ogImage = imageUrl;
-        } else if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
-          const backendBase = getApiEndpoint('').replace(/\/api\/v1$/, '').replace(/\/$/, '');
-          ogImage = `${backendBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-        } else {
-          ogImage = `${siteUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+      if (products.length > 0) {
+        // Перевіряємо images array спочатку
+        const product = products[0];
+        const firstImage = product.images?.find((img: any) => img.is_primary) || product.images?.[0];
+        const imageUrl = firstImage?.image_url || product.primary_image;
+        
+        if (imageUrl) {
+          if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+            ogImage = imageUrl;
+          } else if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
+            const backendBase = getApiEndpoint('').replace(/\/api\/v1$/, '').replace(/\/$/, '');
+            ogImage = `${backendBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+          } else {
+            ogImage = `${siteUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+          }
         }
       }
     }
   } catch (error) {
     console.error('Failed to fetch category image:', error);
+  }
+  
+  // Якщо не знайдено зображення з категорії, використовуємо fallback
+  // Але це має бути рідкісний випадок
+  if (!ogImage) {
+    ogImage = `${siteUrl}/images/logo/logo-white-pink-1.png`;
   }
 
   return {
@@ -150,6 +169,9 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
     },
     other: {
       'og:see_also': siteUrl, // Threads support
+      'og:type': 'website', // Explicit OG type
+      'article:publisher': 'https://www.facebook.com/runebox', // Facebook page
+      'article:author': 'Rune Box', // LinkedIn support
     },
   };
 }

@@ -64,6 +64,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   const metaTitle = blog.meta_title || `${blog.title} | Rune box Blog`;
   const metaDescription = blog.meta_description || blog.excerpt || blog.title;
+  // ВАЖЛИВО: Використовуємо зображення з блогу, НЕ fallback з layout
+  // Пріоритет: og_image > featured_image > fallback (тільки якщо немає зображення)
   const ogImage = blog.og_image || blog.featured_image || `${siteUrl}/images/og/og-image.jpg`;
   const pageUrl = `${siteUrl}/blog/${blog.slug}`;
 
@@ -121,7 +123,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     other: {
       'article:published_time': blog.published_at || blog.created_at,
-      'article:author': blog.author || 'Skrynia Team',
+      'article:author': blog.author || 'Rune Box Team',
+      'article:publisher': 'https://www.facebook.com/runebox', // Facebook page
+      'og:see_also': siteUrl, // Threads support
+      'og:type': 'article', // Explicit OG type
     },
   };
 }

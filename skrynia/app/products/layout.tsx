@@ -2,12 +2,10 @@ import type { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
-// NOTE: This provides fallback metadata for product pages.
-// For optimal SEO, the [slug]/page.tsx should be refactored to:
-// 1. Be a server component
-// 2. Fetch product data from API
-// 3. Use generateMetadata() for dynamic OG tags based on product data
-// 4. Extract interactive parts (cart, quantity selector) into client components
+// ВАЖЛИВО: Це метадані ТІЛЬКИ для сторінки /products (список продуктів).
+// Сторінки окремих продуктів (/products/[slug]) мають власні метадані через generateMetadata()
+// в app/products/[slug]/metadata.ts і НЕ використовують цей fallback.
+// В Next.js 13+ метадані з дочірніх сторінок мають пріоритет над батьківськими.
 
 export const metadata: Metadata = {
   title: 'Handmade Jewelry | Rune Box',

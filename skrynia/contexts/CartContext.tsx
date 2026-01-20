@@ -50,14 +50,33 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems(CartManager.getItems()); // Update state
     setIsCartOpen(true); // Auto-open cart when item added
     
-    // Meta Pixel: Track AddToCart event (client-side)
+    const currency = item.currency || 'PLN';
+    const priceCurrency = currency === 'zł' ? 'PLN' : currency;
+    const itemValue = item.price * item.quantity;
+    
+    // Facebook Pixel: Track AddToCart event (client-side)
     if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
       (window as any).fbq('track', 'AddToCart', {
         content_name: item.title,
         content_ids: [item.id],
         content_type: 'product',
-        value: item.price * item.quantity,
-        currency: item.currency || 'PLN',
+        value: itemValue,
+        currency: priceCurrency,
+      });
+    }
+    
+    // Google Analytics: Track add_to_cart event
+    if (typeof window !== 'undefined' && typeof (window as any).gtag === 'function') {
+      (window as any).gtag('event', 'add_to_cart', {
+        currency: priceCurrency,
+        value: itemValue,
+        items: [{
+          item_id: item.id,
+          item_name: item.title,
+          item_category: item.category || 'jewelry',
+          price: item.price,
+          quantity: item.quantity,
+        }],
       });
     }
     
@@ -65,8 +84,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
     trackAddToCart({
       content_name: item.title,
       content_ids: [item.id],
-      value: item.price * item.quantity,
-      currency: item.currency || 'PLN',
+      value: itemValue,
+      currency: priceCurrency,
     }).catch(() => {
       // Fail silently
     });

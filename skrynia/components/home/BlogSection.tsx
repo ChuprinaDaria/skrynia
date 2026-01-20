@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 import { getApiEndpoint } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -50,8 +51,52 @@ export default function BlogSection() {
     });
   };
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
+
+  // Generate JSON-LD structured data for blog posts
+  const blogSectionJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: t.blog.title,
+    description: t.blog.subtitle,
+    itemListElement: blogs.map((blog, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      item: {
+        '@type': 'BlogPosting',
+        headline: blog.title,
+        description: blog.excerpt || '',
+        image: blog.featured_image || `${siteUrl}/images/logo/logo-white-pink-1.png`,
+        url: `${siteUrl}/blog/${blog.slug}`,
+        datePublished: blog.published_at || blog.created_at,
+        author: {
+          '@type': blog.author ? 'Person' : 'Organization',
+          name: blog.author || 'Rune Box Team',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Rune Box',
+          logo: {
+            '@type': 'ImageObject',
+            url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
+          },
+        },
+      },
+    })),
+  };
+
   return (
-    <section className="py-20 md:py-32 px-4 bg-footer-black relative overflow-hidden">
+    <>
+      {/* JSON-LD структуровані дані для блог секції */}
+      {blogs.length > 0 && (
+        <Script
+          id="blog-section-jsonld"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(blogSectionJsonLd) }}
+          strategy="afterInteractive"
+        />
+      )}
+      <section className="py-20 md:py-32 px-4 bg-footer-black relative overflow-hidden">
       {/* Decorative background */}
       <div className="absolute inset-0 parchment-texture opacity-5" aria-hidden="true" />
 
@@ -157,5 +202,6 @@ export default function BlogSection() {
         )}
       </div>
     </section>
+    </>
   );
 }

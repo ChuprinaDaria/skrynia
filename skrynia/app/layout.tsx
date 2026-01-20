@@ -69,6 +69,11 @@ export const metadata: Metadata = {
   },
   
   // Open Graph - для Facebook, Threads, LinkedIn
+  // ВАЖЛИВО: Це базові налаштування ТІЛЬКИ для головної сторінки (/) та загальних сторінок.
+  // Сторінки продуктів (/products/[slug]) мають власні метадані через generateMetadata() і НЕ використовують цей fallback.
+  // Сторінки категорій (/collections/[category]) мають власні метадані через generateMetadata() і НЕ використовують цей fallback.
+  // Сторінки блогу (/blog/[slug]) мають власні метадані через generateMetadata() і НЕ використовують цей fallback.
+  // В Next.js 13+ метадані з дочірніх сторінок мають пріоритет над батьківськими.
   openGraph: {
     type: "website",
     locale: "en_US",

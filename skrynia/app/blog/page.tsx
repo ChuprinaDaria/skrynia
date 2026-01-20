@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Script from 'next/script';
 import { getApiEndpoint } from '@/lib/api';
 import { useLanguage } from '@/contexts/LanguageContext';
 
@@ -62,6 +63,56 @@ export default function BlogPage() {
     });
   };
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
+
+  // Generate JSON-LD structured data for blog listing
+  const blogListJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Blog',
+    name: t.blog.title,
+    description: t.blog.subtitle,
+    url: `${siteUrl}/blog`,
+    publisher: {
+      '@type': 'Organization',
+      name: 'Rune Box',
+      logo: {
+        '@type': 'ImageObject',
+        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
+      },
+    },
+    blogPost: blogs.map((blog) => ({
+      '@type': 'BlogPosting',
+      headline: blog.title,
+      description: blog.excerpt || '',
+      image: blog.featured_image || `${siteUrl}/images/logo/logo-white-pink-1.png`,
+      url: `${siteUrl}/blog/${blog.slug}`,
+      datePublished: blog.published_at || blog.created_at,
+      author: {
+        '@type': blog.author ? 'Person' : 'Organization',
+        name: blog.author || 'Rune Box Team',
+      },
+    })),
+  };
+
+  const breadcrumbJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Головна',
+        item: siteUrl,
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Блог',
+        item: `${siteUrl}/blog`,
+      },
+    ],
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-deep-black pt-24 pb-20">
@@ -73,7 +124,21 @@ export default function BlogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-deep-black pt-24 pb-20">
+    <>
+      {/* JSON-LD структуровані дані */}
+      <Script
+        id="blog-list-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(blogListJsonLd) }}
+        strategy="afterInteractive"
+      />
+      <Script
+        id="blog-breadcrumb-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+        strategy="afterInteractive"
+      />
+      <div className="min-h-screen bg-deep-black pt-24 pb-20">
       <div className="container mx-auto px-4 md:px-6">
         <div className="max-w-4xl mx-auto">
           <header className="mb-12 text-center">
@@ -160,5 +225,6 @@ export default function BlogPage() {
         </div>
       </div>
     </div>
+    </>
   );
 }
