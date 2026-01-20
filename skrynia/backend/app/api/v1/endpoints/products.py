@@ -186,17 +186,25 @@ def get_products_catalog_csv(
                 )
             
             # Build image URLs
+            # ВАЖЛИВО: Використовуємо frontend_url для зображень, оскільки nginx проксує /static/ до backend
+            # Це забезпечує доступність зображень для Facebook/Meta crawler
             image_link = None
             if primary_image and primary_image.image_url:
                 image_url = primary_image.image_url.strip()
                 if image_url.startswith('http://') or image_url.startswith('https://'):
+                    # Already absolute URL - use as is (but ensure HTTPS in production)
                     image_link = image_url
+                    if 'runebox.eu' in image_link and image_link.startswith('http://'):
+                        image_link = image_link.replace('http://', 'https://')
+                elif image_url.startswith('/static/') or image_url.startswith('/uploads/'):
+                    # Static files: use frontend URL (nginx proxies /static/ to backend)
+                    image_link = urljoin(frontend_url, image_url)
                 elif image_url.startswith('/'):
-                    # Static files are served from backend
-                    image_link = urljoin(backend_url, image_url)
+                    # Frontend public assets
+                    image_link = urljoin(frontend_url, image_url)
                 else:
-                    # Relative path - prepend backend URL
-                    image_link = urljoin(backend_url, '/' + image_url.lstrip('/'))
+                    # Relative path - prepend frontend URL
+                    image_link = urljoin(frontend_url, '/' + image_url.lstrip('/'))
             
             # Fallback to placeholder if no image (Meta requires image_link)
             if not image_link:

@@ -19,7 +19,7 @@ const INPOST_SUPPORTED_COUNTRIES = ['PL', 'BE', 'IT', 'FR', 'LU', 'PT', 'ES', 'N
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart, total } = useCart();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<DeliveryMethod>('inpost');
@@ -510,7 +510,7 @@ export default function CheckoutPage() {
                                       token={inpostToken}
                                       version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
                                       country={formData.shipping_country === 'PL' ? undefined : formData.shipping_country}
-                                      language={t.language === 'uk' ? 'uk' : t.language === 'en' ? 'en' : t.language === 'es' ? 'es' : t.language === 'fr' ? 'fr' : t.language === 'pt' ? 'pt' : t.language === 'it' ? 'it' : 'pl'}
+                                      language={language === 'UA' ? 'uk' : language === 'EN' ? 'en' : language === 'FR' ? 'fr' : language === 'DE' ? 'de' : language === 'PL' ? 'pl' : language === 'SE' ? 'sv' : language === 'NO' ? 'no' : language === 'DK' ? 'da' : 'pl'}
                                       config="parcelCollect"
                                       sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
                                       onPointSelect={(point: InPostPoint) => {

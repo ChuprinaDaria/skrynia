@@ -4,6 +4,10 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const userAgent = request.headers.get('user-agent') || '';
   
+  // Debug: Log user-agent for troubleshooting
+  console.log("User-Agent:", userAgent);
+  console.log("Request URL:", request.url);
+  
   // Detect Facebook crawler
   const isFacebookBot = 
     userAgent.includes('facebookexternalhit') ||
