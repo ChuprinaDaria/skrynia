@@ -38,12 +38,8 @@ export default function HomePage() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchFeaturedProducts();
-  }, [language]); // Re-fetch when language changes
-
-  const getProductTitle = (product: ApiProduct): string => {
-    switch (language) {
+  const getProductTitle = (product: ApiProduct, currentLanguage: string = language): string => {
+    switch (currentLanguage) {
       case 'EN':
         return product.title_en || product.title_uk;
       case 'DE':
@@ -71,9 +67,10 @@ export default function HomePage() {
       if (res.ok) {
         const data: ApiProduct[] = await res.json();
         // Transform API products to frontend Product format with all language fields
+        // Use current language to set initial title, but keep all language fields for ProductCard
         const transformedProducts: Product[] = data.map((product) => ({
           id: product.id.toString(),
-          title: getProductTitle(product),
+          title: getProductTitle(product, language), // Use current language
           titleEn: product.title_en,
           titleUk: product.title_uk,
           titleDe: product.title_de,
@@ -100,6 +97,10 @@ export default function HomePage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchFeaturedProducts();
+  }, [language]); // Re-fetch when language changes
 
   // Generate JSON-LD with actual products
   const homePageJsonLd = {

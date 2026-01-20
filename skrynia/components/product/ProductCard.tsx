@@ -56,7 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
       default:
         return product.titleUk || product.title;
     }
-  }, [language, product.titleEn, product.titleUk, product.titleDe, product.titlePl, product.titleSe, product.titleNo, product.titleDk, product.titleFr, product.title]);
+  }, [language, product]); // Include entire product object to ensure updates
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
   const productUrl = `${siteUrl}/products/${product.slug}`;
   
