@@ -453,7 +453,7 @@ export default function AccountPage() {
                   </div>
                 )
               ) : (
-                <p className="text-sage text-xs sm:text-sm">{t.account.noAddress || 'Адреса не вказана'}</p>
+                <p className="text-sage text-xs sm:text-sm">Адреса не вказана</p>
               )}
             </div>
 
@@ -642,7 +642,7 @@ export default function AccountPage() {
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="font-cinzel text-2xl text-ivory">
-                  {editingAddress ? (t.account.editAddress || 'Редагувати адресу') : (t.account.addAddress || 'Додати адресу')}
+                  {editingAddress ? 'Редагувати адресу' : 'Додати адресу'}
                 </h2>
                 <button
                   onClick={() => {
@@ -684,7 +684,7 @@ export default function AccountPage() {
 
                 <div>
                   <label className="block text-ivory font-inter mb-2">
-                    {t.checkout?.addressLine1 || 'Адреса'} <span className="text-oxblood">*</span>
+                    Адреса <span className="text-oxblood">*</span>
                   </label>
                   <input
                     type="text"
@@ -697,7 +697,7 @@ export default function AccountPage() {
 
                 <div>
                   <label className="block text-ivory font-inter mb-2">
-                    {t.checkout?.addressLine2 || 'Адреса (додатково)'}
+                    Адреса (додатково)
                   </label>
                   <input
                     type="text"
@@ -767,7 +767,7 @@ export default function AccountPage() {
                     className="w-4 h-4 text-oxblood bg-deep-black border-sage/30 rounded focus:ring-oxblood"
                   />
                   <label htmlFor="is_default" className="text-ivory font-inter">
-                    {t.account.setAsDefault || 'Встановити як адресу за замовчуванням'}
+                    Встановити як адресу за замовчуванням
                   </label>
                 </div>
 
@@ -777,7 +777,7 @@ export default function AccountPage() {
                     disabled={savingAddress}
                     className="flex-1"
                   >
-                    {savingAddress ? (t.account.saving || 'Збереження...') : (t.account.save || 'Зберегти')}
+                    {savingAddress ? 'Збереження...' : 'Зберегти'}
                   </Button>
                   <Button
                     variant="ghost"
@@ -787,7 +787,7 @@ export default function AccountPage() {
                     }}
                     className="flex-1"
                   >
-                    {t.account.cancel || 'Скасувати'}
+                    Скасувати
                   </Button>
                 </div>
               </div>
