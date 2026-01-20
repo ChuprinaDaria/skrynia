@@ -332,7 +332,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
-      url: ${{ secrets.FRONTEND_URL }}
+      url: ${{ vars.FRONTEND_URL || 'https://runebox.eu' }}
     
     steps:
       - name: Deployment notification
