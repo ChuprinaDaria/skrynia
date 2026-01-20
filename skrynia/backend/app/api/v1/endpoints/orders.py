@@ -286,6 +286,52 @@ async def update_order(
             update_data["shipped_at"] = datetime.utcnow()
         elif update_data["status"] == OrderStatus.DELIVERED:
             update_data["delivered_at"] = datetime.utcnow()
+        
+        # Auto-trigger second payment for made-to-order orders when status changes to PROCESSING
+        if (update_data["status"] == OrderStatus.PROCESSING and 
+            order.is_made_to_order and 
+            order.payment_status == PaymentStatus.PAID_PARTIALLY):
+            # Automatically generate and send second payment link
+            try:
+                checkout_url = create_checkout_session(order, stage=2, db=db)
+                
+                html_content = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <style>
+                        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                        .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                        .button {{ display: inline-block; padding: 12px 30px; background-color: #007bff; color: #ffffff; text-decoration: none; border-radius: 5px; margin: 20px 0; }}
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h2>Your Order is Ready - Complete Payment</h2>
+                        <p>Hello {order.customer_name},</p>
+                        <p>Your made-to-order item #{order.order_number} is ready for final payment.</p>
+                        <p>Please complete the remaining 50% payment:</p>
+                        <a href="{checkout_url}" class="button">Pay Now</a>
+                        <p>If you have any questions, please contact us.</p>
+                    </div>
+                </body>
+                </html>
+                """
+                
+                message = MessageSchema(
+                    subject=f"Complete Payment for Order #{order.order_number}",
+                    recipients=[order.customer_email],
+                    body=html_content,
+                    subtype="html"
+                )
+                
+                background_tasks.add_task(fm.send_message, message)
+            except Exception as e:
+                # Log error but don't fail the status update
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"Failed to auto-trigger second payment for order {order.id}: {str(e)}")
 
     if "payment_status" in update_data:
         if update_data["payment_status"] == PaymentStatus.COMPLETED:

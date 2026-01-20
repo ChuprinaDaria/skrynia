@@ -40,7 +40,14 @@ interface ApiProduct {
   currency: string;
   stock_quantity?: number;
   primary_image?: string;
-  materials?: string[];
+  materials_uk?: string[];
+  materials_en?: string[];
+  materials_de?: string[];
+  materials_pl?: string[];
+  materials_se?: string[];
+  materials_no?: string[];
+  materials_dk?: string[];
+  materials_fr?: string[];
   specifications?: Array<{ label: string; value: string }>;
   legend_title_uk?: string;
   legend_title_en?: string;
@@ -77,15 +84,6 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
   const [error, setError] = useState<string | null>(null);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [showOrderForm, setShowOrderForm] = useState(false);
-  const [orderFormData, setOrderFormData] = useState({
-    customer_name: '',
-    customer_email: '',
-    customer_phone: '',
-    custom_text: '',
-    description: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [viewingNow, setViewingNow] = useState(0);
   const [isClient, setIsClient] = useState(false);
 
@@ -279,7 +277,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 currency: p.currency,
                 image: normalizeImageUrl(p.primary_image) || '/images/products/placeholder.jpg',
                 category: 'slavic' as const,
-                materials: p.materials || [],
+                materials: p.materials_uk || [],
                 isHandmade: p.is_handmade ?? true,
                 slug: p.slug,
               }));
@@ -320,45 +318,6 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     });
   };
 
-  const handleMadeToOrderSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!product) return;
-    
-    setIsSubmitting(true);
-    
-    try {
-      const response = await fetch(getApiEndpoint('/api/v1/made-to-order/'), {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          product_id: product.id,
-          ...orderFormData,
-        }),
-      });
-
-      if (response.ok) {
-        alert(t.product.madeToOrder?.success || 'Ваше замовлення прийнято! Ми зв\'яжемося з вами найближчим часом.');
-        setShowOrderForm(false);
-        setOrderFormData({
-          customer_name: '',
-          customer_email: '',
-          customer_phone: '',
-          custom_text: '',
-          description: '',
-        });
-      } else {
-        const errorData = await response.json();
-        alert(`${t.common.error}: ${errorData.detail || (t.product.madeToOrder?.submit || 'Не вдалося відправити замовлення')}`);
-      }
-    } catch (error) {
-      console.error('Failed to submit order:', error);
-      alert(t.common.error + ': ' + (t.product.madeToOrder?.submit || 'Не вдалося відправити замовлення'));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -413,7 +372,18 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       name: 'Rune Box',
     },
     category: 'Jewelry',
-    material: product.materials?.join(', ') || '',
+    material: (() => {
+      switch (language) {
+        case 'EN': return product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        case 'DE': return product.materials_de?.join(', ') || product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        case 'PL': return product.materials_pl?.join(', ') || product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        case 'SE': return product.materials_se?.join(', ') || product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        case 'NO': return product.materials_no?.join(', ') || product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        case 'DK': return product.materials_dk?.join(', ') || product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        case 'FR': return product.materials_fr?.join(', ') || product.materials_en?.join(', ') || product.materials_uk?.join(', ') || '';
+        default: return product.materials_uk?.join(', ') || '';
+      }
+    })(),
     isHandmade: product.is_handmade ?? true,
     offers: {
       '@type': 'Offer',
@@ -593,11 +563,25 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 )}
 
                 {/* Materials */}
-                {product.materials && product.materials.length > 0 && (
-                  <div>
-                    <h2 className="font-rutenia text-lg text-ivory mb-3">{t.product.materials}</h2>
-                    <div className="flex flex-wrap gap-3">
-                      {product.materials.map((material, index) => (
+                {(() => {
+                  const getMaterials = (): string[] => {
+                    switch (language) {
+                      case 'EN': return product.materials_en || product.materials_uk || [];
+                      case 'DE': return product.materials_de || product.materials_en || product.materials_uk || [];
+                      case 'PL': return product.materials_pl || product.materials_en || product.materials_uk || [];
+                      case 'SE': return product.materials_se || product.materials_en || product.materials_uk || [];
+                      case 'NO': return product.materials_no || product.materials_en || product.materials_uk || [];
+                      case 'DK': return product.materials_dk || product.materials_en || product.materials_uk || [];
+                      case 'FR': return product.materials_fr || product.materials_en || product.materials_uk || [];
+                      default: return product.materials_uk || [];
+                    }
+                  };
+                  const materials = getMaterials();
+                  return materials.length > 0 ? (
+                    <div>
+                      <h2 className="font-rutenia text-lg text-ivory mb-3">{t.product.materials}</h2>
+                      <div className="flex flex-wrap gap-3">
+                        {materials.map((material, index) => (
                         <div
                           key={index}
                           className="flex items-center gap-2 px-3 py-2 bg-footer-black border border-sage/20 rounded-sm"
@@ -615,7 +599,8 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                       ))}
                     </div>
                   </div>
-                )}
+                  ) : null;
+                })()}
 
                 {/* Divider */}
                 <div className="h-px bg-sage/20" aria-hidden="true" />
@@ -642,136 +627,15 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                         </p>
                       </div>
                       
-                      {/* Order Buttons */}
-                      {!showOrderForm ? (
-                        <div className="space-y-3">
-                          <Button 
-                            onClick={handleAddToCart}
-                            size="lg" 
-                            fullWidth 
-                            className="text-lg"
-                          >
-                            {t.product.madeToOrder?.orderWithPayment || 'Замовити з оплатою 50%'}
-                          </Button>
-                          <Button 
-                            onClick={() => setShowOrderForm(true)} 
-                            size="lg" 
-                            fullWidth 
-                            variant="ghost"
-                            className="text-lg"
-                          >
-                            {t.product.madeToOrder?.orderButton || 'Замовити без оплати'}
-                          </Button>
-                        </div>
-                      ) : (
-                        /* Order Form */
-                        <form onSubmit={handleMadeToOrderSubmit} className="space-y-4 bg-footer-black/50 border border-sage/20 rounded-sm p-6">
-                          <h3 className="font-cinzel text-xl text-ivory mb-4">{t.product.madeToOrder?.formTitle || 'Форма замовлення'}</h3>
-                          
-                          <div>
-                            <label htmlFor="customer_name" className="block text-ivory font-inter mb-2">
-                              {t.product.madeToOrder?.name || 'Ім\'я'} <span className="text-oxblood">*</span>
-                            </label>
-                            <input
-                              id="customer_name"
-                              type="text"
-                              required
-                              value={orderFormData.customer_name}
-                              onChange={(e) => setOrderFormData({ ...orderFormData, customer_name: e.target.value })}
-                              className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="customer_email" className="block text-ivory font-inter mb-2">
-                              {t.product.madeToOrder?.email || 'Email'} <span className="text-oxblood">*</span>
-                            </label>
-                            <input
-                              id="customer_email"
-                              type="email"
-                              required
-                              value={orderFormData.customer_email}
-                              onChange={(e) => setOrderFormData({ ...orderFormData, customer_email: e.target.value })}
-                              className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="customer_phone" className="block text-ivory font-inter mb-2">
-                              {t.product.madeToOrder?.phone || 'Телефон'}
-                            </label>
-                            <input
-                              id="customer_phone"
-                              type="tel"
-                              value={orderFormData.customer_phone}
-                              onChange={(e) => setOrderFormData({ ...orderFormData, customer_phone: e.target.value })}
-                              className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
-                            />
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="custom_text" className="block text-ivory font-inter mb-2">
-                              {t.product.madeToOrder?.customText || 'Текст для нанесення (якщо потрібно)'}
-                            </label>
-                            <textarea
-                              id="custom_text"
-                              value={orderFormData.custom_text}
-                              onChange={(e) => setOrderFormData({ ...orderFormData, custom_text: e.target.value })}
-                              rows={3}
-                              maxLength={500}
-                              placeholder={t.product.madeToOrder?.customTextPlaceholder || 'Введіть текст, який хочете додати на прикрасу...'}
-                              className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
-                            />
-                            <p className="text-sage text-xs mt-1">{orderFormData.custom_text.length}/500</p>
-                          </div>
-                          
-                          <div>
-                            <label htmlFor="description" className="block text-ivory font-inter mb-2">
-                              {t.product.madeToOrder?.description || 'Опис / Коментар'}
-                            </label>
-                            <textarea
-                              id="description"
-                              value={orderFormData.description}
-                              onChange={(e) => setOrderFormData({ ...orderFormData, description: e.target.value })}
-                              rows={4}
-                              maxLength={2000}
-                              placeholder={t.product.madeToOrder?.descriptionPlaceholder || 'Опишіть свої побажання щодо виготовлення...'}
-                              className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
-                            />
-                            <p className="text-sage text-xs mt-1">{orderFormData.description.length}/2000</p>
-                          </div>
-                          
-                          <div className="flex gap-4">
-                            <Button 
-                              type="submit" 
-                              size="lg" 
-                              fullWidth 
-                              className="text-lg"
-                              disabled={isSubmitting}
-                            >
-                              {isSubmitting ? (t.product.madeToOrder?.submitting || 'Відправка...') : (t.product.madeToOrder?.submit || 'Відправити замовлення')}
-                            </Button>
-                            <Button 
-                              type="button" 
-                              onClick={() => {
-                                setShowOrderForm(false);
-                                setOrderFormData({
-                                  customer_name: '',
-                                  customer_email: '',
-                                  customer_phone: '',
-                                  custom_text: '',
-                                  description: '',
-                                });
-                              }}
-                              variant="ghost"
-                              size="lg"
-                              className="text-lg"
-                            >
-                              {t.product.madeToOrder?.cancel || 'Скасувати'}
-                            </Button>
-                          </div>
-                        </form>
-                      )}
+                      {/* Order Button */}
+                      <Button 
+                        onClick={handleAddToCart}
+                        size="lg" 
+                        fullWidth 
+                        className="text-lg"
+                      >
+                        {t.product.madeToOrder?.orderWithPayment || 'Оплатити 50%'}
+                      </Button>
                     </>
                   ) : (
                     <>

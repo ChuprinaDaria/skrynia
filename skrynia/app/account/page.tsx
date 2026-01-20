@@ -97,6 +97,19 @@ export default function AccountPage() {
   const [trackingData, setTrackingData] = useState<Record<string, TrackingInfo>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
+  const [editingAddress, setEditingAddress] = useState<UserAddress | null>(null);
+  const [addressFormData, setAddressFormData] = useState({
+    full_name: '',
+    phone: '',
+    address_line1: '',
+    address_line2: '',
+    city: '',
+    postal_code: '',
+    country: 'PL',
+    is_default: true,
+  });
+  const [savingAddress, setSavingAddress] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('user_token');
@@ -267,6 +280,72 @@ export default function AccountPage() {
     router.push('/');
   };
 
+  const handleOpenAddressModal = (address?: UserAddress) => {
+    if (address) {
+      setEditingAddress(address);
+      setAddressFormData({
+        full_name: address.full_name || '',
+        phone: address.phone || '',
+        address_line1: address.address_line1 || '',
+        address_line2: address.address_line2 || '',
+        city: address.city || '',
+        postal_code: address.postal_code || '',
+        country: address.country || 'PL',
+        is_default: address.is_default || false,
+      });
+    } else {
+      setEditingAddress(null);
+      setAddressFormData({
+        full_name: user?.full_name || '',
+        phone: user?.phone || '',
+        address_line1: '',
+        address_line2: '',
+        city: '',
+        postal_code: '',
+        country: 'PL',
+        is_default: addresses.length === 0,
+      });
+    }
+    setIsAddressModalOpen(true);
+  };
+
+  const handleSaveAddress = async () => {
+    setSavingAddress(true);
+    try {
+      const token = localStorage.getItem('user_token');
+      if (!token) return;
+
+      const url = editingAddress
+        ? getApiEndpoint(`/api/v1/users/me/addresses/${editingAddress.id}`)
+        : getApiEndpoint('/api/v1/users/me/addresses');
+      
+      const method = editingAddress ? 'PATCH' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(addressFormData),
+      });
+
+      if (response.ok) {
+        await fetchUserAddresses();
+        setIsAddressModalOpen(false);
+        setEditingAddress(null);
+      } else {
+        const errorData = await response.json();
+        setError(errorData.detail || 'Failed to save address');
+      }
+    } catch (err) {
+      console.error('Error saving address:', err);
+      setError('Failed to save address');
+    } finally {
+      setSavingAddress(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-deep-black pt-24 pb-20 flex items-center justify-center">
@@ -340,10 +419,20 @@ export default function AccountPage() {
             </div>
 
             {/* Shipping Address / Paczkomat */}
-            {defaultAddress && (
-              <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-3 sm:p-4 mb-6">
-                <h3 className="text-ivory font-semibold mb-2 text-sm sm:text-base">{t.account.shippingAddress}</h3>
-                {defaultAddress.pickup_point_code ? (
+            <div className="bg-deep-black/50 border border-sage/20 rounded-sm p-3 sm:p-4 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-ivory font-semibold text-sm sm:text-base">{t.account.shippingAddress}</h3>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => handleOpenAddressModal(defaultAddress || undefined)}
+                  className="text-xs"
+                >
+                  {defaultAddress ? (t.account.editAddress || 'Редагувати') : (t.account.addAddress || 'Додати адресу')}
+                </Button>
+              </div>
+              {defaultAddress ? (
+                defaultAddress.pickup_point_code ? (
                   <div className="text-sage text-xs sm:text-sm space-y-1">
                     <p className="font-semibold text-ivory break-words">{t.account.inpostPaczkomat} {defaultAddress.pickup_point_code}</p>
                     {defaultAddress.address_line1 && (
@@ -361,9 +450,11 @@ export default function AccountPage() {
                     <p>{defaultAddress.country}</p>
                     {defaultAddress.phone && <p className="mt-2">📞 {defaultAddress.phone}</p>}
                   </div>
-                )}
-              </div>
-            )}
+                )
+              ) : (
+                <p className="text-sage text-xs sm:text-sm">{t.account.noAddress || 'Адреса не вказана'}</p>
+              )}
+            </div>
 
             {/* Loyalty Status with Progress Bar */}
             {bonusInfo && (
@@ -542,6 +633,167 @@ export default function AccountPage() {
           </div>
         </div>
       </div>
+
+      {/* Address Edit Modal */}
+      {isAddressModalOpen && (
+        <div className="fixed inset-0 bg-deep-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-footer-black border border-sage/30 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="font-cinzel text-2xl text-ivory">
+                  {editingAddress ? (t.account.editAddress || 'Редагувати адресу') : (t.account.addAddress || 'Додати адресу')}
+                </h2>
+                <button
+                  onClick={() => {
+                    setIsAddressModalOpen(false);
+                    setEditingAddress(null);
+                  }}
+                  className="text-sage hover:text-oxblood transition-colors"
+                  aria-label="Close"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-ivory font-inter mb-2">
+                    {t.checkout?.fullName || 'Повне ім\'я'} <span className="text-oxblood">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={addressFormData.full_name}
+                    onChange={(e) => setAddressFormData({ ...addressFormData, full_name: e.target.value })}
+                    className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ivory font-inter mb-2">
+                    {t.checkout?.phone || 'Телефон'}
+                  </label>
+                  <input
+                    type="tel"
+                    value={addressFormData.phone}
+                    onChange={(e) => setAddressFormData({ ...addressFormData, phone: e.target.value })}
+                    className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ivory font-inter mb-2">
+                    {t.checkout?.addressLine1 || 'Адреса'} <span className="text-oxblood">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={addressFormData.address_line1}
+                    onChange={(e) => setAddressFormData({ ...addressFormData, address_line1: e.target.value })}
+                    className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-ivory font-inter mb-2">
+                    {t.checkout?.addressLine2 || 'Адреса (додатково)'}
+                  </label>
+                  <input
+                    type="text"
+                    value={addressFormData.address_line2}
+                    onChange={(e) => setAddressFormData({ ...addressFormData, address_line2: e.target.value })}
+                    className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-ivory font-inter mb-2">
+                      {t.checkout?.city || 'Місто'} <span className="text-oxblood">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={addressFormData.city}
+                      onChange={(e) => setAddressFormData({ ...addressFormData, city: e.target.value })}
+                      className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-ivory font-inter mb-2">
+                      {t.checkout?.postalCode || 'Поштовий індекс'} <span className="text-oxblood">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={addressFormData.postal_code}
+                      onChange={(e) => setAddressFormData({ ...addressFormData, postal_code: e.target.value })}
+                      className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-ivory font-inter mb-2">
+                    {t.checkout?.country || 'Країна'} <span className="text-oxblood">*</span>
+                  </label>
+                  <select
+                    required
+                    value={addressFormData.country}
+                    onChange={(e) => setAddressFormData({ ...addressFormData, country: e.target.value })}
+                    className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood"
+                  >
+                    <option value="PL">Poland</option>
+                    <option value="UA">Ukraine</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="IT">Italy</option>
+                    <option value="ES">Spain</option>
+                    <option value="NL">Netherlands</option>
+                    <option value="BE">Belgium</option>
+                    <option value="PT">Portugal</option>
+                    <option value="LU">Luxembourg</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="is_default"
+                    checked={addressFormData.is_default}
+                    onChange={(e) => setAddressFormData({ ...addressFormData, is_default: e.target.checked })}
+                    className="w-4 h-4 text-oxblood bg-deep-black border-sage/30 rounded focus:ring-oxblood"
+                  />
+                  <label htmlFor="is_default" className="text-ivory font-inter">
+                    {t.account.setAsDefault || 'Встановити як адресу за замовчуванням'}
+                  </label>
+                </div>
+
+                <div className="flex gap-4 pt-4">
+                  <Button
+                    onClick={handleSaveAddress}
+                    disabled={savingAddress}
+                    className="flex-1"
+                  >
+                    {savingAddress ? (t.account.saving || 'Збереження...') : (t.account.save || 'Зберегти')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => {
+                      setIsAddressModalOpen(false);
+                      setEditingAddress(null);
+                    }}
+                    className="flex-1"
+                  >
+                    {t.account.cancel || 'Скасувати'}
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

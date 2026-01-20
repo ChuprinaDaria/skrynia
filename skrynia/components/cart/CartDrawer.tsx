@@ -81,16 +81,17 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
 
       {/* Drawer */}
       <div
-        className={`fixed top-0 right-0 h-full w-full md:w-[480px] bg-footer-black border-l border-sage/30 z-[60] flex flex-col transition-transform duration-300 ease-in-out pointer-events-auto ${
+        className={`fixed top-0 right-0 h-full w-full md:w-[480px] bg-footer-black border-l border-sage/30 z-[60] flex flex-col transition-transform duration-300 ease-in-out pointer-events-auto transform-gpu ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
+        style={{ willChange: 'transform' }}
         role="dialog"
         aria-modal="true"
         aria-labelledby="cart-title"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-sage/20">
+        <div className="flex-shrink-0 flex items-center justify-between p-6 border-b border-sage/20 relative z-10">
           <h2 id="cart-title" className="font-rutenia text-2xl text-ivory">
             {t.cart.title}
           </h2>
@@ -99,7 +100,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               e.stopPropagation();
               onClose();
             }}
-            className="text-ivory hover:text-oxblood transition-colors duration-200"
+            className="text-ivory hover:text-oxblood transition-colors duration-200 flex-shrink-0 relative z-10"
             aria-label="Close cart"
             type="button"
           >
@@ -118,7 +119,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
         </div>
 
         {/* Scrollable Content Area */}
-        <div className="flex-1 overflow-y-auto min-h-0">
+        <div className="flex-1 overflow-y-auto min-h-0 overscroll-contain">
         {/* Cart Items */}
         <div className="p-6">
           {items.length === 0 ? (
@@ -231,7 +232,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
 
         {/* Footer - Totals & Checkout */}
         {items.length > 0 && (
-          <div className="border-t border-sage/20 p-6 bg-deep-black/50">
+          <div className="flex-shrink-0 border-t border-sage/20 p-6 bg-deep-black/50 overflow-y-auto overscroll-contain">
             {/* Progressive Discount Info Banner */}
             {discountPercent > 0 && (
               <div className="mb-4 p-3 bg-oxblood/20 border border-oxblood/50 rounded-sm">

@@ -63,7 +63,14 @@ class ProductBase(BaseModel):
     stock_quantity: int = 0
     sku: Optional[str] = None
 
-    materials: Optional[List[str]] = None
+    materials_uk: Optional[List[str]] = None
+    materials_en: Optional[List[str]] = None
+    materials_de: Optional[List[str]] = None
+    materials_pl: Optional[List[str]] = None
+    materials_se: Optional[List[str]] = None
+    materials_no: Optional[List[str]] = None
+    materials_dk: Optional[List[str]] = None
+    materials_fr: Optional[List[str]] = None
     specifications: Optional[Dict[str, str]] = None
     is_handmade: bool = True
 
@@ -85,8 +92,22 @@ class ProductBase(BaseModel):
     is_made_to_order: bool = False
     made_to_order_duration: Optional[str] = None
 
-    meta_description: Optional[str] = None
-    meta_keywords: Optional[List[str]] = None
+    meta_description_uk: Optional[str] = None
+    meta_description_en: Optional[str] = None
+    meta_description_de: Optional[str] = None
+    meta_description_pl: Optional[str] = None
+    meta_description_se: Optional[str] = None
+    meta_description_no: Optional[str] = None
+    meta_description_dk: Optional[str] = None
+    meta_description_fr: Optional[str] = None
+    meta_keywords_uk: Optional[List[str]] = None
+    meta_keywords_en: Optional[List[str]] = None
+    meta_keywords_de: Optional[List[str]] = None
+    meta_keywords_pl: Optional[List[str]] = None
+    meta_keywords_se: Optional[List[str]] = None
+    meta_keywords_no: Optional[List[str]] = None
+    meta_keywords_dk: Optional[List[str]] = None
+    meta_keywords_fr: Optional[List[str]] = None
 
 
 class ProductCreate(ProductBase):
@@ -128,7 +149,14 @@ class ProductUpdate(BaseModel):
     price: Optional[float] = None
     stock_quantity: Optional[int] = None
 
-    materials: Optional[List[str]] = None
+    materials_uk: Optional[List[str]] = None
+    materials_en: Optional[List[str]] = None
+    materials_de: Optional[List[str]] = None
+    materials_pl: Optional[List[str]] = None
+    materials_se: Optional[List[str]] = None
+    materials_no: Optional[List[str]] = None
+    materials_dk: Optional[List[str]] = None
+    materials_fr: Optional[List[str]] = None
     specifications: Optional[Dict[str, str]] = None
 
     category_id: Optional[int] = None
@@ -148,6 +176,23 @@ class ProductUpdate(BaseModel):
     # Made to Order
     is_made_to_order: Optional[bool] = None
     made_to_order_duration: Optional[str] = None
+
+    meta_description_uk: Optional[str] = None
+    meta_description_en: Optional[str] = None
+    meta_description_de: Optional[str] = None
+    meta_description_pl: Optional[str] = None
+    meta_description_se: Optional[str] = None
+    meta_description_no: Optional[str] = None
+    meta_description_dk: Optional[str] = None
+    meta_description_fr: Optional[str] = None
+    meta_keywords_uk: Optional[List[str]] = None
+    meta_keywords_en: Optional[List[str]] = None
+    meta_keywords_de: Optional[List[str]] = None
+    meta_keywords_pl: Optional[List[str]] = None
+    meta_keywords_se: Optional[List[str]] = None
+    meta_keywords_no: Optional[List[str]] = None
+    meta_keywords_dk: Optional[List[str]] = None
+    meta_keywords_fr: Optional[List[str]] = None
 
 
 class Product(ProductBase):

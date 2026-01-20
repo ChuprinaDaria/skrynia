@@ -14,6 +14,7 @@ import { trackInitiateCheckout } from '@/lib/facebook-conversions';
 type PaymentMethod = 'stripe' | 'przelewy24' | 'blik' | 'bank_transfer';
 type DeliveryMethod = 'inpost' | 'novaposhta' | 'poczta' | 'courier';
 
+// InPost supported countries (including international)
 const INPOST_SUPPORTED_COUNTRIES = ['PL', 'BE', 'IT', 'FR', 'LU', 'PT', 'ES', 'NL'];
 
 export default function CheckoutPage() {
@@ -146,6 +147,74 @@ export default function CheckoutPage() {
       router.push('/cart');
     }
   }, [items, router]);
+
+  // Load user profile data if logged in
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userToken = localStorage.getItem('user_token');
+      if (!userToken) return;
+
+      try {
+        const response = await fetch(getApiEndpoint('/api/v1/users/me'), {
+          headers: {
+            'Authorization': `Bearer ${userToken}`,
+          },
+        });
+
+        if (response.ok) {
+          const userData = await response.json();
+          
+          // Load default address
+          try {
+            const addressResponse = await fetch(getApiEndpoint('/api/v1/users/me/addresses/default'), {
+              headers: {
+                'Authorization': `Bearer ${userToken}`,
+              },
+            });
+
+            if (addressResponse.ok) {
+              const addressData = await addressResponse.json();
+              setFormData(prev => ({
+                ...prev,
+                customer_email: userData.email || prev.customer_email,
+                customer_name: userData.full_name || prev.customer_name,
+                customer_phone: addressData.phone || userData.phone || prev.customer_phone,
+                shipping_address_line1: addressData.address_line1 || prev.shipping_address_line1,
+                shipping_address_line2: addressData.address_line2 || prev.shipping_address_line2,
+                shipping_city: addressData.city || prev.shipping_city,
+                shipping_postal_code: addressData.postal_code || prev.shipping_postal_code,
+                shipping_country: addressData.country || prev.shipping_country,
+              }));
+
+              // Set delivery method based on country and InPost support
+              if (addressData.country && INPOST_SUPPORTED_COUNTRIES.includes(addressData.country)) {
+                setDeliveryMethod('inpost');
+              } else if (addressData.country === 'UA') {
+                setDeliveryMethod('novaposhta');
+              }
+
+              // If InPost locker is selected
+              if (addressData.inpost_locker_id) {
+                setSelectedPickupPoint(addressData.inpost_locker_id);
+              }
+            }
+          } catch (err) {
+            // No default address, use user data only
+            setFormData(prev => ({
+              ...prev,
+              customer_email: userData.email || prev.customer_email,
+              customer_name: userData.full_name || prev.customer_name,
+              customer_phone: userData.phone || prev.customer_phone,
+            }));
+          }
+        }
+      } catch (err) {
+        console.error('Error loading user data:', err);
+      }
+    };
+
+    loadUserData();
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -54,7 +54,14 @@ class Product(Base):
     sku = Column(String, unique=True, nullable=True)
 
     # Product Details
-    materials = Column(JSON, nullable=True)  # List of materials
+    materials_uk = Column(JSON, nullable=True)  # List of materials in Ukrainian
+    materials_en = Column(JSON, nullable=True)  # List of materials in English
+    materials_de = Column(JSON, nullable=True)  # List of materials in German
+    materials_pl = Column(JSON, nullable=True)  # List of materials in Polish
+    materials_se = Column(JSON, nullable=True)  # List of materials in Swedish
+    materials_no = Column(JSON, nullable=True)  # List of materials in Norwegian
+    materials_dk = Column(JSON, nullable=True)  # List of materials in Danish
+    materials_fr = Column(JSON, nullable=True)  # List of materials in French
     specifications = Column(JSON, nullable=True)  # Dict of specs
     is_handmade = Column(Boolean, default=True)
 
@@ -79,8 +86,22 @@ class Product(Base):
     made_to_order_duration = Column(String, nullable=True)  # e.g., "2-3 тижні", "1 місяць"
 
     # SEO
-    meta_description = Column(Text, nullable=True)
-    meta_keywords = Column(JSON, nullable=True)
+    meta_description_uk = Column(Text, nullable=True)
+    meta_description_en = Column(Text, nullable=True)
+    meta_description_de = Column(Text, nullable=True)
+    meta_description_pl = Column(Text, nullable=True)
+    meta_description_se = Column(Text, nullable=True)
+    meta_description_no = Column(Text, nullable=True)
+    meta_description_dk = Column(Text, nullable=True)
+    meta_description_fr = Column(Text, nullable=True)
+    meta_keywords_uk = Column(JSON, nullable=True)
+    meta_keywords_en = Column(JSON, nullable=True)
+    meta_keywords_de = Column(JSON, nullable=True)
+    meta_keywords_pl = Column(JSON, nullable=True)
+    meta_keywords_se = Column(JSON, nullable=True)
+    meta_keywords_no = Column(JSON, nullable=True)
+    meta_keywords_dk = Column(JSON, nullable=True)
+    meta_keywords_fr = Column(JSON, nullable=True)
 
     # Timestamps
     created_at = Column(DateTime(timezone=True), server_default=func.now())

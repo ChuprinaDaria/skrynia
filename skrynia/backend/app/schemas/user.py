@@ -16,6 +16,7 @@ class UserCreate(UserBase):
 class UserUpdate(BaseModel):
     email: Optional[EmailStr] = None
     full_name: Optional[str] = None
+    phone: Optional[str] = None
     password: Optional[str] = None
 
 
@@ -27,6 +28,7 @@ class User(UserBase):
     loyalty_status: Optional[str] = None
     bonus_points: float = 0.0
     total_spent: float = 0.0
+    phone: Optional[str] = None
     created_at: datetime
 
     class Config:

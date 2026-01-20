@@ -37,6 +37,8 @@ class User(Base):
     total_spent = Column(Float, default=0.0)  # Загальна сума покупок
     # Language preference
     language = Column(String, default="EN")  # UA, EN, DE, PL, SE, NO, DK, FR
+    # Phone number
+    phone = Column(String, nullable=True)
     # Email notifications
     email_notifications_enabled = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
