@@ -52,6 +52,11 @@ services:
       INPOST_ORGANIZATION_ID: ${INPOST_ORGANIZATION_ID}
       INPOST_GEOWIDGET_TOKEN: ${INPOST_GEOWIDGET_TOKEN}
       INPOST_SANDBOX: ${INPOST_SANDBOX:-true}
+      # Facebook Conversions API
+      FACEBOOK_PIXEL_ID: ${FACEBOOK_PIXEL_ID}
+      FACEBOOK_ACCESS_TOKEN: ${FACEBOOK_ACCESS_TOKEN}
+      FACEBOOK_API_VERSION: ${FACEBOOK_API_VERSION:-v18.0}
+      FACEBOOK_DATASET_QUALITY_TOKEN: ${FACEBOOK_DATASET_QUALITY_TOKEN}
     volumes:
       # Named volume for persistent uploads (survives container recreation)
       - uploads_data:/app/static/uploads

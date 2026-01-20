@@ -192,6 +192,119 @@ environment:
 
 ---
 
+---
+
+## Facebook Conversions API Secrets
+
+### 1. Facebook Pixel ID
+**Назва секрету**: `FACEBOOK_PIXEL_ID`
+
+**Опис**: ID вашого Facebook Pixel.
+
+**Значення**: `1552229889398632`
+
+**Використання**: 
+- Використовується для ідентифікації Pixel в Conversions API
+- Не секретний, але зберігається в Secrets для консистентності
+
+---
+
+### 2. Facebook Access Token
+**Назва секрету**: `FACEBOOK_ACCESS_TOKEN`
+
+**Опис**: Access Token для доступу до Facebook Conversions API.
+
+**Як отримати**:
+1. Перейдіть до [Facebook Business Manager](https://business.facebook.com/)
+2. Відкрийте **Events Manager**
+3. Виберіть ваш Pixel (ID: `1552229889398632`)
+4. Перейдіть до **Settings** → **Conversions API**
+5. Створіть **System User** або використайте існуючий
+6. Додайте права доступу до Pixel
+7. Згенеруйте **Access Token** (довгостроковий)
+
+**Важливо**: 
+- Токен має бути **довгостроковим** (Long-lived token)
+- Токен має мати права на `ads_management` та доступ до Pixel
+- **Ніколи не комітьте токен в код**
+
+**Використання**: 
+- Використовується для відправки подій до Facebook Conversions API
+- Передається в HTTP заголовках при запитах до Graph API
+
+---
+
+### 3. Facebook API Version
+**Назва секрету**: `FACEBOOK_API_VERSION`
+
+**Опис**: Версія Facebook Graph API.
+
+**Значення**: `v18.0` (або остання доступна версія)
+
+**За замовчуванням**: `v18.0`
+
+**Використання**: 
+- Використовується для формування URL запитів до Graph API
+- Формат: `https://graph.facebook.com/{version}/{pixel_id}/events`
+
+---
+
+### 4. Facebook Dataset Quality API Token
+**Назва секрету**: `FACEBOOK_DATASET_QUALITY_TOKEN`
+
+**Опис**: Токен для Dataset Quality API (для отримання метрик якості даних).
+
+**Як отримати**:
+1. Перейдіть до [Facebook Business Manager](https://business.facebook.com/)
+2. Відкрийте **Events Manager**
+3. Виберіть ваш Pixel (ID: `1552229889398632`)
+4. Перейдіть до **Settings** → **Conversions API**
+5. Увімкніть **Dataset Quality API** (Recommended)
+6. Згенеруйте **Dataset Quality API Token**
+7. Скопіюйте токен
+
+**Важливо**: 
+- Цей токен дозволяє отримувати метрики якості даних (EMQ, AEM)
+- Не використовується для відправки подій, тільки для читання метрик
+- **Ніколи не комітьте токен в код**
+
+**Використання**: 
+- Використовується для отримання Event Match Quality (EMQ) метрик
+- Використовується для отримання Aggregated Event Measurement (AEM) метрик
+- Дозволяє відстежувати якість даних та оптимізувати результативність
+
+**API Endpoints**:
+- `GET /api/v1/facebook/metrics/emq` - Event Match Quality метрики
+- `GET /api/v1/facebook/metrics/aem` - Aggregated Event Measurement метрики
+
+---
+
+### Налаштування в GitHub Actions
+
+Додайте до GitHub Secrets:
+
+```
+Name: FACEBOOK_PIXEL_ID
+Value: 1552229889398632
+
+Name: FACEBOOK_ACCESS_TOKEN
+Value: ваш_access_token
+
+Name: FACEBOOK_API_VERSION
+Value: v18.0
+```
+
+### Використання в Docker Compose
+
+```yaml
+environment:
+  FACEBOOK_PIXEL_ID: ${FACEBOOK_PIXEL_ID}
+  FACEBOOK_ACCESS_TOKEN: ${FACEBOOK_ACCESS_TOKEN}
+  FACEBOOK_API_VERSION: ${FACEBOOK_API_VERSION:-v18.0}
+```
+
+---
+
 ## Додаткова інформація
 
 - **InPost Documentation**: https://dokumentacja-inpost.atlassian.net/
@@ -199,4 +312,5 @@ environment:
 - **Geowidget Documentation**: Див. `backend/INPOST_GEOWIDGET.md`
 - **Parcel Manager (Sandbox)**: https://sandbox-manager.paczkomaty.pl
 - **Parcel Manager (Production)**: https://manager.paczkomaty.pl
+- **Facebook Conversions API**: Див. `FACEBOOK_CONVERSIONS_API_SETUP.md`
 

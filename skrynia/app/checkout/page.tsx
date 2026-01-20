@@ -9,13 +9,14 @@ import { useCart } from '@/contexts/CartContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint } from '@/lib/api';
 import { InPostGeowidget, InPostPoint } from '@/components/shipping/InPostGeowidget';
+import { trackInitiateCheckout } from '@/lib/facebook-conversions';
 
 type PaymentMethod = 'stripe' | 'przelewy24' | 'blik' | 'bank_transfer';
 type DeliveryMethod = 'inpost' | 'novaposhta' | 'poczta' | 'courier';
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clearCart } = useCart();
+  const { items, subtotal, clearCart, total } = useCart();
   const { t } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -27,6 +28,42 @@ export default function CheckoutPage() {
   // Get InPost token from environment (available at build time)
   const inpostToken = process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN || '';
   const hasInPostToken = !!inpostToken;
+
+  // Meta Pixel: Track InitiateCheckout when page loads
+  useEffect(() => {
+    if (items.length > 0) {
+      const contentIds = items.map(item => item.id);
+      const contents = items.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+        item_price: item.price,
+      }));
+      const numItems = items.reduce((sum, item) => sum + item.quantity, 0);
+      const currency = items[0]?.currency || 'PLN';
+      
+      // Client-side tracking (Meta Pixel)
+      if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
+        (window as any).fbq('track', 'InitiateCheckout', {
+          content_ids: contentIds,
+          contents: contents,
+          value: total,
+          currency: currency,
+          num_items: numItems,
+        });
+      }
+      
+      // Server-side tracking (Conversions API)
+      trackInitiateCheckout({
+        content_ids: contentIds,
+        contents: contents,
+        value: total,
+        currency: currency,
+        num_items: numItems,
+      }).catch(() => {
+        // Fail silently
+      });
+    }
+  }, []); // Only run once on mount
 
   // Form state - moved before functions that use it
   const [formData, setFormData] = useState({

@@ -152,3 +152,4 @@ docker exec skrynia_db_prod psql -U postgres -d skrynia -c "SELECT id, title, ti
 
 
 
+

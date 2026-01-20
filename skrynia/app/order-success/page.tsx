@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint } from '@/lib/api';
+import { trackPurchase } from '@/lib/facebook-conversions';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -23,6 +24,49 @@ function OrderSuccessContent() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderNumber]);
+
+  // Meta Pixel: Track Purchase when order is loaded
+  useEffect(() => {
+    if (order) {
+      const contentIds = order.items?.map((item: any) => item.product_id?.toString() || item.product_sku) || [];
+      const contents = order.items?.map((item: any) => ({
+        id: item.product_id?.toString() || item.product_sku,
+        quantity: item.quantity,
+        item_price: item.price,
+      })) || [];
+      const numItems = order.items?.reduce((sum: number, item: any) => sum + item.quantity, 0) || 0;
+      const currency = order.currency || 'PLN';
+      
+      // Client-side tracking (Meta Pixel)
+      if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
+        (window as any).fbq('track', 'Purchase', {
+          content_ids: contentIds,
+          contents: contents,
+          value: order.total,
+          currency: currency,
+          num_items: numItems,
+        });
+      }
+      
+      // Server-side tracking (Conversions API)
+      // Include user email if available for better matching
+      const userData = order.customer_email ? {
+        email: order.customer_email,
+        external_id: order.customer_email, // Use email as external_id
+      } : undefined;
+      
+      trackPurchase({
+        content_ids: contentIds,
+        contents: contents,
+        value: order.total,
+        currency: currency,
+        num_items: numItems,
+        user_data: userData,
+      }).catch(() => {
+        // Fail silently
+      });
+    }
+  }, [order]);
 
   const fetchOrderDetails = async () => {
     try {

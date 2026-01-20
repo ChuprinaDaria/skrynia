@@ -69,6 +69,12 @@ class Settings(BaseSettings):
     MAX_FILE_SIZE: int = 10485760  # 10MB (increased from 5MB)
     ALLOWED_EXTENSIONS: List[str] = ["jpg", "jpeg", "png", "webp", "avif"]
 
+    # Facebook Conversions API
+    FACEBOOK_PIXEL_ID: Optional[str] = None  # Pixel ID (e.g., "1552229889398632")
+    FACEBOOK_ACCESS_TOKEN: Optional[str] = None  # Access token for Conversions API
+    FACEBOOK_API_VERSION: str = "v18.0"  # Facebook Graph API version
+    FACEBOOK_DATASET_QUALITY_TOKEN: Optional[str] = None  # Dataset Quality API token (for metrics)
+
     class Config:
         env_file = ".env"
         case_sensitive = True

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { CartManager, CartItem } from '@/lib/cart';
+import { trackAddToCart } from '@/lib/facebook-conversions';
 
 interface CartContextType {
   items: CartItem[];
@@ -48,6 +49,27 @@ export function CartProvider({ children }: { children: ReactNode }) {
     CartManager.addItem(item);
     setItems(CartManager.getItems()); // Update state
     setIsCartOpen(true); // Auto-open cart when item added
+    
+    // Meta Pixel: Track AddToCart event (client-side)
+    if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
+      (window as any).fbq('track', 'AddToCart', {
+        content_name: item.title,
+        content_ids: [item.id],
+        content_type: 'product',
+        value: item.price * item.quantity,
+        currency: item.currency || 'PLN',
+      });
+    }
+    
+    // Facebook Conversions API: Track AddToCart event (server-side)
+    trackAddToCart({
+      content_name: item.title,
+      content_ids: [item.id],
+      value: item.price * item.quantity,
+      currency: item.currency || 'PLN',
+    }).catch(() => {
+      // Fail silently
+    });
   };
 
   const removeItem = (itemId: string) => {

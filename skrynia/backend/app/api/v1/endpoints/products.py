@@ -117,16 +117,27 @@ def get_products_catalog_csv(
             }
         )
     
-    # Get all active products
-    products = db.query(Product).filter(Product.is_active == True).all()
-    
-    # Get URLs for product links and images
-    frontend_url = settings.FRONTEND_URL or "https://runebox.eu"
-    backend_url = settings.BACKEND_URL or frontend_url
-    
-    # Ensure URLs don't end with /
-    frontend_url = frontend_url.rstrip('/')
-    backend_url = backend_url.rstrip('/')
+    try:
+        # Get all active products
+        products = db.query(Product).filter(Product.is_active == True).all()
+        
+        # Get URLs for product links and images
+        frontend_url = settings.FRONTEND_URL or "https://runebox.eu"
+        backend_url = settings.BACKEND_URL or frontend_url
+        
+        # Ensure URLs don't end with /
+        frontend_url = frontend_url.rstrip('/')
+        backend_url = backend_url.rstrip('/')
+    except Exception as e:
+        # Log error and return 500
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error fetching products for CSV catalog: {str(e)}")
+        return Response(
+            status_code=500,
+            content=f"Error generating catalog: {str(e)}",
+            media_type="text/plain"
+        )
     
     # Currency mapping
     currency_map = {
@@ -137,29 +148,30 @@ def get_products_catalog_csv(
         "UAH": "UAH"
     }
     
-    # Create CSV in memory with UTF-8 encoding
-    output = io.StringIO()
-    
-    # Meta CSV headers (based on the example file)
-    fieldnames = [
-        'id', 'title', 'description', 'availability', 'condition', 'price',
-        'link', 'image_link', 'brand', 'google_product_category',
-        'fb_product_category', 'quantity_to_sell_on_facebook', 'sale_price',
-        'sale_price_effective_date', 'item_group_id', 'gender', 'color',
-        'size', 'age_group', 'material', 'pattern', 'shipping',
-        'shipping_weight', 'video[0].url', 'video[0].tag[0]', 'gtin',
-        'product_tags[0]', 'product_tags[1]', 'style[0]'
-    ]
-    
-    writer = csv.DictWriter(
-        output, 
-        fieldnames=fieldnames, 
-        quoting=csv.QUOTE_ALL,
-        lineterminator='\n'
-    )
-    writer.writeheader()
-    
-    for product in products:
+    try:
+        # Create CSV in memory with UTF-8 encoding
+        output = io.StringIO()
+        
+        # Meta CSV headers (based on the example file)
+        fieldnames = [
+            'id', 'title', 'description', 'availability', 'condition', 'price',
+            'link', 'image_link', 'brand', 'google_product_category',
+            'fb_product_category', 'quantity_to_sell_on_facebook', 'sale_price',
+            'sale_price_effective_date', 'item_group_id', 'gender', 'color',
+            'size', 'age_group', 'material', 'pattern', 'shipping',
+            'shipping_weight', 'video[0].url', 'video[0].tag[0]', 'gtin',
+            'product_tags[0]', 'product_tags[1]', 'style[0]'
+        ]
+        
+        writer = csv.DictWriter(
+            output, 
+            fieldnames=fieldnames, 
+            quoting=csv.QUOTE_ALL,
+            lineterminator='\n'
+        )
+        writer.writeheader()
+        
+        for product in products:
         # Get primary image or first image
         primary_image = next(
             (img for img in product.images if img.is_primary),
@@ -244,7 +256,7 @@ def get_products_catalog_csv(
             'google_product_category': 'Apparel & Accessories > Jewelry',
             'fb_product_category': 'Clothing & Accessories > Jewelry',
             'quantity_to_sell_on_facebook': str(product.stock_quantity) if not product.is_made_to_order and product.stock_quantity and product.stock_quantity >= 1 else '',
-            'sale_price': f"{product.compare_at_price:.2f} {currency_code}" if product.compare_at_price and product.compare_at_price > product.price else '',
+            'sale_price': f"{product.compare_at_price:.2f} {currency_code}" if product.compare_at_price is not None and product.compare_at_price > product.price else '',
             'sale_price_effective_date': '',
             'item_group_id': '',
             'gender': 'unisex',
@@ -263,36 +275,50 @@ def get_products_catalog_csv(
             'style[0]': ''
         }
         
-        writer.writerow(row)
-    
-    # Get CSV content
-    csv_content = output.getvalue()
-    output.close()
-    
-    # Prepare headers
-    headers = {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": "inline; filename=catalog_products.csv",
-        "Cache-Control": "public, max-age=3600",
-        # CORS headers for Facebook/Meta crawler
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
-        "Access-Control-Allow-Headers": "*",
-    }
-    
-    # For HEAD request, return only headers without body
-    if request.method == "HEAD":
+            writer.writerow(row)
+        
+        # Get CSV content
+        csv_content = output.getvalue()
+        output.close()
+        
+        # Prepare headers
+        headers = {
+            "Content-Type": "text/csv; charset=utf-8",
+            "Content-Disposition": "inline; filename=catalog_products.csv",
+            "Cache-Control": "public, max-age=3600",
+            # CORS headers for Facebook/Meta crawler
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+            "Access-Control-Allow-Headers": "*",
+        }
+        
+        # For HEAD request, return only headers without body
+        if request.method == "HEAD":
+            return Response(
+                status_code=200,
+                headers=headers
+            )
+        
+        # Return CSV as response with UTF-8 encoding
         return Response(
-            status_code=200,
+            content=csv_content.encode('utf-8-sig'),  # UTF-8 with BOM for Excel compatibility
+            media_type="text/csv",
             headers=headers
         )
-    
-    # Return CSV as response with UTF-8 encoding
-    return Response(
-        content=csv_content.encode('utf-8-sig'),  # UTF-8 with BOM for Excel compatibility
-        media_type="text/csv",
-        headers=headers
-    )
+    except Exception as e:
+        # Log error and return 500
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error generating CSV catalog: {str(e)}", exc_info=True)
+        return Response(
+            status_code=500,
+            content=f"Error generating catalog: {str(e)}",
+            media_type="text/plain",
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+            }
+        )
 
 
 @router.get("/by-id/{product_id}", response_model=ProductSchema)

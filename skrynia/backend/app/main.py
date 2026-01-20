@@ -5,7 +5,7 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.core.middleware import SecurityHeadersMiddleware, RateLimitMiddleware
-from app.api.v1.endpoints import auth, products, orders, payments, upload, admin, shipping, made_to_order, categories, social_links, contact_info, users, user_addresses, beads, necklaces, quote_requests, blog, about_page
+from app.api.v1.endpoints import auth, products, orders, payments, upload, admin, shipping, made_to_order, categories, social_links, contact_info, users, user_addresses, beads, necklaces, quote_requests, blog, about_page, facebook_events
 
 # Create FastAPI app
 app = FastAPI(
@@ -55,6 +55,7 @@ app.include_router(beads.router, prefix="/api/v1/beads", tags=["Beads Constructo
 app.include_router(necklaces.router, prefix="/api/v1/necklaces", tags=["Necklace Configurations"])
 app.include_router(quote_requests.router, prefix="/api/v1/quotes", tags=["Quote Requests"])
 app.include_router(blog.router, prefix="/api/v1/blog", tags=["Blog"])
+app.include_router(facebook_events.router, prefix="/api/v1/facebook", tags=["Facebook Conversions API"])
 
 
 @app.get("/")

@@ -1,35 +1,27 @@
 import type { Metadata } from 'next';
-import { getApiEndpoint, getApiUrl } from '@/lib/api';
+import { getApiEndpoint } from '@/lib/api';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
+
+export const runtime = 'nodejs';
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   try {
-    // Fetch product data from API
-    // IMPORTANT: In production Docker container, we need to use internal Docker network.
+    // Fetch product data from API.
+    // IMPORTANT: crawlers hit the public site; they cannot resolve Docker-internal names.
     // Priority order:
-    // 1. http://backend:8000 (Docker service name - works inside Docker network)
-    // 2. siteUrl/api/v1 (nginx proxy - works if accessible from container)
-    // 3. NEXT_PUBLIC_API_URL (if set at runtime)
-    let apiEndpoint: string;
-    
-    // In Docker, prefer internal service name (faster, no SSL needed)
+    // 1) BACKEND_URL (explicit; can be Docker internal like http://backend:8000)
+    // 2) NEXT_PUBLIC_API_URL (normalized via getApiEndpoint)
+    // 3) siteUrl (nginx proxy on the public domain)
+    const candidateEndpoints: string[] = [];
     if (process.env.BACKEND_URL) {
-      apiEndpoint = `${process.env.BACKEND_URL}/api/v1/products/${slug}`;
-    } else if (process.env.NODE_ENV === 'production') {
-      // Try Docker service name (internal network)
-      apiEndpoint = `http://backend:8000/api/v1/products/${slug}`;
-    } else {
-      // Development: use siteUrl (nginx proxy) or localhost
-      apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
+      candidateEndpoints.push(`${process.env.BACKEND_URL.replace(/\/+$/, '')}/api/v1/products/${slug}`);
     }
-    
-    // Log for debugging
-    console.log(`[Metadata] Fetching product ${slug} from: ${apiEndpoint}`);
-    console.log(`[Metadata] BACKEND_URL: ${process.env.BACKEND_URL || 'NOT SET'}`);
-    console.log(`[Metadata] NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'NOT SET'}`);
-    console.log(`[Metadata] NODE_ENV: ${process.env.NODE_ENV}`);
+    // Use normalized API base if configured (works for SSR and local)
+    candidateEndpoints.push(getApiEndpoint(`/api/v1/products/${slug}`));
+    // Always include public-domain fallback (works for bots even if internal networking doesn't)
+    candidateEndpoints.push(`${siteUrl}/api/v1/products/${slug}`);
     
     // Create abort controller for timeout
     const controller = new AbortController();
@@ -37,22 +29,36 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     
     let res;
     try {
-      res = await fetch(apiEndpoint, {
-        next: { revalidate: 3600 }, // Revalidate every hour
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; FacebookBot/1.0; +https://www.facebook.com/help/crawler)',
-          'Accept': 'application/json',
-        },
-        signal: controller.signal,
-      });
+      // Try endpoints sequentially until one succeeds.
+      res = null as any;
+      let lastError: any = null;
+      for (const apiEndpoint of candidateEndpoints) {
+        try {
+          const attempt = await fetch(apiEndpoint, {
+            next: { revalidate: 3600 }, // Revalidate every hour
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (compatible; FacebookBot/1.0; +https://www.facebook.com/help/crawler)',
+              'Accept': 'application/json',
+            },
+            signal: controller.signal,
+          });
+          if (attempt.ok) {
+            res = attempt;
+            break;
+          }
+          // Keep last non-OK attempt to log status if all fail
+          res = attempt;
+        } catch (e: any) {
+          lastError = e;
+        }
+      }
       clearTimeout(timeoutId);
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
       if (fetchError.name === 'AbortError') {
-        console.error(`[Metadata] Product ${slug} fetch timeout from ${apiEndpoint}`);
+        console.error(`[Metadata] Product ${slug} fetch timeout`);
       } else {
-        console.error(`[Metadata] Product ${slug} fetch error from ${apiEndpoint}:`, fetchError.message);
-        console.error(`[Metadata] Error details:`, fetchError);
+        console.error(`[Metadata] Product ${slug} fetch error:`, fetchError.message);
       }
       // Continue to fallback metadata below
       res = null;
@@ -60,7 +66,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     // Log response status
     if (res) {
-      console.log(`[Metadata] API response status for ${slug}: ${res.status} ${res.statusText}`);
       if (!res.ok) {
         console.error(`[Metadata] ❌ API returned error ${res.status} for ${slug}`);
         const errorText = await res.text().catch(() => 'Could not read error body');
@@ -74,12 +79,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const product = await res.json();
       
       // Log success
-      console.log(`[Metadata] ✅ Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
-      console.log(`[Metadata] Product has ${product.images?.length || 0} images`);
-      
-      // Log success (only in development)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[Metadata] Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
+        console.log(`[Metadata] ✅ Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
+        console.log(`[Metadata] Product has ${product.images?.length || 0} images`);
       }
       
       // Get first image (primary or first in array)
@@ -91,13 +93,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         // Handle both absolute URLs and relative paths
         if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
           ogImage = imageUrl;
-        } else if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
-          // Backend static files
-          const backendBase = getApiUrl().replace(/\/api$/, '').replace(/\/$/, '');
-          ogImage = `${backendBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         } else {
-          // Frontend public images
-          ogImage = `${siteUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+          // Backend static files OR frontend public images.
+          // Prefer normalized API base to ensure absolute URL for crawlers.
+          const apiBase = getApiEndpoint('/api/v1/health').replace(/\/api\/v1\/health$/, '');
+          ogImage = `${apiBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
         }
       }
 
@@ -157,7 +157,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
           url: `${siteUrl}/products/${slug}`,
-          type: 'website', // Next.js doesn't support 'product' type, using 'website' with product tags in 'other'
+          type: 'product',
           siteName: 'Rune Box',
           locale: 'en_US',
           images: [
@@ -205,8 +205,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         },
         // Additional meta tags for product-specific OG properties
         other: {
-          // Override og:type to product (Next.js doesn't support it directly)
-          'og:type': 'product',
           // Prefer a large OG image for Meta/Threads
           'og:image': ogImageUrl,
           'og:image:width': '1600',
@@ -241,7 +239,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: 'Product | Rune Box',
       description: fallbackDescription,
       url: `${siteUrl}/products/${slug}`,
-      type: 'website',
+      type: 'product',
       siteName: 'Rune Box',
       locale: 'en_US',
       images: [
@@ -275,7 +273,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       },
     },
     other: {
-      'og:type': 'product',
       'og:see_also': siteUrl,
     },
   };

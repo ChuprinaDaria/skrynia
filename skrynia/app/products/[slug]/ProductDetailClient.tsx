@@ -13,6 +13,7 @@ import ProductValueProps from '@/components/product/ProductValueProps';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { getApiEndpoint, normalizeImageUrl } from '@/lib/api';
 import { useCart } from '@/contexts/CartContext';
+import { trackViewContent } from '@/lib/facebook-conversions';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
@@ -80,6 +81,35 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     setIsClient(true);
     fetchProduct();
   }, [slug, language]);
+
+  // Track ViewContent event when product is loaded
+  useEffect(() => {
+    if (product && isClient) {
+      const displayTitle = getProductTitle(product);
+      
+      // Client-side tracking (Meta Pixel)
+      if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
+        (window as any).fbq('track', 'ViewContent', {
+          content_name: displayTitle,
+          content_ids: [product.id.toString()],
+          content_type: 'product',
+          value: product.price,
+          currency: product.currency || 'PLN',
+        });
+      }
+      
+      // Server-side tracking (Conversions API)
+      trackViewContent({
+        content_ids: [product.id.toString()],
+        content_name: displayTitle,
+        content_type: 'product',
+        value: product.price,
+        currency: product.currency || 'PLN',
+      }).catch(() => {
+        // Fail silently
+      });
+    }
+  }, [product, isClient, language]);
 
   const getProductTitle = (product: ApiProduct): string => {
     switch (language) {
