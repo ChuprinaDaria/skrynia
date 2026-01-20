@@ -55,10 +55,11 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const itemValue = item.price * item.quantity;
     
     // Facebook Pixel: Track AddToCart event (client-side)
+    // Використовуємо productId, оскільки item має тип Omit<CartItem, 'id'>
     if (typeof window !== 'undefined' && typeof (window as any).fbq === 'function') {
       (window as any).fbq('track', 'AddToCart', {
         content_name: item.title,
-        content_ids: [item.id],
+        content_ids: [item.productId.toString()],
         content_type: 'product',
         value: itemValue,
         currency: priceCurrency,
@@ -71,7 +72,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         currency: priceCurrency,
         value: itemValue,
         items: [{
-          item_id: item.id,
+          item_id: item.productId.toString(),
           item_name: item.title,
           item_category: item.category || 'jewelry',
           price: item.price,
@@ -83,7 +84,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     // Facebook Conversions API: Track AddToCart event (server-side)
     trackAddToCart({
       content_name: item.title,
-      content_ids: [item.id],
+      content_ids: [item.productId.toString()],
       value: itemValue,
       currency: priceCurrency,
     }).catch(() => {
