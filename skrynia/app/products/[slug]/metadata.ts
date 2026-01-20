@@ -7,23 +7,29 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   try {
     // Fetch product data from API
-    // IMPORTANT: In production Docker container, NEXT_PUBLIC_API_URL might not be available at runtime.
+    // IMPORTANT: In production Docker container, we need to use internal Docker network.
     // Priority order:
-    // 1. siteUrl/api/v1 (nginx proxies /api/* to backend) - ALWAYS WORKS
-    // 2. NEXT_PUBLIC_API_URL (if set at runtime)
-    // 3. http://backend:8000 (Docker service name - internal network)
+    // 1. http://backend:8000 (Docker service name - works inside Docker network)
+    // 2. siteUrl/api/v1 (nginx proxy - works if accessible from container)
+    // 3. NEXT_PUBLIC_API_URL (if set at runtime)
     let apiEndpoint: string;
     
-    // ALWAYS prefer siteUrl/api/v1 first - nginx proxies it to backend
-    // This works in all environments (dev, prod, Docker)
-    apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
-    
-    // Log for debugging (only in development)
-    if (process.env.NODE_ENV === 'development') {
-      console.log(`[Metadata] Fetching product ${slug} from: ${apiEndpoint}`);
-      console.log(`[Metadata] NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'NOT SET'}`);
-      console.log(`[Metadata] NODE_ENV: ${process.env.NODE_ENV}`);
+    // In Docker, prefer internal service name (faster, no SSL needed)
+    if (process.env.BACKEND_URL) {
+      apiEndpoint = `${process.env.BACKEND_URL}/api/v1/products/${slug}`;
+    } else if (process.env.NODE_ENV === 'production') {
+      // Try Docker service name (internal network)
+      apiEndpoint = `http://backend:8000/api/v1/products/${slug}`;
+    } else {
+      // Development: use siteUrl (nginx proxy) or localhost
+      apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
     }
+    
+    // Log for debugging
+    console.log(`[Metadata] Fetching product ${slug} from: ${apiEndpoint}`);
+    console.log(`[Metadata] BACKEND_URL: ${process.env.BACKEND_URL || 'NOT SET'}`);
+    console.log(`[Metadata] NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'NOT SET'}`);
+    console.log(`[Metadata] NODE_ENV: ${process.env.NODE_ENV}`);
     
     // Create abort controller for timeout
     const controller = new AbortController();
