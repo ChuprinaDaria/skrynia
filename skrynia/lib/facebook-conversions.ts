@@ -36,6 +36,7 @@ interface CustomData {
   contents?: ContentItem[];
   content_name?: string;
   content_category?: string;
+  content_type?: string; // e.g., "product" (required for AddToCart, ViewContent)
   num_items?: number;
 }
 
