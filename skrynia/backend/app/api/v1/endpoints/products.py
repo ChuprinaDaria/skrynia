@@ -163,6 +163,8 @@ def get_products_catalog_csv(
             'product_tags[0]', 'product_tags[1]', 'style[0]'
         ]
         
+        # Write CSV header row (column names only, no comments)
+        # Meta accepts CSV with or without comment lines
         writer = csv.DictWriter(
             output, 
             fieldnames=fieldnames, 
@@ -227,10 +229,12 @@ def get_products_catalog_csv(
             if len(description) > 9999:
                 description = description[:9996] + "..."
             
-            # Get tags
+            # Get tags (use tags_uk or tags_en, fallback to empty list)
             tags = []
-            if product.tags and isinstance(product.tags, list):
-                tags = product.tags[:2]  # Meta allows up to 2 product_tags
+            if product.tags_uk and isinstance(product.tags_uk, list):
+                tags = product.tags_uk[:2]  # Meta allows up to 2 product_tags
+            elif product.tags_en and isinstance(product.tags_en, list):
+                tags = product.tags_en[:2]  # Fallback to English tags
             
             # Format title (max 200 chars per Meta requirements)
             title = product.title_uk or product.title_en or "Product"
