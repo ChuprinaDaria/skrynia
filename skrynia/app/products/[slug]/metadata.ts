@@ -8,11 +8,34 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     // Fetch product data from API
     const apiEndpoint = getApiEndpoint(`/api/v1/products/${slug}`);
-    const res = await fetch(apiEndpoint, {
-      next: { revalidate: 3600 }, // Revalidate every hour
-    });
+    
+    // Create abort controller for timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+    
+    let res;
+    try {
+      res = await fetch(apiEndpoint, {
+        next: { revalidate: 3600 }, // Revalidate every hour
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; FacebookBot/1.0; +https://www.facebook.com/help/crawler)',
+          'Accept': 'application/json',
+        },
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+    } catch (fetchError: any) {
+      clearTimeout(timeoutId);
+      if (fetchError.name === 'AbortError') {
+        console.warn(`Product metadata fetch timeout for ${slug}`);
+      } else {
+        console.warn(`Product metadata fetch error for ${slug}:`, fetchError.message);
+      }
+      // Continue to fallback metadata below
+      res = null;
+    }
 
-    if (res.ok) {
+    if (res && res.ok) {
       const product = await res.json();
       
       // Get first image (primary or first in array)
@@ -144,9 +167,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           'og:see_also': siteUrl,
         },
       };
+      // Return early if we have product data
+      return metadata;
     }
   } catch (error) {
+    // Log error but don't throw - always return fallback metadata
     console.error('Failed to fetch product metadata:', error);
+    // Continue to fallback metadata below
   }
 
   // Fallback metadata if product not found

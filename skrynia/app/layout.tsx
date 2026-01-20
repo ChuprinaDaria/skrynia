@@ -231,12 +231,24 @@ const jsonLd = {
       "priceRange": "$$",
       "currenciesAccepted": "PLN, EUR, UAH",
       "paymentAccepted": "Credit Card, PayPal, Bank Transfer",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "ul. Wojciecha Gersona 9/7",
+        "addressLocality": "Wrocław",
+        "postalCode": "51-664",
+        "addressCountry": "PL"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "51.1079",
+        "longitude": "17.0385"
+      },
       "areaServed": {
         "@type": "GeoCircle",
         "geoMidpoint": {
           "@type": "GeoCoordinates",
-          "latitude": "52.2297",
-          "longitude": "21.0122"
+          "latitude": "51.1079",
+          "longitude": "17.0385"
         },
         "geoRadius": "5000"
       },
