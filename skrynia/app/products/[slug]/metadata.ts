@@ -84,7 +84,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
           url: `${siteUrl}/products/${slug}`,
-          type: 'product', // Changed from 'website' to 'product'
+          type: 'website', // Next.js doesn't support 'product' type, using 'website' with product tags in 'other'
           siteName: 'Rune Box',
           locale: 'en_US',
           images: [
@@ -95,11 +95,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
               alt: title,
             },
           ],
-          // Product-specific OG tags
-          ...(price > 0 && {
-            // Note: Next.js Metadata API doesn't directly support og:price
-            // We'll add it via 'other' field
-          }),
         },
         twitter: {
           card: 'summary_large_image',
@@ -136,6 +131,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         },
         // Additional meta tags for product-specific OG properties
         other: {
+          // Override og:type to product (Next.js doesn't support it directly)
+          'og:type': 'product',
           // Product price and currency for OG
           ...(price > 0 && {
             'product:price:amount': price.toFixed(2),
@@ -160,7 +157,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: 'Product | Rune Box',
       description: 'Unique handmade jewelry from Rune Box',
       url: `${siteUrl}/products/${slug}`,
-      type: 'product',
+      type: 'website',
       siteName: 'Rune Box',
       locale: 'en_US',
       images: [
@@ -192,6 +189,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         'max-image-preview': 'large',
         'max-snippet': -1,
       },
+    },
+    other: {
+      'og:type': 'product',
+      'og:see_also': siteUrl,
     },
   };
 }
