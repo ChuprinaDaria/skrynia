@@ -198,7 +198,7 @@ jobs:
             echo "✅ .env file updated with latest secrets"
             
             echo "🔐 Logging in to GHCR..."
-            echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u chuprinadaria --password-stdin
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u chuprinadaria --password-stdin
             
             echo "🐳 Pulling latest Docker images..."
             docker compose -f docker-compose.prod.yml pull || {

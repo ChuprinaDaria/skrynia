@@ -163,7 +163,7 @@ export default function CheckoutPage() {
         if (response.ok) {
           const userData = await response.json();
           
-          // Load default address
+          // Load default address (if exists)
           try {
             const addressResponse = await fetch(getApiEndpoint('/api/v1/users/addresses/default'), {
               headers: {
@@ -196,9 +196,11 @@ export default function CheckoutPage() {
               if (addressData.inpost_locker_id) {
                 setSelectedPickupPoint(addressData.inpost_locker_id);
               }
+            } else if (addressResponse.status === 404) {
+              // No default address - this is expected, silently continue
             }
           } catch (err) {
-            // No default address, use user data only
+            // No default address or network error, use user data only
             setFormData(prev => ({
               ...prev,
               customer_email: userData.email || prev.customer_email,

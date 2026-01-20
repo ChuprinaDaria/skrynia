@@ -167,25 +167,32 @@ export function InPostGeowidget({
     };
   }, [onPointSelect]);
 
-  // Build widget props
-  const widgetProps: any = {
-    ref: widgetRef,
-    id: widgetId,
-    token,
-    language,
-    config,
-    onpoint: 'onpointselect'
-  };
-
-  // Country prop only for International version (v5 does NOT use country parameter)
-  if (version === 'international' && country) {
-    widgetProps.country = country;
-  }
+  // Build widget props - use setAttribute approach for custom elements
+  // Custom elements may have read-only properties, so we use ref to set attributes
+  useEffect(() => {
+    if (widgetRef.current) {
+      const element = widgetRef.current as any;
+      // Set attributes instead of properties for custom elements
+      element.setAttribute('token', token);
+      element.setAttribute('language', language);
+      element.setAttribute('config', config);
+      element.setAttribute('onpoint', 'onpointselect');
+      
+      // Country prop only for International version (v5 does NOT use country parameter)
+      if (version === 'international' && country) {
+        element.setAttribute('country', country);
+      } else if (version === 'v5') {
+        // Remove country attribute for v5
+        element.removeAttribute('country');
+      }
+    }
+  }, [token, language, config, country, version, widgetId]);
 
   // Use React.createElement to avoid TypeScript JSX type checking issues
   // @ts-ignore - Custom HTML element not in JSX.IntrinsicElements
   return React.createElement('inpost-geowidget', {
-    ...widgetProps,
+    ref: widgetRef,
+    id: widgetId,
     style: { width: '100%', height: '100%', display: 'block' }
   });
 }
