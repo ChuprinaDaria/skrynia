@@ -58,13 +58,24 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       res = null;
     }
 
+    // Log response status
+    if (res) {
+      console.log(`[Metadata] API response status for ${slug}: ${res.status} ${res.statusText}`);
+      if (!res.ok) {
+        console.error(`[Metadata] ❌ API returned error ${res.status} for ${slug}`);
+        const errorText = await res.text().catch(() => 'Could not read error body');
+        console.error(`[Metadata] Error body:`, errorText.substring(0, 200));
+      }
+    } else {
+      console.error(`[Metadata] ❌ No response from API for ${slug}`);
+    }
+    
     if (res && res.ok) {
       const product = await res.json();
       
-      // Log success (only in development)
-      if (process.env.NODE_ENV === 'development') {
-        console.log(`[Metadata] Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
-      }
+      // Log success
+      console.log(`[Metadata] ✅ Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
+      console.log(`[Metadata] Product has ${product.images?.length || 0} images`);
       
       // Log success (only in development)
       if (process.env.NODE_ENV === 'development') {
@@ -220,6 +231,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   // Fallback metadata if product not found
+  console.error(`[Metadata] ⚠️ Using FALLBACK metadata for ${slug} - API request failed or product not found`);
   const fallbackDescription =
     'Unique handmade jewelry from Rune Box. Explore authentic designs inspired by Slavic, Viking and Celtic cultures with premium natural materials.';
   return {
