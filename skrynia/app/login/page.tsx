@@ -97,16 +97,37 @@ export default function LoginPage() {
       // Store user token
       localStorage.setItem('user_token', data.access_token);
       
+      // Dispatch custom event to notify other components about login
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('userLoggedIn'));
+      }
+      
       // Show success message briefly
       setSuccess(true);
       setError('');
       
-      // Redirect to account page after successful login
-      console.log('[Login] Redirecting to account page');
+      // Check if user came from cart
+      const returnToCart = typeof window !== 'undefined' && sessionStorage.getItem('returnToCart') === 'true';
       
       // Wait a moment to show success message, then redirect
       setTimeout(() => {
-        router.push('/account');
+        if (returnToCart) {
+          // Remove the flag
+          sessionStorage.removeItem('returnToCart');
+          // Set flag to open cart after navigation
+          sessionStorage.setItem('openCartAfterLogin', 'true');
+          // Go back to previous page or home
+          const previousPage = sessionStorage.getItem('previousPage');
+          if (previousPage && previousPage !== '/login' && previousPage !== '/register') {
+            router.push(previousPage);
+          } else {
+            router.push('/');
+          }
+        } else {
+          // Redirect to account page after successful login
+          console.log('[Login] Redirecting to account page');
+          router.push('/account');
+        }
         router.refresh(); // Refresh to update UI with user data
       }, 1000);
     } catch (err) {

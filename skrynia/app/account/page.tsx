@@ -18,6 +18,7 @@ interface UserProfile {
   loyalty_status: string | null;
   bonus_points: number;
   total_spent: number;
+  phone: string | null;
   created_at: string;
   total_orders: number;
   pending_orders: number;

@@ -37,6 +37,43 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
   } = useCart();
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [agreedToPrivacy, setAgreedToPrivacy] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check if user is authenticated
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const checkAuth = () => {
+        const token = localStorage.getItem('user_token');
+        setIsAuthenticated(!!token);
+      };
+      
+      // Check initially
+      checkAuth();
+      
+      // Listen for custom login event
+      const handleLogin = () => {
+        checkAuth();
+      };
+      
+      // Listen for storage changes (when user logs in/out in another tab)
+      const handleStorageChange = () => {
+        checkAuth();
+      };
+      
+      window.addEventListener('userLoggedIn', handleLogin);
+      window.addEventListener('storage', handleStorageChange);
+      
+      // Also check on cart open
+      if (isOpen) {
+        checkAuth();
+      }
+      
+      return () => {
+        window.removeEventListener('userLoggedIn', handleLogin);
+        window.removeEventListener('storage', handleStorageChange);
+      };
+    }
+  }, [isOpen]);
   
   // Lock body scroll when drawer is open
   useEffect(() => {
@@ -305,7 +342,8 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
               </div>
             )}
 
-            {/* Auth Reminder */}
+            {/* Auth Reminder - Only show if user is not authenticated */}
+            {!isAuthenticated && (
             <div className="mb-4 p-4 bg-gradient-to-r from-oxblood/20 to-oxblood/10 border border-oxblood/30 rounded-sm">
               <h3 className="font-rutenia text-ivory text-base mb-2">
                 {t.cart.authReminder.title}
@@ -339,6 +377,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                   href="/login"
                   onClick={(e) => {
                     e.stopPropagation();
+                    // Save flag that user came from cart
+                    if (typeof window !== 'undefined') {
+                      sessionStorage.setItem('returnToCart', 'true');
+                    }
                     onClose();
                   }}
                   className="flex-1 px-4 py-2 bg-oxblood/20 hover:bg-oxblood/30 border border-oxblood/50 text-ivory text-sm font-inter text-center rounded-sm transition-colors pointer-events-auto relative z-[70]"
@@ -349,6 +391,10 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                   href="/register"
                   onClick={(e) => {
                     e.stopPropagation();
+                    // Save flag that user came from cart
+                    if (typeof window !== 'undefined') {
+                      sessionStorage.setItem('returnToCart', 'true');
+                    }
                     onClose();
                   }}
                   className="flex-1 px-4 py-2 bg-oxblood hover:bg-oxblood/90 text-ivory text-sm font-inter text-center rounded-sm transition-colors font-semibold pointer-events-auto relative z-[70]"
@@ -357,6 +403,7 @@ const CartDrawer: React.FC<CartDrawerProps> = ({
                 </Link>
               </div>
             </div>
+            )}
 
             {/* Legal Checkboxes */}
             <div className="mb-4 space-y-3">

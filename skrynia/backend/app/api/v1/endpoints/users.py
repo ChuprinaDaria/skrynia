@@ -76,6 +76,7 @@ def get_current_user_profile(
         loyalty_status=current_user.loyalty_status.value if current_user.loyalty_status else None,
         bonus_points=current_user.bonus_points,
         total_spent=current_user.total_spent,
+        phone=current_user.phone,
         created_at=current_user.created_at,
         total_orders=total_orders,
         pending_orders=pending_orders,

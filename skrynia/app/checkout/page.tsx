@@ -104,13 +104,12 @@ export default function CheckoutPage() {
 
     switch (deliveryMethod) {
       case 'inpost':
-        // InPost Paczkomat prices (Poland)
+        // InPost Paczkomat prices (Poland) - only Size A available
         if (country === 'PL') {
-          if (packageSize === 'small') return 13.99;
-          if (packageSize === 'medium') return 15.99;
-          return 18.99;
+          return 16.99; // Size A only for Poland
         }
-        return 25; // InPost international
+        // InPost international prices (EU countries) - only Size B available in PLN
+        return 49.99; // Size B only for international
 
       case 'novaposhta':
         // Nova Poshta (Ukraine)
@@ -131,7 +130,7 @@ export default function CheckoutPage() {
         // Courier delivery
         if (country === 'PL') return 20;
         if (country === 'UA') return 50;
-        return 35; // EU countries
+        return 80; // International courier delivery (all other countries)
 
       default:
         return 50;
@@ -449,8 +448,8 @@ export default function CheckoutPage() {
                               <p className="text-ivory font-semibold mb-1">InPost Paczkomat</p>
                               <p className="text-sage text-xs">
                                 {formData.shipping_country === 'PL' 
-                                  ? `Odbiór z paczkomatu • ${calculatePackageSize() === 'small' ? '13.99' : calculatePackageSize() === 'medium' ? '15.99' : '18.99'} zł`
-                                  : `InPost pickup point • ${calculateShippingCost()} ${formData.shipping_country === 'GB' ? 'GBP' : 'EUR'}`
+                                  ? `Odbiór z paczkomatu • ${calculateShippingCost()} zł`
+                                  : `InPost pickup point • ${calculateShippingCost()} PLN`
                                 }
                               </p>
                             </div>
