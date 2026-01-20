@@ -27,17 +27,9 @@ function resolveImageUrl(imageUrl: string | undefined | null): string | null {
 export default async function OpenGraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
-  // Safe fallback if NEXT_PUBLIC_API_URL isn't set in prod container
-  // Priority order: NEXT_PUBLIC_API_URL -> Docker service name -> siteUrl
-  let apiEndpoint: string;
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    apiEndpoint = getApiEndpoint(`/api/v1/products/${slug}`);
-  } else if (process.env.NODE_ENV === 'production') {
-    const dockerBackendUrl = process.env.BACKEND_URL || 'http://backend:8000';
-    apiEndpoint = `${dockerBackendUrl}/api/v1/products/${slug}`;
-  } else {
-    apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
-  }
+  // ALWAYS use siteUrl/api/v1 - nginx proxies it to backend
+  // This works in all environments (dev, prod, Docker)
+  const apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
 
   let title = 'Rune Box';
   let imageUrl: string | null = null;

@@ -9,19 +9,20 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     // Fetch product data from API
     // IMPORTANT: In production Docker container, NEXT_PUBLIC_API_URL might not be available at runtime.
     // Priority order:
-    // 1. NEXT_PUBLIC_API_URL (if set)
-    // 2. siteUrl/api/v1 (nginx proxies /api/* to backend)
+    // 1. siteUrl/api/v1 (nginx proxies /api/* to backend) - ALWAYS WORKS
+    // 2. NEXT_PUBLIC_API_URL (if set at runtime)
     // 3. http://backend:8000 (Docker service name - internal network)
     let apiEndpoint: string;
-    if (process.env.NEXT_PUBLIC_API_URL) {
-      apiEndpoint = getApiEndpoint(`/api/v1/products/${slug}`);
-    } else if (process.env.NODE_ENV === 'production') {
-      // In Docker, try service name first, then fallback to siteUrl
-      const dockerBackendUrl = process.env.BACKEND_URL || 'http://backend:8000';
-      apiEndpoint = `${dockerBackendUrl}/api/v1/products/${slug}`;
-    } else {
-      // Development: use siteUrl (nginx proxy) or localhost
-      apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
+    
+    // ALWAYS prefer siteUrl/api/v1 first - nginx proxies it to backend
+    // This works in all environments (dev, prod, Docker)
+    apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
+    
+    // Log for debugging (only in development)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Metadata] Fetching product ${slug} from: ${apiEndpoint}`);
+      console.log(`[Metadata] NEXT_PUBLIC_API_URL: ${process.env.NEXT_PUBLIC_API_URL || 'NOT SET'}`);
+      console.log(`[Metadata] NODE_ENV: ${process.env.NODE_ENV}`);
     }
     
     // Create abort controller for timeout
@@ -42,9 +43,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     } catch (fetchError: any) {
       clearTimeout(timeoutId);
       if (fetchError.name === 'AbortError') {
-        console.warn(`Product metadata fetch timeout for ${slug}`);
+        console.error(`[Metadata] Product ${slug} fetch timeout from ${apiEndpoint}`);
       } else {
-        console.warn(`Product metadata fetch error for ${slug}:`, fetchError.message);
+        console.error(`[Metadata] Product ${slug} fetch error from ${apiEndpoint}:`, fetchError.message);
+        console.error(`[Metadata] Error details:`, fetchError);
       }
       // Continue to fallback metadata below
       res = null;
@@ -52,6 +54,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
     if (res && res.ok) {
       const product = await res.json();
+      
+      // Log success (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Metadata] Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
+      }
+      
+      // Log success (only in development)
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Metadata] Successfully fetched product ${slug}:`, product.title_uk || product.title_en);
+      }
       
       // Get first image (primary or first in array)
       const firstImage = product.images?.find((img: any) => img.is_primary) || product.images?.[0];
@@ -196,7 +208,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     }
   } catch (error) {
     // Log error but don't throw - always return fallback metadata
-    console.error('Failed to fetch product metadata:', error);
+    console.error(`[Metadata] Failed to fetch product ${slug} metadata:`, error);
+    console.error(`[Metadata] Using fallback metadata for ${slug}`);
     // Continue to fallback metadata below
   }
 
