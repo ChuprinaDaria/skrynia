@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Script from 'next/script';
@@ -36,8 +36,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
   const { t, language } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Get product title based on current language
-  const getDisplayTitle = (): string => {
+  // Get product title based on current language - use useMemo to ensure it updates when language changes
+  const displayTitle = useMemo(() => {
     switch (language) {
       case 'EN':
         return product.titleEn || product.titleUk || product.title;
@@ -56,9 +56,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
       default:
         return product.titleUk || product.title;
     }
-  };
-
-  const displayTitle = getDisplayTitle();
+  }, [language, product.titleEn, product.titleUk, product.titleDe, product.titlePl, product.titleSe, product.titleNo, product.titleDk, product.titleFr, product.title]);
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
   const productUrl = `${siteUrl}/products/${product.slug}`;
   
