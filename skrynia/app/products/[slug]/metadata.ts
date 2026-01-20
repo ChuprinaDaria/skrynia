@@ -113,10 +113,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       // ВАЖЛИВО: Всі дані беруться БЕЗПОСЕРЕДНЬО з продукту, БЕЗ fallback на layout
       
       // Title - з продукту
-      const title = product.title_en || product.title_uk;
-      if (!title) {
-        console.error(`[Metadata] Product ${slug} has no title`);
-        throw new Error(`Product ${slug} has no title`);
+      const title = product.title_en || product.title_uk || `Product ${slug}`;
+      if (!product.title_en && !product.title_uk) {
+        console.error(`[Metadata] Product ${slug} has no title, using fallback`);
       }
       
       // Description - з продукту, очищаємо markdown
@@ -268,6 +267,54 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         },
       };
     }
+    
+    // Якщо продукт не знайдено або API не повернув OK, повертаємо мінімальні метадані
+    console.error(`[Metadata] ⚠️ Product ${slug} not found or API error - returning minimal metadata WITHOUT layout fallback`);
+    return {
+      title: `Product ${slug} | Rune Box`,
+      description: 'Product details are being loaded. Please check back soon.',
+      openGraph: {
+        title: `Product ${slug} | Rune Box`,
+        description: 'Product details are being loaded.',
+        url: `${siteUrl}/products/${slug}`,
+        type: 'product',
+        siteName: 'Rune Box',
+        locale: 'en_US',
+        images: [
+          {
+            // Використовуємо динамічний opengraph-image, який сам обробить fallback
+            url: `${siteUrl}/products/${slug}/opengraph-image`,
+            width: 1600,
+            height: 840,
+            alt: `Product ${slug}`,
+          },
+        ],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: `Product ${slug} | Rune Box`,
+        description: 'Product details are being loaded.',
+        images: [`${siteUrl}/products/${slug}/opengraph-image`],
+        creator: '@runebox',
+        site: '@runebox',
+      },
+      alternates: {
+        canonical: `${siteUrl}/products/${slug}`,
+      },
+      robots: {
+        index: false, // Не індексуємо сторінки без продукту
+        follow: true,
+        googleBot: {
+          index: false,
+          follow: true,
+        },
+      },
+      other: {
+        'og:see_also': siteUrl,
+        'article:publisher': 'https://www.facebook.com/runebox',
+        'og:type': 'product',
+      },
+    };
   } catch (error) {
     // ВАЖЛИВО: Якщо продукт не знайдено або помилка, НЕ використовуємо fallback з layout
     // Краще повернути notFound() або мінімальні метадані БЕЗ зображення з layout

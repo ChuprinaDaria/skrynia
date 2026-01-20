@@ -172,109 +172,109 @@ def get_products_catalog_csv(
         writer.writeheader()
         
         for product in products:
-        # Get primary image or first image
-        primary_image = next(
-            (img for img in product.images if img.is_primary),
-            product.images[0] if product.images else None
-        )
-        
-        # Build image URLs
-        image_link = None
-        if primary_image:
-            if primary_image.image_url.startswith('http'):
-                image_link = primary_image.image_url
+            # Get primary image or first image
+            primary_image = next(
+                (img for img in product.images if img.is_primary),
+                product.images[0] if product.images else None
+            )
+            
+            # Build image URLs
+            image_link = None
+            if primary_image:
+                if primary_image.image_url.startswith('http'):
+                    image_link = primary_image.image_url
+                else:
+                    # Static files are served from backend
+                    image_link = urljoin(backend_url, primary_image.image_url)
+            
+            # Build product link (frontend URL)
+            product_link = f"{frontend_url}/products/{product.slug}"
+            
+            # Format price
+            currency_code = currency_map.get(product.currency, "PLN")
+            price_str = f"{product.price:.2f} {currency_code}"
+            
+            # Availability
+            if product.is_made_to_order:
+                availability = "preorder"
+            elif product.stock_quantity and product.stock_quantity > 0:
+                availability = "in stock"
             else:
-                # Static files are served from backend
-                image_link = urljoin(backend_url, primary_image.image_url)
-        
-        # Build product link (frontend URL)
-        product_link = f"{frontend_url}/products/{product.slug}"
-        
-        # Format price
-        currency_code = currency_map.get(product.currency, "PLN")
-        price_str = f"{product.price:.2f} {currency_code}"
-        
-        # Availability
-        if product.is_made_to_order:
-            availability = "preorder"
-        elif product.stock_quantity and product.stock_quantity > 0:
-            availability = "in stock"
-        else:
-            availability = "out of stock"
-        
-        # Format materials (max 200 chars per Meta requirements)
-        material_str = None
-        if product.materials and isinstance(product.materials, list):
-            material_str = ", ".join(product.materials[:3])  # Limit to 3 materials
-            if len(material_str) > 200:
-                material_str = material_str[:197] + "..."
-        
-        # Format description (remove markdown, limit to 9999 chars for Meta)
-        description = product.description_uk or product.description_en or ""
-        # Remove markdown formatting more thoroughly
-        # Remove markdown links [text](url)
-        description = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', description)
-        # Remove markdown bold/italic
-        description = description.replace("**", "").replace("*", "").replace("__", "").replace("_", "")
-        # Remove markdown headers
-        description = re.sub(r'^#+\s*', '', description, flags=re.MULTILINE)
-        # Remove extra whitespace
-        description = ' '.join(description.split())
-        # Ensure not all uppercase (Meta requirement)
-        if description.isupper() and len(description) > 0:
-            description = description.capitalize()
-        # Limit length to 9999 chars (Meta limit)
-        if len(description) > 9999:
-            description = description[:9996] + "..."
-        
-        # Get tags
-        tags = []
-        if product.tags and isinstance(product.tags, list):
-            tags = product.tags[:2]  # Meta allows up to 2 product_tags
-        
-        # Format title (max 200 chars per Meta requirements)
-        title = product.title_uk or product.title_en or "Product"
-        if len(title) > 200:
-            title = title[:197] + "..."
-        
-        # Format ID (max 100 chars per Meta requirements, must be unique)
-        product_id = product.sku or str(product.id)
-        if len(product_id) > 100:
-            product_id = product_id[:100]
-        
-        # Build row data
-        row = {
-            'id': product_id,
-            'title': title,
-            'description': description,
-            'availability': availability,
-            'condition': 'new',
-            'price': price_str,
-            'link': product_link,
-            'image_link': image_link or '',
-            'brand': 'Rune box',
-            'google_product_category': 'Apparel & Accessories > Jewelry',
-            'fb_product_category': 'Clothing & Accessories > Jewelry',
-            'quantity_to_sell_on_facebook': str(product.stock_quantity) if not product.is_made_to_order and product.stock_quantity and product.stock_quantity >= 1 else '',
-            'sale_price': f"{product.compare_at_price:.2f} {currency_code}" if product.compare_at_price is not None and product.compare_at_price > product.price else '',
-            'sale_price_effective_date': '',
-            'item_group_id': '',
-            'gender': 'unisex',
-            'color': '',
-            'size': '',
-            'age_group': 'adult',
-            'material': material_str or '',
-            'pattern': '',
-            'shipping': '',
-            'shipping_weight': '',
-            'video[0].url': '',
-            'video[0].tag[0]': '',
-            'gtin': '',
-            'product_tags[0]': tags[0] if len(tags) > 0 else '',
-            'product_tags[1]': tags[1] if len(tags) > 1 else '',
-            'style[0]': ''
-        }
-        
+                availability = "out of stock"
+            
+            # Format materials (max 200 chars per Meta requirements)
+            material_str = None
+            if product.materials and isinstance(product.materials, list):
+                material_str = ", ".join(product.materials[:3])  # Limit to 3 materials
+                if len(material_str) > 200:
+                    material_str = material_str[:197] + "..."
+            
+            # Format description (remove markdown, limit to 9999 chars for Meta)
+            description = product.description_uk or product.description_en or ""
+            # Remove markdown formatting more thoroughly
+            # Remove markdown links [text](url)
+            description = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', description)
+            # Remove markdown bold/italic
+            description = description.replace("**", "").replace("*", "").replace("__", "").replace("_", "")
+            # Remove markdown headers
+            description = re.sub(r'^#+\s*', '', description, flags=re.MULTILINE)
+            # Remove extra whitespace
+            description = ' '.join(description.split())
+            # Ensure not all uppercase (Meta requirement)
+            if description.isupper() and len(description) > 0:
+                description = description.capitalize()
+            # Limit length to 9999 chars (Meta limit)
+            if len(description) > 9999:
+                description = description[:9996] + "..."
+            
+            # Get tags
+            tags = []
+            if product.tags and isinstance(product.tags, list):
+                tags = product.tags[:2]  # Meta allows up to 2 product_tags
+            
+            # Format title (max 200 chars per Meta requirements)
+            title = product.title_uk or product.title_en or "Product"
+            if len(title) > 200:
+                title = title[:197] + "..."
+            
+            # Format ID (max 100 chars per Meta requirements, must be unique)
+            product_id = product.sku or str(product.id)
+            if len(product_id) > 100:
+                product_id = product_id[:100]
+            
+            # Build row data
+            row = {
+                'id': product_id,
+                'title': title,
+                'description': description,
+                'availability': availability,
+                'condition': 'new',
+                'price': price_str,
+                'link': product_link,
+                'image_link': image_link or '',
+                'brand': 'Rune box',
+                'google_product_category': 'Apparel & Accessories > Jewelry',
+                'fb_product_category': 'Clothing & Accessories > Jewelry',
+                'quantity_to_sell_on_facebook': str(product.stock_quantity) if not product.is_made_to_order and product.stock_quantity and product.stock_quantity >= 1 else '',
+                'sale_price': f"{product.compare_at_price:.2f} {currency_code}" if product.compare_at_price is not None and product.compare_at_price > product.price else '',
+                'sale_price_effective_date': '',
+                'item_group_id': '',
+                'gender': 'unisex',
+                'color': '',
+                'size': '',
+                'age_group': 'adult',
+                'material': material_str or '',
+                'pattern': '',
+                'shipping': '',
+                'shipping_weight': '',
+                'video[0].url': '',
+                'video[0].tag[0]': '',
+                'gtin': '',
+                'product_tags[0]': tags[0] if len(tags) > 0 else '',
+                'product_tags[1]': tags[1] if len(tags) > 1 else '',
+                'style[0]': ''
+            }
+            
             writer.writerow(row)
         
         # Get CSV content
