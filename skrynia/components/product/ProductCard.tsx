@@ -10,6 +10,13 @@ export interface Product {
   id: string;
   title: string;
   titleEn?: string;
+  titleUk?: string;
+  titleDe?: string;
+  titlePl?: string;
+  titleSe?: string;
+  titleNo?: string;
+  titleDk?: string;
+  titleFr?: string;
   price: number;
   currency: string;
   image: string;
@@ -26,9 +33,32 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [isHovered, setIsHovered] = useState(false);
 
+  // Get product title based on current language
+  const getDisplayTitle = (): string => {
+    switch (language) {
+      case 'EN':
+        return product.titleEn || product.titleUk || product.title;
+      case 'DE':
+        return product.titleDe || product.titleEn || product.titleUk || product.title;
+      case 'PL':
+        return product.titlePl || product.titleEn || product.titleUk || product.title;
+      case 'SE':
+        return product.titleSe || product.titleEn || product.titleUk || product.title;
+      case 'NO':
+        return product.titleNo || product.titleEn || product.titleUk || product.title;
+      case 'DK':
+        return product.titleDk || product.titleEn || product.titleUk || product.title;
+      case 'FR':
+        return product.titleFr || product.titleEn || product.titleUk || product.title;
+      default:
+        return product.titleUk || product.title;
+    }
+  };
+
+  const displayTitle = getDisplayTitle();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
   const productUrl = `${siteUrl}/products/${product.slug}`;
   
@@ -36,8 +66,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
   const productJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: product.title,
-    description: `${product.title} - ${product.materials.join(', ')}. ${product.isHandmade ? t.common.handmade : ''}`,
+    name: displayTitle,
+    description: `${displayTitle} - ${product.materials.join(', ')}. ${product.isHandmade ? t.common.handmade : ''}`,
     image: product.image,
     sku: product.slug,
     brand: {
@@ -81,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
         <div className="relative aspect-square bg-deep-black overflow-hidden rounded-sm border border-transparent group-hover:border-oxblood transition-all duration-300">
           <Image
             src={product.image}
-            alt={`${product.title} - ${product.materials.join(', ')}. ${product.isHandmade ? t.common.handmade : ''}`}
+            alt={`${displayTitle} - ${product.materials.join(', ')}. ${product.isHandmade ? t.common.handmade : ''}`}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className="object-cover image-zoom"
@@ -124,7 +154,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, priority = false }) 
         <div className="mt-4 space-y-2">
           {/* Title */}
           <h3 className="font-rutenia text-lg text-ivory group-hover:text-oxblood transition-colors duration-300 line-clamp-2">
-            {product.title}
+            {displayTitle}
           </h3>
 
           {/* Materials */}

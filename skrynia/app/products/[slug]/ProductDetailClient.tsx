@@ -43,7 +43,19 @@ interface ApiProduct {
   materials?: string[];
   specifications?: Array<{ label: string; value: string }>;
   legend_title_uk?: string;
+  legend_title_en?: string;
+  legend_title_pl?: string;
+  legend_title_se?: string;
+  legend_title_no?: string;
+  legend_title_dk?: string;
+  legend_title_fr?: string;
   legend_content_uk?: string;
+  legend_content_en?: string;
+  legend_content_pl?: string;
+  legend_content_se?: string;
+  legend_content_no?: string;
+  legend_content_dk?: string;
+  legend_content_fr?: string;
   is_handmade?: boolean;
   is_made_to_order?: boolean;
   made_to_order_duration?: string;
@@ -172,6 +184,48 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     }
   };
 
+  const getLegendTitle = (product: ApiProduct): string | null => {
+    switch (language) {
+      case 'EN':
+        return product.legend_title_en || product.legend_title_uk || null;
+      case 'DE':
+        return product.legend_title_en || product.legend_title_uk || null; // DE not available, fallback to EN/UK
+      case 'PL':
+        return product.legend_title_pl || product.legend_title_en || product.legend_title_uk || null;
+      case 'SE':
+        return product.legend_title_se || product.legend_title_en || product.legend_title_uk || null;
+      case 'NO':
+        return product.legend_title_no || product.legend_title_en || product.legend_title_uk || null;
+      case 'DK':
+        return product.legend_title_dk || product.legend_title_en || product.legend_title_uk || null;
+      case 'FR':
+        return product.legend_title_fr || product.legend_title_en || product.legend_title_uk || null;
+      default:
+        return product.legend_title_uk || null;
+    }
+  };
+
+  const getLegendContent = (product: ApiProduct): string | null => {
+    switch (language) {
+      case 'EN':
+        return product.legend_content_en || product.legend_content_uk || null;
+      case 'DE':
+        return product.legend_content_en || product.legend_content_uk || null; // DE not available, fallback to EN/UK
+      case 'PL':
+        return product.legend_content_pl || product.legend_content_en || product.legend_content_uk || null;
+      case 'SE':
+        return product.legend_content_se || product.legend_content_en || product.legend_content_uk || null;
+      case 'NO':
+        return product.legend_content_no || product.legend_content_en || product.legend_content_uk || null;
+      case 'DK':
+        return product.legend_content_dk || product.legend_content_en || product.legend_content_uk || null;
+      case 'FR':
+        return product.legend_content_fr || product.legend_content_en || product.legend_content_uk || null;
+      default:
+        return product.legend_content_uk || null;
+    }
+  };
+
   useEffect(() => {
     // Only run on client to avoid hydration mismatch
     if (typeof window === 'undefined') return;
@@ -214,6 +268,13 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
                 id: p.id.toString(),
                 title: getProductTitle(p),
                 titleEn: p.title_en,
+                titleUk: p.title_uk,
+                titleDe: p.title_de,
+                titlePl: p.title_pl,
+                titleSe: p.title_se,
+                titleNo: p.title_no,
+                titleDk: p.title_dk,
+                titleFr: p.title_fr,
                 price: p.price,
                 currency: p.currency,
                 image: normalizeImageUrl(p.primary_image) || '/images/products/placeholder.jpg',
@@ -758,23 +819,29 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
           </article>
 
           {/* The Legend Section */}
-          {product.legend_title_uk && product.legend_content_uk && (
-            <section className="mb-20" aria-labelledby="legend-title">
-              <div className="max-w-4xl mx-auto bg-footer-black border border-sage/20 rounded-sm p-8 md:p-12 relative overflow-hidden parchment-texture">
-                <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-oxblood/50" aria-hidden="true" />
-                <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-oxblood/50" aria-hidden="true" />
-                <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-oxblood/50" aria-hidden="true" />
-                <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-oxblood/50" aria-hidden="true" />
+          {(() => {
+            const legendTitle = getLegendTitle(product);
+            const legendContent = getLegendContent(product);
+            return legendTitle && legendContent ? (
+              <section className="mb-20" aria-labelledby="legend-title">
+                <div className="max-w-4xl mx-auto bg-footer-black border border-sage/20 rounded-sm p-8 md:p-12 relative overflow-hidden parchment-texture">
+                  <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-oxblood/50" aria-hidden="true" />
+                  <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-oxblood/50" aria-hidden="true" />
+                  <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-oxblood/50" aria-hidden="true" />
+                  <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-oxblood/50" aria-hidden="true" />
 
-                <h2 id="legend-title" className="font-rutenia text-2xl md:text-3xl text-ivory mb-6 text-center">
-                  {t.product.legend}: {product.legend_title_uk}
-                </h2>
-                <p className="text-ivory/85 font-inter leading-relaxed text-center max-w-3xl mx-auto">
-                  {product.legend_content_uk}
-                </p>
-              </div>
-            </section>
-          )}
+                  <h2 id="legend-title" className="font-rutenia text-2xl md:text-3xl text-ivory mb-6 text-center">
+                    {t.product.legend}: {legendTitle}
+                  </h2>
+                  <div className="text-ivory/85 font-inter leading-relaxed text-center max-w-3xl mx-auto prose prose-invert prose-headings:text-ivory prose-p:text-ivory/85 prose-strong:text-ivory prose-a:text-oxblood hover:prose-a:text-ivory">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {legendContent}
+                    </ReactMarkdown>
+                  </div>
+                </div>
+              </section>
+            ) : null;
+          })()}
 
           {/* Specifications */}
           {product.specifications && product.specifications.length > 0 && (

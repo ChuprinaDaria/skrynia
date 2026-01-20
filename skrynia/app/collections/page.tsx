@@ -70,11 +70,18 @@ const CollectionsPage: React.FC = () => {
 
       if (res.ok) {
         const data: ApiProduct[] = await res.json();
-        // Transform API products to frontend Product format with correct language
+        // Transform API products to frontend Product format with all language fields
         const transformedProducts: Product[] = data.map((product) => ({
           id: product.id.toString(),
           title: getProductTitle(product),
           titleEn: product.title_en,
+          titleUk: product.title_uk,
+          titleDe: product.title_de,
+          titlePl: product.title_pl,
+          titleSe: product.title_se,
+          titleNo: product.title_no,
+          titleDk: product.title_dk,
+          titleFr: product.title_fr,
           price: product.price,
           currency: product.currency,
           image: normalizeImageUrl(product.primary_image) || '/images/products/placeholder.jpg',

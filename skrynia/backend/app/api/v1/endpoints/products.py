@@ -97,6 +97,7 @@ def get_products(
 @router.api_route("/catalog.csv", methods=["GET", "HEAD", "OPTIONS"])
 def get_products_catalog_csv(
     request: Request,
+    lang: Optional[str] = Query("uk", description="Language code: uk, en, de, pl, se, no, dk, fr"),
     db: Session = Depends(get_db)
 ):
     """
@@ -105,6 +106,16 @@ def get_products_catalog_csv(
     formatted according to Meta's catalog requirements.
     
     Supports GET (full CSV), HEAD (headers only), and OPTIONS (CORS preflight).
+    
+    Language parameter:
+    - uk: Ukrainian (default)
+    - en: English
+    - de: German
+    - pl: Polish
+    - se: Swedish
+    - no: Norwegian
+    - dk: Danish
+    - fr: French
     """
     
     # Handle OPTIONS (CORS preflight)
@@ -141,6 +152,43 @@ def get_products_catalog_csv(
             content=f"Error generating catalog: {str(e)}",
             media_type="text/plain"
         )
+    
+    # Normalize language code (handle both UA and uk, etc.)
+    lang_map = {
+        "ua": "uk",
+        "uk": "uk",
+        "en": "en",
+        "de": "de",
+        "pl": "pl",
+        "se": "se",
+        "no": "no",
+        "dk": "dk",
+        "fr": "fr"
+    }
+    lang_code = lang_map.get(lang.lower() if lang else "uk", "uk")
+    
+    # Helper function to get multilingual field with fallback
+    def get_field(product, field_name: str, lang_code: str):
+        """Get field value for specified language with fallback to uk, then en."""
+        # Try requested language
+        field = getattr(product, f"{field_name}_{lang_code}", None)
+        if field:
+            return field
+        
+        # Fallback to Ukrainian
+        if lang_code != "uk":
+            field = getattr(product, f"{field_name}_uk", None)
+            if field:
+                return field
+        
+        # Fallback to English
+        if lang_code != "en":
+            field = getattr(product, f"{field_name}_en", None)
+            if field:
+                return field
+        
+        # Return empty string if nothing found
+        return ""
     
     # Currency mapping
     currency_map = {
@@ -233,7 +281,7 @@ def get_products_catalog_csv(
                     material_str = material_str[:197] + "..."
             
             # Format description (remove markdown, limit to 9999 chars for Meta)
-            description = product.description_uk or product.description_en or ""
+            description = get_field(product, "description", lang_code) or ""
             # Remove markdown formatting more thoroughly
             # Remove markdown links [text](url)
             description = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', description)
@@ -250,15 +298,14 @@ def get_products_catalog_csv(
             if len(description) > 9999:
                 description = description[:9996] + "..."
             
-            # Get tags (use tags_uk or tags_en, fallback to empty list)
+            # Get tags (use selected language, fallback to uk, then en)
             tags = []
-            if product.tags_uk and isinstance(product.tags_uk, list):
-                tags = product.tags_uk[:2]  # Meta allows up to 2 product_tags
-            elif product.tags_en and isinstance(product.tags_en, list):
-                tags = product.tags_en[:2]  # Fallback to English tags
+            tags_field = get_field(product, "tags", lang_code)
+            if tags_field and isinstance(tags_field, list):
+                tags = tags_field[:2]  # Meta allows up to 2 product_tags
             
             # Format title (max 200 chars per Meta requirements)
-            title = product.title_uk or product.title_en or "Product"
+            title = get_field(product, "title", lang_code) or "Product"
             if len(title) > 200:
                 title = title[:197] + "..."
             
