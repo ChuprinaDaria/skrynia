@@ -167,8 +167,6 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           'og:see_also': siteUrl,
         },
       };
-      // Return early if we have product data
-      return metadata;
     }
   } catch (error) {
     // Log error but don't throw - always return fallback metadata
