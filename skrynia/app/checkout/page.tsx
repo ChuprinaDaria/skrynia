@@ -19,7 +19,7 @@ const INPOST_SUPPORTED_COUNTRIES = ['PL', 'BE', 'IT', 'FR', 'LU', 'PT', 'ES', 'N
 
 export default function CheckoutPage() {
   const router = useRouter();
-  const { items, subtotal, clearCart, total } = useCart();
+  const { items, subtotal, clearCart, total, closeCart } = useCart();
   const { t, language } = useLanguage();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -31,6 +31,11 @@ export default function CheckoutPage() {
   // Get InPost token from environment (available at build time)
   const inpostToken = process.env.NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN || '';
   const hasInPostToken = !!inpostToken;
+
+  // Close cart drawer when on checkout page (to avoid confusion)
+  useEffect(() => {
+    closeCart();
+  }, [closeCart]);
 
   // Meta Pixel: Track InitiateCheckout when page loads
   useEffect(() => {
@@ -164,43 +169,34 @@ export default function CheckoutPage() {
           const userData = await response.json();
           
           // Load default address (if exists)
-          try {
-            const addressResponse = await fetch(getApiEndpoint('/api/v1/users/addresses/default'), {
-              headers: {
-                'Authorization': `Bearer ${userToken}`,
-              },
-            });
+          // Use userData.default_address if available (from /users/me endpoint)
+          if (userData.default_address) {
+            const addressData = userData.default_address;
+            setFormData(prev => ({
+              ...prev,
+              customer_email: userData.email || prev.customer_email,
+              customer_name: userData.full_name || prev.customer_name,
+              customer_phone: addressData.phone || userData.phone || prev.customer_phone,
+              shipping_address_line1: addressData.address_line1 || prev.shipping_address_line1,
+              shipping_address_line2: addressData.address_line2 || prev.shipping_address_line2,
+              shipping_city: addressData.city || prev.shipping_city,
+              shipping_postal_code: addressData.postal_code || prev.shipping_postal_code,
+              shipping_country: addressData.country || prev.shipping_country,
+            }));
 
-            if (addressResponse.ok) {
-              const addressData = await addressResponse.json();
-              setFormData(prev => ({
-                ...prev,
-                customer_email: userData.email || prev.customer_email,
-                customer_name: userData.full_name || prev.customer_name,
-                customer_phone: addressData.phone || userData.phone || prev.customer_phone,
-                shipping_address_line1: addressData.address_line1 || prev.shipping_address_line1,
-                shipping_address_line2: addressData.address_line2 || prev.shipping_address_line2,
-                shipping_city: addressData.city || prev.shipping_city,
-                shipping_postal_code: addressData.postal_code || prev.shipping_postal_code,
-                shipping_country: addressData.country || prev.shipping_country,
-              }));
-
-              // Set delivery method based on country and InPost support
-              if (addressData.country && INPOST_SUPPORTED_COUNTRIES.includes(addressData.country)) {
-                setDeliveryMethod('inpost');
-              } else if (addressData.country === 'UA') {
-                setDeliveryMethod('novaposhta');
-              }
-
-              // If InPost locker is selected
-              if (addressData.inpost_locker_id) {
-                setSelectedPickupPoint(addressData.inpost_locker_id);
-              }
-            } else if (addressResponse.status === 404) {
-              // No default address - this is expected, silently continue
+            // Set delivery method based on country and InPost support
+            if (addressData.country && INPOST_SUPPORTED_COUNTRIES.includes(addressData.country)) {
+              setDeliveryMethod('inpost');
+            } else if (addressData.country === 'UA') {
+              setDeliveryMethod('novaposhta');
             }
-          } catch (err) {
-            // No default address or network error, use user data only
+
+            // If InPost locker is selected
+            if (addressData.inpost_locker_id) {
+              setSelectedPickupPoint(addressData.inpost_locker_id);
+            }
+          } else {
+            // No default address - use user data only
             setFormData(prev => ({
               ...prev,
               customer_email: userData.email || prev.customer_email,
@@ -284,15 +280,22 @@ export default function CheckoutPage() {
 
       const order = await response.json();
 
-      // Clear cart
-      clearCart();
-
-      // Redirect to payment or success page
-      if (order.payment_intent_id) {
-        // Redirect to payment page
+      // Only clear cart if order doesn't require payment (e.g., bank transfer)
+      // For payment methods that require payment gateway, clear cart on success page
+      if (!order.payment_intent_id && order.payment_method === 'bank_transfer') {
+        // Bank transfer - order is created, clear cart
+        clearCart();
+        router.push(`/order-success?order=${order.order_number}`);
+      } else if (order.payment_intent_id) {
+        // Payment required - store order number and redirect to payment
+        // Cart will be cleared after successful payment
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('pendingOrderNumber', order.order_number);
+        }
         router.push(`/payment/${order.payment_intent_id}`);
       } else {
-        // Redirect to success page
+        // Other payment methods - clear cart and redirect to success
+        clearCart();
         router.push(`/order-success?order=${order.order_number}`);
       }
     } catch (err) {

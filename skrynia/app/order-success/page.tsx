@@ -5,12 +5,14 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Button from '@/components/ui/Button';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useCart } from '@/contexts/CartContext';
 import { getApiEndpoint } from '@/lib/api';
 import { trackPurchase } from '@/lib/facebook-conversions';
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
   const { t } = useLanguage();
+  const { clearCart } = useCart();
   const orderNumber = searchParams.get('order');
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -86,6 +88,16 @@ function OrderSuccessContent() {
       if (response.ok) {
         const data = await response.json();
         setOrder(data);
+        
+        // Clear cart only when order is confirmed (paid or completed)
+        // This ensures cart is cleared after successful payment
+        if (data.status === 'paid' || data.status === 'completed' || data.status === 'processing') {
+          clearCart();
+          // Clear pending order number from sessionStorage
+          if (typeof window !== 'undefined') {
+            sessionStorage.removeItem('pendingOrderNumber');
+          }
+        }
       }
     } catch (error) {
       console.error('Failed to fetch order:', error);
