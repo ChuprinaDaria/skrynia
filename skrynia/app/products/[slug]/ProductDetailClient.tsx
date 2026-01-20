@@ -242,6 +242,11 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
     if (!product) return;
     
     const primaryImage = product.images?.find(img => img.is_primary) || product.images?.[0];
+    // Map category_id to category name for analytics
+    const categoryName = product.category_id === 1 ? 'slavic' :
+                         product.category_id === 2 ? 'viking' :
+                         product.category_id === 3 ? 'celtic' : 'jewelry';
+    
     addItem({
       productId: product.id,
       title: product.title_uk,
@@ -250,6 +255,7 @@ export default function ProductDetailClient({ slug }: ProductDetailClientProps) 
       quantity: quantity,
       image: normalizeImageUrl(primaryImage?.image_url) || '/images/products/placeholder.jpg',
       slug: product.slug,
+      category: categoryName,
     });
   };
 

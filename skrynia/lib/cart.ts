@@ -11,6 +11,7 @@ export interface CartItem {
   quantity: number;
   image?: string;
   slug: string;
+  category?: string; // Optional category for analytics tracking
 }
 
 const CART_STORAGE_KEY = 'skrynia_cart';
