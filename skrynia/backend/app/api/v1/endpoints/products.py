@@ -118,8 +118,9 @@ def get_products_catalog_csv(
         )
     
     try:
-        # Get all active products
-        products = db.query(Product).filter(Product.is_active == True).all()
+        # Get all active products with images eagerly loaded
+        from sqlalchemy.orm import joinedload
+        products = db.query(Product).options(joinedload(Product.images)).filter(Product.is_active == True).all()
         
         # Get URLs for product links and images
         frontend_url = settings.FRONTEND_URL or "https://runebox.eu"
@@ -175,19 +176,29 @@ def get_products_catalog_csv(
         
         for product in products:
             # Get primary image or first image
-            primary_image = next(
-                (img for img in product.images if img.is_primary),
-                product.images[0] if product.images else None
-            )
+            primary_image = None
+            if product.images and len(product.images) > 0:
+                primary_image = next(
+                    (img for img in product.images if img.is_primary),
+                    product.images[0] if product.images else None
+                )
             
             # Build image URLs
             image_link = None
-            if primary_image:
-                if primary_image.image_url.startswith('http'):
-                    image_link = primary_image.image_url
-                else:
+            if primary_image and primary_image.image_url:
+                image_url = primary_image.image_url.strip()
+                if image_url.startswith('http://') or image_url.startswith('https://'):
+                    image_link = image_url
+                elif image_url.startswith('/'):
                     # Static files are served from backend
-                    image_link = urljoin(backend_url, primary_image.image_url)
+                    image_link = urljoin(backend_url, image_url)
+                else:
+                    # Relative path - prepend backend URL
+                    image_link = urljoin(backend_url, '/' + image_url.lstrip('/'))
+            
+            # Fallback to placeholder if no image (Meta requires image_link)
+            if not image_link:
+                image_link = f"{frontend_url}/images/logo/logo-white-pink-1.png"
             
             # Build product link (frontend URL)
             product_link = f"{frontend_url}/products/{product.slug}"

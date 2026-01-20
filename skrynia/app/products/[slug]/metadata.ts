@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getApiEndpoint } from '@/lib/api';
+import { getApiEndpoint, normalizeImageUrl } from '@/lib/api';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
@@ -89,26 +89,39 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const firstImage = product.images?.find((img: any) => img.is_primary) || product.images?.[0];
       let ogImage: string | null = null;
       
-      if (firstImage?.image_url) {
-        const imageUrl = firstImage.image_url;
-        // Handle both absolute URLs and relative paths
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-          ogImage = imageUrl;
+      // Get the raw image URL from product
+      const rawImageUrl = firstImage?.image_url || product.primary_image;
+      
+      if (rawImageUrl) {
+        // For OG images, always use public site URL to ensure crawlers can access them
+        // nginx proxies /static/ to backend, so we can use siteUrl for static files
+        if (rawImageUrl.startsWith('http://') || rawImageUrl.startsWith('https://')) {
+          // Already absolute URL - use as is (but ensure HTTPS in production)
+          ogImage = rawImageUrl;
+          if (process.env.NODE_ENV === 'production' && ogImage.startsWith('http://') && ogImage.includes('runebox.eu')) {
+            ogImage = ogImage.replace('http://', 'https://');
+          }
+        } else if (rawImageUrl.startsWith('/static/') || rawImageUrl.startsWith('/uploads/')) {
+          // Static files: use public site URL (nginx proxies /static/ to backend)
+          ogImage = `${siteUrl}${rawImageUrl}`;
+        } else if (rawImageUrl.startsWith('/')) {
+          // Frontend public assets
+          ogImage = `${siteUrl}${rawImageUrl}`;
         } else {
-          // Backend static files OR frontend public images.
-          // Prefer normalized API base to ensure absolute URL for crawlers.
-          const apiBase = getApiEndpoint('/api/v1/health').replace(/\/api\/v1\/health$/, '');
-          ogImage = `${apiBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+          // Relative path
+          ogImage = `${siteUrl}/${rawImageUrl}`;
         }
-      } else if (product.primary_image) {
-        // Fallback to primary_image if images array is empty
-        const imageUrl = product.primary_image;
-        if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-          ogImage = imageUrl;
-        } else {
-          const apiBase = getApiEndpoint('/api/v1/health').replace(/\/api\/v1\/health$/, '');
-          ogImage = `${apiBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
-        }
+      }
+      
+      // Fallback to logo if no product image or placeholder
+      if (!ogImage || ogImage.includes('/images/products/placeholder.jpg')) {
+        ogImage = `${siteUrl}/images/logo/logo-white-pink-1.png`;
+      }
+      
+      // Log OG image URL for debugging
+      if (process.env.NODE_ENV === 'development') {
+        console.log(`[Metadata] OG Image URL for ${slug}:`, ogImage);
+        console.log(`[Metadata] Raw image URL:`, rawImageUrl);
       }
       
       // ВАЖЛИВО: Всі дані беруться БЕЗПОСЕРЕДНЬО з продукту, БЕЗ fallback на layout
@@ -126,12 +139,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const materials = product.materials?.join(', ') || 'premium materials';
         description = `${title}. Handmade jewelry with ${materials}. Unique design inspired by ancient cultures.`;
       } else {
-        // Очищаємо markdown
+        // Очищаємо markdown та HTML
         description = description
-          .replace(/\*\*/g, '')
-          .replace(/\*/g, '')
-          .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
-          .replace(/#+\s*/g, '')
+          .replace(/\*\*/g, '') // Bold markdown
+          .replace(/\*/g, '') // Italic markdown
+          .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1') // Links [text](url) -> text
+          .replace(/#+\s*/g, '') // Headers
+          .replace(/<[^>]+>/g, '') // HTML tags
+          .replace(/\n+/g, ' ') // Newlines to spaces
+          .replace(/\s+/g, ' ') // Multiple spaces to single space
           .trim();
       }
 
@@ -140,6 +156,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         const materials = product.materials?.join(', ') || 'premium materials';
         description = `${description} Handmade jewelry with ${materials}. Authentic design by Rune Box.`;
       }
+      
+      // Helper function to truncate at word boundary
+      const truncateAtWord = (text: string, maxLength: number): string => {
+        if (text.length <= maxLength) return text;
+        const truncated = text.substring(0, maxLength);
+        const lastSpace = truncated.lastIndexOf(' ');
+        return lastSpace > 0 ? truncated.substring(0, lastSpace) + '...' : truncated + '...';
+      };
       
       // Price та currency - з продукту
       const price = product.price ?? 0;
@@ -179,14 +203,16 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const descDk = product.description_dk || descEn;
       const descFr = product.description_fr || descEn;
 
-      // ВАЖЛИВО: Використовуємо динамічний opengraph-image, який генерується на основі зображення продукту
-      // Це гарантує, що зображення береться з продукту, а не з layout fallback
-      const ogImageUrl = `${siteUrl}/products/${slug}/opengraph-image`;
+      // ВАЖЛИВО: Використовуємо ПРЯМУ URL зображення продукту як основне OG зображення
+      // Це краще працює з LinkedIn, Meta, Facebook, Threads
+      // Динамічний opengraph-image маршрут залишається як fallback
+      const ogImageUrl = ogImage; // Use direct product image URL
+      const ogImageFallback = `${siteUrl}/products/${slug}/opengraph-image`; // Fallback to generated image
       
       // ВАЖЛИВО: Всі метадані беруться з продукту, БЕЗ fallback на layout
       return {
         title: `${title} | Rune Box`,
-        description: description.substring(0, 160), // Limit to 160 chars for SEO
+        description: truncateAtWord(description, 160), // Limit to 160 chars for SEO, truncate at word boundary
         keywords: [
           ...productKeywords,
           'handmade jewelry',
@@ -199,15 +225,23 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         ].filter(Boolean),
         openGraph: {
           title: `${title} | Rune Box`,
-          description: description.substring(0, 200),
+          description: truncateAtWord(description, 200), // Limit to 200 chars for OG, truncate at word boundary
           url: `${siteUrl}/products/${slug}`,
           type: 'website', // Next.js Metadata doesn't support 'product' type, but we set 'og:type': 'product' in 'other' field
           siteName: 'Rune Box',
           locale: 'en_US',
           images: [
             {
-              // Use dynamic OG image (>=1600px wide) based on primary product photo
+              // Use direct product image URL (primary) - better for LinkedIn, Meta, Facebook, Threads
+              // LinkedIn recommends 1200x630 minimum, but 1600x840 is optimal
               url: ogImageUrl,
+              width: 1600,
+              height: 840,
+              alt: title,
+            },
+            {
+              // Fallback to generated opengraph-image
+              url: ogImageFallback,
               width: 1600,
               height: 840,
               alt: title,
@@ -217,8 +251,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         twitter: {
           card: 'summary_large_image',
           title: `${title} | Rune Box`,
-          description: description.substring(0, 200),
-          images: [ogImageUrl],
+          description: truncateAtWord(description, 200), // Limit to 200 chars for Twitter, truncate at word boundary
+          images: [ogImageUrl], // Use direct product image
           creator: '@runebox',
           site: '@runebox',
         },
@@ -248,12 +282,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           },
         },
         // Additional meta tags for product-specific OG properties
+        // ВАЖЛИВО: НЕ додаємо og:image* в other - Next.js вже додає їх через openGraph.images з property="og:image"
+        // Додаємо тільки специфічні теги, які Next.js не підтримує напряму
         other: {
-          // Prefer a large OG image for Meta/Threads
-          'og:image': ogImageUrl,
-          'og:image:width': '1600',
-          'og:image:height': '840',
-          // Product price and currency for OG
+          // Product price and currency for OG (не підтримується Next.js напряму)
           ...(price > 0 && {
             'product:price:amount': price.toFixed(2),
             'product:price:currency': priceCurrency,
@@ -264,6 +296,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           'og:see_also': siteUrl,
           // Facebook & LinkedIn support
           'article:publisher': 'https://www.facebook.com/runebox',
+          // Next.js підтримує тільки 'website' і 'article', тому 'product' має бути в other
           'og:type': 'product', // Explicit OG type
         },
       };
