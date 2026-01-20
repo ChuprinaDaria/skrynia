@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, Request
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -92,13 +92,31 @@ def get_products(
     return _get_products_impl(skip, limit, category_id, is_featured, is_active, search, db)
 
 
-@router.api_route("/catalog.csv", methods=["GET", "HEAD"])
-def get_products_catalog_csv(db: Session = Depends(get_db)):
+@router.api_route("/catalog.csv", methods=["GET", "HEAD", "OPTIONS"])
+def get_products_catalog_csv(
+    request: Request,
+    db: Session = Depends(get_db)
+):
     """
     Generate Meta (Facebook) product catalog CSV feed.
     This endpoint is public and returns a CSV file with all active products
     formatted according to Meta's catalog requirements.
+    
+    Supports GET (full CSV), HEAD (headers only), and OPTIONS (CORS preflight).
     """
+    
+    # Handle OPTIONS (CORS preflight)
+    if request.method == "OPTIONS":
+        return Response(
+            status_code=204,
+            headers={
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Max-Age": "3600",
+            }
+        )
+    
     # Get all active products
     products = db.query(Product).filter(Product.is_active == True).all()
     
@@ -167,7 +185,7 @@ def get_products_catalog_csv(db: Session = Depends(get_db)):
         # Availability
         if product.is_made_to_order:
             availability = "preorder"
-        elif product.stock_quantity > 0:
+        elif product.stock_quantity and product.stock_quantity > 0:
             availability = "in stock"
         else:
             availability = "out of stock"
@@ -225,7 +243,7 @@ def get_products_catalog_csv(db: Session = Depends(get_db)):
             'brand': 'Rune box',
             'google_product_category': 'Apparel & Accessories > Jewelry',
             'fb_product_category': 'Clothing & Accessories > Jewelry',
-            'quantity_to_sell_on_facebook': str(product.stock_quantity) if not product.is_made_to_order and product.stock_quantity >= 1 else '',
+            'quantity_to_sell_on_facebook': str(product.stock_quantity) if not product.is_made_to_order and product.stock_quantity and product.stock_quantity >= 1 else '',
             'sale_price': f"{product.compare_at_price:.2f} {currency_code}" if product.compare_at_price and product.compare_at_price > product.price else '',
             'sale_price_effective_date': '',
             'item_group_id': '',
@@ -251,16 +269,29 @@ def get_products_catalog_csv(db: Session = Depends(get_db)):
     csv_content = output.getvalue()
     output.close()
     
+    # Prepare headers
+    headers = {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": "inline; filename=catalog_products.csv",
+        "Cache-Control": "public, max-age=3600",
+        # CORS headers for Facebook/Meta crawler
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, HEAD, OPTIONS",
+        "Access-Control-Allow-Headers": "*",
+    }
+    
+    # For HEAD request, return only headers without body
+    if request.method == "HEAD":
+        return Response(
+            status_code=200,
+            headers=headers
+        )
+    
     # Return CSV as response with UTF-8 encoding
-    # Note: Using inline disposition for Meta compatibility
     return Response(
         content=csv_content.encode('utf-8-sig'),  # UTF-8 with BOM for Excel compatibility
         media_type="text/csv",
-        headers={
-            "Content-Type": "text/csv; charset=utf-8",
-            "Content-Disposition": "inline; filename=catalog_products.csv",  # inline for Meta
-            "Cache-Control": "public, max-age=3600"  # Cache for 1 hour
-        }
+        headers=headers
     )
 
 
