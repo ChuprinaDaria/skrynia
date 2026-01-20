@@ -510,7 +510,7 @@ export default function CheckoutPage() {
                                       token={inpostToken}
                                       version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
                                       country={formData.shipping_country === 'PL' ? undefined : formData.shipping_country}
-                                      language={language === 'UA' ? 'uk' : language === 'EN' ? 'en' : language === 'FR' ? 'fr' : language === 'DE' ? 'de' : language === 'PL' ? 'pl' : language === 'SE' ? 'sv' : language === 'NO' ? 'no' : language === 'DK' ? 'da' : 'pl'}
+                                      language={language === 'UA' ? 'uk' : language === 'EN' ? 'en' : language === 'FR' ? 'fr' : language === 'PL' ? 'pl' : language === 'DE' ? 'en' : language === 'SE' ? 'en' : language === 'NO' ? 'en' : language === 'DK' ? 'en' : 'pl'}
                                       config="parcelCollect"
                                       sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
                                       onPointSelect={(point: InPostPoint) => {
