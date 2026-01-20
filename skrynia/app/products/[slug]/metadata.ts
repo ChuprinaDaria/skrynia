@@ -98,7 +98,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         if (rawImageUrl.startsWith('http://') || rawImageUrl.startsWith('https://')) {
           // Already absolute URL - use as is (but ensure HTTPS in production)
           ogImage = rawImageUrl;
-          if (process.env.NODE_ENV === 'production' && ogImage.startsWith('http://') && ogImage.includes('runebox.eu')) {
+          if (process.env.NODE_ENV === 'production' && ogImage && ogImage.startsWith('http://') && ogImage.includes('runebox.eu')) {
             ogImage = ogImage.replace('http://', 'https://');
           }
         } else if (rawImageUrl.startsWith('/static/') || rawImageUrl.startsWith('/uploads/')) {
