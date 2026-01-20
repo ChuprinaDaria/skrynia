@@ -7,7 +7,22 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   try {
     // Fetch product data from API
-    const apiEndpoint = getApiEndpoint(`/api/v1/products/${slug}`);
+    // IMPORTANT: In production Docker container, NEXT_PUBLIC_API_URL might not be available at runtime.
+    // Priority order:
+    // 1. NEXT_PUBLIC_API_URL (if set)
+    // 2. siteUrl/api/v1 (nginx proxies /api/* to backend)
+    // 3. http://backend:8000 (Docker service name - internal network)
+    let apiEndpoint: string;
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      apiEndpoint = getApiEndpoint(`/api/v1/products/${slug}`);
+    } else if (process.env.NODE_ENV === 'production') {
+      // In Docker, try service name first, then fallback to siteUrl
+      const dockerBackendUrl = process.env.BACKEND_URL || 'http://backend:8000';
+      apiEndpoint = `${dockerBackendUrl}/api/v1/products/${slug}`;
+    } else {
+      // Development: use siteUrl (nginx proxy) or localhost
+      apiEndpoint = `${siteUrl}/api/v1/products/${slug}`;
+    }
     
     // Create abort controller for timeout
     const controller = new AbortController();
@@ -66,6 +81,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         .replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1')
         .replace(/#+\s*/g, '')
         .trim();
+
+      // Facebook/Meta warning: keep description >= 100 chars
+      if (description.length < 100) {
+        description = `${description} Discover authentic handmade jewelry by Rune Box: premium materials, unique symbolism, and fast EU delivery.`;
+      }
       
       const title = product.title_en || product.title_uk || 'Product';
       const price = product.price || 0;
@@ -91,6 +111,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       const descDk = product.description_dk || descEn;
       const descFr = product.description_fr || descEn;
 
+      const ogImageUrl = `${siteUrl}/products/${slug}/opengraph-image`;
       return {
         title: `${title} | Rune Box`,
         description: description.substring(0, 160), // Limit to 160 chars for SEO
@@ -112,9 +133,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           locale: 'en_US',
           images: [
             {
-              url: ogImage,
-              width: 1200,
-              height: 630,
+              // Use dynamic OG image (>=1600px wide) based on primary product photo
+              url: ogImageUrl,
+              width: 1600,
+              height: 840,
               alt: title,
             },
           ],
@@ -123,7 +145,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
           card: 'summary_large_image',
           title: `${title} | Rune Box`,
           description: description.substring(0, 200),
-          images: [ogImage],
+          images: [ogImageUrl],
           creator: '@runebox',
           site: '@runebox',
         },
@@ -156,6 +178,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         other: {
           // Override og:type to product (Next.js doesn't support it directly)
           'og:type': 'product',
+          // Prefer a large OG image for Meta/Threads
+          'og:image': ogImageUrl,
+          'og:image:width': '1600',
+          'og:image:height': '840',
           // Product price and currency for OG
           ...(price > 0 && {
             'product:price:amount': price.toFixed(2),
@@ -175,12 +201,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   // Fallback metadata if product not found
+  const fallbackDescription =
+    'Unique handmade jewelry from Rune Box. Explore authentic designs inspired by Slavic, Viking and Celtic cultures with premium natural materials.';
   return {
     title: 'Product | Rune Box',
-    description: 'Unique handmade jewelry from Rune Box',
+    description: fallbackDescription,
     openGraph: {
       title: 'Product | Rune Box',
-      description: 'Unique handmade jewelry from Rune Box',
+      description: fallbackDescription,
       url: `${siteUrl}/products/${slug}`,
       type: 'website',
       siteName: 'Rune Box',
@@ -188,8 +216,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       images: [
         {
           url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
-          width: 1200,
-          height: 630,
+          width: 1600,
+          height: 840,
           alt: 'Rune Box',
         },
       ],
@@ -197,7 +225,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     twitter: {
       card: 'summary_large_image',
       title: 'Product | Rune Box',
-      description: 'Unique handmade jewelry from Rune Box',
+      description: fallbackDescription,
       images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
       creator: '@runebox',
       site: '@runebox',

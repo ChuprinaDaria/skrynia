@@ -73,6 +73,9 @@ services:
       NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN: ${NEXT_PUBLIC_INPOST_GEOWIDGET_TOKEN}
       NEXT_PUBLIC_INPOST_SANDBOX: ${NEXT_PUBLIC_INPOST_SANDBOX}
+      # For SSR metadata fetching when NEXT_PUBLIC_API_URL is not set
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
+      NODE_ENV: production
     networks:
       - skrynia_network
     ports:
