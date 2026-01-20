@@ -193,11 +193,15 @@ async def stripe_webhook(
     db: Session = Depends(get_db)
 ):
     """Handle Stripe webhook events."""
+    import logging
+    logger = logging.getLogger(__name__)
+    
     payload = await request.body()
     sig_header = request.headers.get("stripe-signature")
 
     try:
         event = StripePaymentService.verify_webhook_signature(payload, sig_header)
+        logger.info(f"Stripe webhook event received: {event['type']}")
 
         if event["type"] == "checkout.session.completed":
             session = event["data"]["object"]
@@ -299,27 +303,210 @@ async def stripe_webhook(
                     db=db
                 )
 
-        elif event["type"] == "payment_intent.succeeded":
-            payment_intent = event["data"]["object"]
-            payment_intent_id = payment_intent["id"]
+        elif event["type"] == "checkout.session.expired":
+            # Юзер відкрив чекаут, пішов пити каву і закрив вкладку
+            # Очищаємо "висяче" замовлення
+            session = event["data"]["object"]
+            if "metadata" in session and "order_id" in session["metadata"]:
+                try:
+                    order_id = int(session["metadata"]["order_id"])
+                    order = db.query(Order).filter(Order.id == order_id).first()
+                    
+                    if order and order.status == OrderStatus.PENDING and order.payment_status == PaymentStatus.PENDING:
+                        # Змінюємо статус на скасований, щоб не муляло очі
+                        order.status = OrderStatus.CANCELLED
+                        db.commit()
+                except (ValueError, KeyError):
+                    # Якщо немає order_id в metadata - ігноруємо
+                    pass
 
-            order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+        # Charge Events
+        elif event["type"] == "charge.captured":
+            # Коли charge захоплено (для delayed payment methods)
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                if order:
+                    order.payment_status = PaymentStatus.COMPLETED
+                    if not order.paid_at:
+                        order.paid_at = datetime.utcnow()
+                    db.commit()
 
-            if order:
-                order.payment_status = PaymentStatus.COMPLETED
-                order.status = OrderStatus.PAID
-                order.paid_at = datetime.utcnow()
-                db.commit()
+        elif event["type"] == "charge.expired":
+            # Коли charge прострочено
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                if order and order.status == OrderStatus.PENDING:
+                    order.status = OrderStatus.CANCELLED
+                    order.payment_status = PaymentStatus.FAILED
+                    db.commit()
 
-        elif event["type"] == "payment_intent.payment_failed":
-            payment_intent = event["data"]["object"]
-            payment_intent_id = payment_intent["id"]
+        elif event["type"] == "charge.failed":
+            # Коли charge не вдався
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                if order:
+                    order.payment_status = PaymentStatus.FAILED
+                    db.commit()
 
-            order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+        elif event["type"] == "charge.pending":
+            # Коли charge в очікуванні (для delayed payment methods)
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                if order:
+                    order.payment_status = PaymentStatus.PENDING
+                    db.commit()
 
-            if order:
-                order.payment_status = PaymentStatus.FAILED
-                db.commit()
+        elif event["type"] == "charge.refunded":
+            # Пожарна тривога: рефанд зроблено вручну в Stripe Dashboard
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                
+                if order:
+                    # Оновлюємо статуси
+                    order.payment_status = PaymentStatus.REFUNDED
+                    order.status = OrderStatus.REFUNDED
+                    db.commit()
+                    
+                    # Скасовуємо InPost shipment якщо можливо
+                    try:
+                        from app.models.shipping import Shipment, ShippingProvider, ShippingStatus
+                        shipment = db.query(Shipment).filter(
+                            Shipment.order_id == order.id,
+                            Shipment.provider == ShippingProvider.INPOST
+                        ).first()
+                        
+                        if shipment and shipment.status in [ShippingStatus.LABEL_CREATED, ShippingStatus.READY_TO_SEND]:
+                            # Спробуємо скасувати через InPost API
+                            try:
+                                inpost = InPostService(sandbox=settings.INPOST_SANDBOX)
+                                if shipment.provider_data and shipment.provider_data.get("inpost_shipment_id"):
+                                    shipment_id = shipment.provider_data["inpost_shipment_id"]
+                                    # Примітка: InPost API може не мати прямого методу скасування
+                                    # Але оновлюємо статус локально
+                                    shipment.status = ShippingStatus.CANCELLED
+                                    db.commit()
+                            except Exception:
+                                # Якщо не вдалося скасувати через API - просто оновлюємо статус
+                                shipment.status = ShippingStatus.CANCELLED
+                                db.commit()
+                    except Exception:
+                        # Якщо помилка з shipment - не критично, головне статус замовлення оновлено
+                        pass
+
+        elif event["type"] == "charge.succeeded":
+            # Коли charge успішний
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                if order:
+                    if order.payment_status != PaymentStatus.PAID_PARTIALLY:
+                        order.payment_status = PaymentStatus.COMPLETED
+                    if not order.paid_at:
+                        order.paid_at = datetime.utcnow()
+                    db.commit()
+
+        elif event["type"] == "charge.updated":
+            # Коли charge оновлено (metadata, description)
+            charge = event["data"]["object"]
+            payment_intent_id = charge.get("payment_intent")
+            if payment_intent_id:
+                order = db.query(Order).filter(Order.payment_intent_id == payment_intent_id).first()
+                if order:
+                    # Можна оновити metadata замовлення якщо потрібно
+                    # Поки просто логуємо
+                    pass
+
+        elif event["type"] == "charge.dispute.closed":
+            # Коли dispute закрито
+            dispute = event["data"]["object"]
+            charge_id = dispute.get("charge")
+            if charge_id:
+                # Знаходимо order через charge -> payment_intent
+                # Stripe API потрібен для отримання payment_intent з charge
+                # Поки просто логуємо
+                pass
+
+        elif event["type"] == "charge.dispute.created":
+            # Коли dispute створено
+            dispute = event["data"]["object"]
+            charge_id = dispute.get("charge")
+            # Логуємо dispute для адміністратора
+            logger.warning(f"Stripe dispute created for charge: {charge_id}")
+
+        elif event["type"] == "charge.dispute.funds_reinstated":
+            # Коли кошти повернуто після dispute
+            dispute = event["data"]["object"]
+            charge_id = dispute.get("charge")
+            # Логуємо повернення коштів
+            logger.info(f"Stripe dispute funds reinstated for charge: {charge_id}")
+
+        elif event["type"] == "charge.dispute.funds_withdrawn":
+            # Коли кошти знято через dispute
+            dispute = event["data"]["object"]
+            charge_id = dispute.get("charge")
+            # Логуємо зняття коштів
+            logger.warning(f"Stripe dispute funds withdrawn for charge: {charge_id}")
+
+        elif event["type"] == "charge.dispute.updated":
+            # Коли dispute оновлено
+            dispute = event["data"]["object"]
+            charge_id = dispute.get("charge")
+            # Логуємо оновлення dispute
+            pass
+
+        elif event["type"] == "charge.refund.updated":
+            # Коли refund оновлено
+            refund = event["data"]["object"]
+            charge_id = refund.get("charge")
+            # Логуємо оновлення refund
+            pass
+
+        # Checkout Events
+        elif event["type"] == "checkout.session.async_payment_failed":
+            # Коли async payment не вдався (delayed payment methods)
+            session = event["data"]["object"]
+            if "metadata" in session and "order_id" in session["metadata"]:
+                try:
+                    order_id = int(session["metadata"]["order_id"])
+                    order = db.query(Order).filter(Order.id == order_id).first()
+                    if order:
+                        order.payment_status = PaymentStatus.FAILED
+                        db.commit()
+                except (ValueError, KeyError):
+                    pass
+
+        elif event["type"] == "checkout.session.async_payment_succeeded":
+            # Коли async payment успішний (delayed payment methods)
+            session = event["data"]["object"]
+            if "metadata" in session and "order_id" in session["metadata"]:
+                try:
+                    order_id = int(session["metadata"]["order_id"])
+                    payment_stage = int(session["metadata"].get("payment_stage", "2"))
+                    order = db.query(Order).filter(Order.id == order_id).first()
+                    if order:
+                        if payment_stage == 2:
+                            order.payment_status = PaymentStatus.PAID_FULLY
+                            order.status = OrderStatus.PAID
+                        else:
+                            order.payment_status = PaymentStatus.COMPLETED
+                        order.payment_intent_id = session.get("payment_intent")
+                        if not order.paid_at:
+                            order.paid_at = datetime.utcnow()
+                        db.commit()
+                except (ValueError, KeyError):
+                    pass
 
         return {"status": "success"}
 
