@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
-const siteName = 'Rune box';
+const siteName = 'Rune Box';
 
 // Типи для SEO
 export interface SEOProps {
@@ -140,7 +140,7 @@ export function generateProductJsonLd({
         '@type': 'OfferShippingDetails',
         shippingDestination: {
           '@type': 'DefinedRegion',
-          addressCountry: ['PL', 'DE', 'UA', 'CZ', 'SK', 'AT'],
+          addressCountry: ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT', 'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE'],
         },
         deliveryTime: {
           '@type': 'ShippingDeliveryTime',

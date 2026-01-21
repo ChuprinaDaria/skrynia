@@ -86,11 +86,10 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
         
         if (imageUrl) {
           if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
-            ogImage = imageUrl;
             // Ensure HTTPS in production
-            if (ogImage.startsWith('http://') && ogImage.includes('runebox.eu')) {
-              ogImage = ogImage.replace('http://', 'https://');
-            }
+            ogImage = imageUrl.startsWith('http://') && imageUrl.includes('runebox.eu')
+              ? imageUrl.replace('http://', 'https://')
+              : imageUrl;
           } else {
             // All relative paths go through siteUrl (nginx proxies /static/ to backend)
             ogImage = `${siteUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;

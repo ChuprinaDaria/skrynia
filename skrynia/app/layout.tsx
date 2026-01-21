@@ -222,8 +222,8 @@ const jsonLd = {
           "@type": "ContactPoint",
           "telephone": "+48-xxx-xxx-xxx",
           "contactType": "customer service",
-          "availableLanguage": ["Ukrainian", "Polish", "English", "German", "Swedish", "Norwegian", "Danish", "French"],
-          "areaServed": ["UA", "PL", "DE", "EU"]
+          "availableLanguage": ["English", "Polish", "German", "Swedish", "Norwegian", "Danish", "French"],
+          "areaServed": "EU"
         }
       ]
     },
@@ -234,7 +234,7 @@ const jsonLd = {
       "description": "Online store of authentic handmade jewelry",
       "url": siteUrl,
       "priceRange": "$$",
-      "currenciesAccepted": "PLN, EUR, UAH",
+      "currenciesAccepted": "PLN, EUR",
       "paymentAccepted": "Credit Card, PayPal, Bank Transfer",
       "address": {
         "@type": "PostalAddress",
@@ -259,21 +259,21 @@ const jsonLd = {
       },
       "hasOfferCatalog": {
         "@type": "OfferCatalog",
-        "name": "Колекції прикрас",
+        "name": "Jewelry Collections",
         "itemListElement": [
           {
             "@type": "OfferCatalog",
-            "name": "Українські прикраси",
+            "name": "Slavic Jewelry",
             "itemListElement": []
           },
           {
             "@type": "OfferCatalog",
-            "name": "Вікінгські прикраси",
+            "name": "Viking Jewelry",
             "itemListElement": []
           },
           {
             "@type": "OfferCatalog",
-            "name": "Кельтські прикраси",
+            "name": "Celtic Jewelry",
             "itemListElement": []
           }
         ]
@@ -286,7 +286,7 @@ const jsonLd = {
         {
           "@type": "ListItem",
           "position": 1,
-          "name": "Головна",
+          "name": "Home",
           "item": siteUrl
         }
       ]
