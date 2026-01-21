@@ -12,7 +12,7 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<Language>('UA');
+  const [language, setLanguageState] = useState<Language>('EN');
 
   useEffect(() => {
     // Завантажуємо збережену мову з localStorage
@@ -32,6 +32,11 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           FR: 'fr',
         };
         document.documentElement.lang = langMap[savedLang];
+      }
+    } else {
+      // Якщо немає збереженої мови, встановлюємо англійську за замовчуванням
+      if (typeof document !== 'undefined') {
+        document.documentElement.lang = 'en';
       }
     }
   }, []);

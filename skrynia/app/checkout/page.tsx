@@ -115,26 +115,15 @@ export default function CheckoutPage() {
         // InPost international prices (EU countries) - only Size B available in PLN
         return 49.99; // Size B only for international
 
-      case 'novaposhta':
-        // Nova Poshta (Ukraine)
-        if (country === 'UA') {
-          if (packageSize === 'small') return 45;
-          if (packageSize === 'medium') return 55;
-          return 70;
-        }
-        return 0; // Not available for other countries
-
       case 'poczta':
         // Poczta Polska
         if (country === 'PL') return 14.99;
-        if (country === 'UA') return 35;
         return 25; // EU countries
 
       case 'courier':
         // Courier delivery
         if (country === 'PL') return 20;
-        if (country === 'UA') return 50;
-        return 80; // International courier delivery (all other countries)
+        return 80; // EU courier delivery
 
       default:
         return 50;
@@ -191,8 +180,6 @@ export default function CheckoutPage() {
             // Set delivery method based on country and InPost support
             if (addressData.country && INPOST_SUPPORTED_COUNTRIES.includes(addressData.country)) {
               setDeliveryMethod('inpost');
-            } else if (addressData.country === 'UA') {
-              setDeliveryMethod('novaposhta');
             }
 
             // If InPost locker is selected
@@ -409,15 +396,13 @@ export default function CheckoutPage() {
                         // Auto-select appropriate delivery method for country
                         if (INPOST_SUPPORTED_COUNTRIES.includes(newCountry) && !['inpost', 'poczta', 'courier'].includes(deliveryMethod)) {
                           setDeliveryMethod('inpost');
-                        } else if (newCountry === 'UA' && deliveryMethod !== 'novaposhta' && deliveryMethod !== 'courier') {
-                          setDeliveryMethod('novaposhta');
                         } else if (!INPOST_SUPPORTED_COUNTRIES.includes(newCountry) && deliveryMethod === 'inpost') {
                           setDeliveryMethod('courier');
                         }
                       }}
                       className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                     >
-                      {/* EU Countries */}
+                      {/* EU Countries Only */}
                       <option value="AT">{t.checkout.countries.AT}</option>
                       <option value="BE">{t.checkout.countries.BE}</option>
                       <option value="BG">{t.checkout.countries.BG}</option>
@@ -445,11 +430,10 @@ export default function CheckoutPage() {
                       <option value="SI">{t.checkout.countries.SI}</option>
                       <option value="ES">{t.checkout.countries.ES}</option>
                       <option value="SE">{t.checkout.countries.SE}</option>
-                      {/* Non-EU */}
-                      <option value="UA">{t.checkout.countries.UA}</option>
-                      <option value="GB">{t.checkout.countries.GB}</option>
-                      <option value="US">{t.checkout.countries.US}</option>
                     </select>
+                    <p className="text-sage text-xs mt-2">
+                      {t.checkout.euOnlyDelivery || 'Доставка тільки по країнах ЄС. Для медіа-запитів звертайтесь на email.'}
+                    </p>
                   </div>
 
                   {/* Delivery Method Selection */}
@@ -486,37 +470,6 @@ export default function CheckoutPage() {
                                   ? `Odbiór z paczkomatu • ${calculateShippingCost()} zł`
                                   : `InPost pickup point • ${calculateShippingCost()} PLN`
                                 }
-                              </p>
-                            </div>
-                          </div>
-                        </button>
-                      )}
-
-                      {/* Nova Poshta */}
-                      {formData.shipping_country === 'UA' && (
-                        <button
-                          type="button"
-                          onClick={() => setDeliveryMethod('novaposhta')}
-                          className={`p-4 border-2 rounded-sm text-left transition-all ${
-                            deliveryMethod === 'novaposhta'
-                              ? 'border-oxblood bg-oxblood/10'
-                              : 'border-sage/30 hover:border-sage/50'
-                          }`}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 mt-0.5 ${
-                              deliveryMethod === 'novaposhta' ? 'border-oxblood bg-oxblood' : 'border-sage/50'
-                            }`}>
-                              {deliveryMethod === 'novaposhta' && (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <div className="w-2 h-2 rounded-full bg-ivory"></div>
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex-1">
-                              <p className="text-ivory font-semibold mb-1">Нова Пошта</p>
-                              <p className="text-sage text-xs">
-                                Відділення Нової Пошти • {calculatePackageSize() === 'small' ? '45' : calculatePackageSize() === 'medium' ? '55' : '70'} грн
                               </p>
                             </div>
                           </div>
@@ -574,12 +527,10 @@ export default function CheckoutPage() {
                           </div>
                           <div className="flex-1">
                             <p className="text-ivory font-semibold mb-1">
-                              {formData.shipping_country === 'UA' ? 'Кур\'єр' : 'Kurier'}
+                              {formData.shipping_country === 'PL' ? 'Kurier' : 'Courier'}
                             </p>
                             <p className="text-sage text-xs">
-                              {formData.shipping_country === 'PL' && 'Dostawa kurierem • 20 zł'}
-                              {formData.shipping_country === 'UA' && 'Кур\'єрська доставка • 50 грн'}
-                              {formData.shipping_country !== 'PL' && formData.shipping_country !== 'UA' && 'Courier delivery • 35 zł'}
+                              {formData.shipping_country === 'PL' ? 'Dostawa kurierem • 20 zł' : `Courier delivery • ${calculateShippingCost()} zł`}
                             </p>
                           </div>
                         </div>
@@ -587,8 +538,8 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  {/* InPost / Nova Poshta Pickup Point Selection */}
-                  {(deliveryMethod === 'inpost' || deliveryMethod === 'novaposhta') && (
+                  {/* InPost Pickup Point Selection */}
+                  {deliveryMethod === 'inpost' && (
                     <div>
                       <label className="block text-ivory font-inter mb-2">
                         {deliveryMethod === 'inpost' ? 'Paczkomat' : 'Відділення'} <span className="text-oxblood">*</span>
@@ -613,18 +564,17 @@ export default function CheckoutPage() {
                                       token={inpostToken}
                                       version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
                                       country={formData.shipping_country === 'PL' ? undefined : INPOST_SUPPORTED_COUNTRIES.join(',')}
-                                      language={
-                                        language === 'UA' ? 'uk' : 
-                                        language === 'EN' ? 'en' : 
-                                        language === 'FR' ? 'fr' : 
-                                        language === 'PL' ? 'pl' : 
-                                        ['IT', 'ES', 'PT'].includes(language as string) ? (language as string).toLowerCase() as 'it' | 'es' | 'pt' :
-                                        language === 'DE' ? 'en' : 
-                                        language === 'SE' ? 'en' : 
-                                        language === 'NO' ? 'en' : 
-                                        language === 'DK' ? 'en' : 
-                                        'pl'
-                                      }
+                      language={
+                        language === 'EN' ? 'en' : 
+                        language === 'FR' ? 'fr' : 
+                        language === 'PL' ? 'pl' : 
+                        ['IT', 'ES', 'PT'].includes(language as string) ? (language as string).toLowerCase() as 'it' | 'es' | 'pt' :
+                        language === 'DE' ? 'en' : 
+                        language === 'SE' ? 'en' : 
+                        language === 'NO' ? 'en' : 
+                        language === 'DK' ? 'en' : 
+                        'pl'
+                      }
                                       config="parcelCollect"
                                       sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
                                       onPointSelect={(point: InPostPoint) => {
@@ -693,24 +643,6 @@ export default function CheckoutPage() {
                               </>
                             )}
                           </>
-                        ) : (
-                          <>
-                            {/* Nova Poshta - manual input for now */}
-                            <input
-                              type="text"
-                              required
-                              value={selectedPickupPoint}
-                              onChange={(e) => setSelectedPickupPoint(e.target.value)}
-                              placeholder="Введіть номер відділення (напр. Відділення №1)"
-                              className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                            />
-                            <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
-                              <p className="text-sage text-xs">
-                                💡 Незабаром ви зможете обрати відділення з карти.
-                                Поки що введіть адресу відділення вручну.
-                              </p>
-                            </div>
-                          </>
                         )}
                       </div>
                     </div>
@@ -721,53 +653,53 @@ export default function CheckoutPage() {
                     <>
                       <div>
                         <label className="block text-ivory font-inter mb-2">
-                          {formData.shipping_country === 'UA' ? 'Адреса' : 'Adres'} <span className="text-oxblood">*</span>
+                          {t.checkout.address || 'Adres'} <span className="text-oxblood">*</span>
                         </label>
                         <input
                           type="text"
                           required
                           value={formData.shipping_address_line1}
                           onChange={(e) => setFormData({ ...formData, shipping_address_line1: e.target.value })}
-                          placeholder={formData.shipping_country === 'UA' ? 'вул. Хрещатик, 1' : 'ul. Główna 1'}
+                          placeholder={t.checkout.addressPlaceholder || 'ul. Główna 1'}
                           className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                         />
                       </div>
                       <div>
                         <label className="block text-ivory font-inter mb-2">
-                          {formData.shipping_country === 'UA' ? 'Адреса (додатково)' : 'Adres (dodatkowy)'}
+                          {t.checkout.address2 || 'Adres (dodatkowy)'}
                         </label>
                         <input
                           type="text"
                           value={formData.shipping_address_line2}
                           onChange={(e) => setFormData({ ...formData, shipping_address_line2: e.target.value })}
-                          placeholder={formData.shipping_country === 'UA' ? 'Квартира, офіс' : 'Mieszkanie, biuro'}
+                          placeholder={t.checkout.address2Placeholder || 'Mieszkanie, biuro'}
                           className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <label className="block text-ivory font-inter mb-2">
-                            {formData.shipping_country === 'UA' ? 'Місто' : 'Miasto'} <span className="text-oxblood">*</span>
+                            {t.checkout.city || 'Miasto'} <span className="text-oxblood">*</span>
                           </label>
                           <input
                             type="text"
                             required
                             value={formData.shipping_city}
                             onChange={(e) => setFormData({ ...formData, shipping_city: e.target.value })}
-                            placeholder={formData.shipping_country === 'UA' ? 'Київ' : 'Warszawa'}
+                            placeholder={t.checkout.cityPlaceholder || 'Warszawa'}
                             className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                           />
                         </div>
                         <div>
                           <label className="block text-ivory font-inter mb-2">
-                            {formData.shipping_country === 'UA' ? 'Поштовий індекс' : 'Kod pocztowy'} <span className="text-oxblood">*</span>
+                            {t.checkout.postalCode || 'Kod pocztowy'} <span className="text-oxblood">*</span>
                           </label>
                           <input
                             type="text"
                             required
                             value={formData.shipping_postal_code}
                             onChange={(e) => setFormData({ ...formData, shipping_postal_code: e.target.value })}
-                            placeholder={formData.shipping_country === 'UA' ? '01001' : '00-001'}
+                            placeholder={t.checkout.postalCodePlaceholder || '00-001'}
                             className="w-full px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
                           />
                         </div>

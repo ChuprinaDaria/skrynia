@@ -300,7 +300,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="uk" dir="ltr">
+    <html lang="en" dir="ltr">
       <head>
         {/* Preconnect для швидшого завантаження */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
