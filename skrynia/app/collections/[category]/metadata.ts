@@ -87,10 +87,12 @@ export async function generateMetadata({ params }: { params: Promise<{ category:
         if (imageUrl) {
           if (imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
             ogImage = imageUrl;
-          } else if (imageUrl.startsWith('/static/') || imageUrl.startsWith('/uploads/')) {
-            const backendBase = getApiEndpoint('').replace(/\/api\/v1$/, '').replace(/\/$/, '');
-            ogImage = `${backendBase}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
+            // Ensure HTTPS in production
+            if (ogImage.startsWith('http://') && ogImage.includes('runebox.eu')) {
+              ogImage = ogImage.replace('http://', 'https://');
+            }
           } else {
+            // All relative paths go through siteUrl (nginx proxies /static/ to backend)
             ogImage = `${siteUrl}${imageUrl.startsWith('/') ? '' : '/'}${imageUrl}`;
           }
         }

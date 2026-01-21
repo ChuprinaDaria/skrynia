@@ -3,19 +3,20 @@ import type { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 export const metadata: Metadata = {
-  title: 'Контакти | Rune box',
-  description: 'Зв\'яжіться з нами для замовлення прикрас, консультацій або співпраці. Email, телефон, соціальні мережі.',
+  title: 'Contact Us | Rune Box',
+  description: 'Get in touch with us to order jewelry, ask questions or collaborate. Email, phone, social media.',
   keywords: [
-    'контакти',
-    'зв\'язатися',
-    'замовити прикраси',
-    'консультація',
+    'contact',
+    'get in touch',
+    'order jewelry',
+    'consultation',
     'email',
-    'телефон',
+    'phone',
+    'customer service',
   ],
   openGraph: {
     title: 'Contact Us | Rune Box',
-    description: 'Get in touch with us to order jewelry or get a consultation',
+    description: 'Get in touch with us to order jewelry or get a consultation. We are happy to help!',
     url: `${siteUrl}/contact`,
     type: 'website',
     siteName: 'Rune Box',
@@ -25,14 +26,14 @@ export const metadata: Metadata = {
         url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
         width: 1200,
         height: 630,
-        alt: 'Contact Us | Rune Box',
+        alt: 'Contact Rune Box',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Contact Us | Rune Box',
-    description: 'Get in touch with us to order jewelry or get a consultation',
+    description: 'Get in touch with us to order jewelry or get a consultation.',
     images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
     creator: '@runebox',
     site: '@runebox',
@@ -40,11 +41,29 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${siteUrl}/contact`,
     languages: {
+      'en': `${siteUrl}/contact`,
       'uk': `${siteUrl}/contact`,
-      'en': `${siteUrl}/contact/en`,
-      'de': `${siteUrl}/contact/de`,
-      'pl': `${siteUrl}/contact/pl`,
+      'de': `${siteUrl}/contact`,
+      'pl': `${siteUrl}/contact`,
+      'sv': `${siteUrl}/contact`,
+      'no': `${siteUrl}/contact`,
+      'da': `${siteUrl}/contact`,
+      'fr': `${siteUrl}/contact`,
     },
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  other: {
+    'og:see_also': siteUrl,
+    'article:publisher': 'https://www.facebook.com/runebox',
+  },
 };
-

@@ -3,21 +3,21 @@ import type { Metadata } from 'next';
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
 
 export const metadata: Metadata = {
-  title: 'Доставка та Оплата | Rune box',
-  description: 'Інформація про способи доставки, оплати та умови повернення. Безкоштовна доставка по ЄС від 150€.',
+  title: 'Shipping & Payment | Rune Box',
+  description: 'Information about delivery methods, payment options and return conditions. EU-wide delivery with InPost and courier services.',
   keywords: [
-    'доставка',
-    'оплата',
-    'повернення',
-    'безкоштовна доставка',
+    'shipping',
+    'delivery',
+    'payment',
+    'returns',
+    'free shipping',
     'InPost',
-    'DHL',
-    'Нова Пошта',
-    'умови доставки',
+    'courier delivery',
+    'EU shipping',
   ],
   openGraph: {
     title: 'Shipping & Payment | Rune Box',
-    description: 'Information about delivery methods, payment options and return conditions',
+    description: 'Information about delivery methods, payment options and return conditions. EU-wide delivery.',
     url: `${siteUrl}/shipping`,
     type: 'website',
     siteName: 'Rune Box',
@@ -27,14 +27,14 @@ export const metadata: Metadata = {
         url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
         width: 1200,
         height: 630,
-        alt: 'Shipping & Payment | Rune Box',
+        alt: 'Rune Box Shipping & Payment',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Shipping & Payment | Rune Box',
-    description: 'Information about delivery methods, payment options and return conditions',
+    description: 'Information about delivery methods, payment options and return conditions.',
     images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
     creator: '@runebox',
     site: '@runebox',
@@ -42,11 +42,29 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${siteUrl}/shipping`,
     languages: {
+      'en': `${siteUrl}/shipping`,
       'uk': `${siteUrl}/shipping`,
-      'en': `${siteUrl}/shipping/en`,
-      'de': `${siteUrl}/shipping/de`,
-      'pl': `${siteUrl}/shipping/pl`,
+      'de': `${siteUrl}/shipping`,
+      'pl': `${siteUrl}/shipping`,
+      'sv': `${siteUrl}/shipping`,
+      'no': `${siteUrl}/shipping`,
+      'da': `${siteUrl}/shipping`,
+      'fr': `${siteUrl}/shipping`,
     },
   },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  other: {
+    'og:see_also': siteUrl,
+    'article:publisher': 'https://www.facebook.com/runebox',
+  },
 };
-
