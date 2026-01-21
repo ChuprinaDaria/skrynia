@@ -542,105 +542,101 @@ export default function CheckoutPage() {
                   {deliveryMethod === 'inpost' && (
                     <div>
                       <label className="block text-ivory font-inter mb-2">
-                        {deliveryMethod === 'inpost' ? 'Paczkomat' : 'Відділення'} <span className="text-oxblood">*</span>
+                        Paczkomat <span className="text-oxblood">*</span>
                       </label>
                       <div className="space-y-3">
-                        {deliveryMethod === 'inpost' ? (
-                          <>
-                            {/* InPost Map Widget */}
-                            {showInPostMap && hasInPostToken ? (
-                              <div className="space-y-3">
-                                <div 
-                                  className="border border-sage/30 rounded-sm"
-                                  style={{ 
-                                    height: '600px',
-                                    width: '100%',
-                                    position: 'relative',
-                                    overflow: 'visible'
+                        {/* InPost Map Widget */}
+                        {showInPostMap && hasInPostToken ? (
+                          <div className="space-y-3">
+                            <div 
+                              className="border border-sage/30 rounded-sm"
+                              style={{ 
+                                height: '600px',
+                                width: '100%',
+                                position: 'relative',
+                                overflow: 'visible'
+                              }}
+                            >
+                              <div style={{ height: '100%', width: '100%' }}>
+                                <InPostGeowidget
+                                  token={inpostToken}
+                                  version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
+                                  country={formData.shipping_country === 'PL' ? undefined : INPOST_SUPPORTED_COUNTRIES.join(',')}
+                                  language={
+                                    language === 'EN' ? 'en' : 
+                                    language === 'FR' ? 'fr' : 
+                                    language === 'PL' ? 'pl' : 
+                                    ['IT', 'ES', 'PT'].includes(language as string) ? (language as string).toLowerCase() as 'it' | 'es' | 'pt' :
+                                    language === 'DE' ? 'en' : 
+                                    language === 'SE' ? 'en' : 
+                                    language === 'NO' ? 'en' : 
+                                    language === 'DK' ? 'en' : 
+                                    'pl'
+                                  }
+                                  config="parcelCollect"
+                                  sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
+                                  onPointSelect={(point: InPostPoint) => {
+                                    setSelectedInPostPoint(point);
+                                    // Extract point code from name (e.g., "WAW01M" from "Paczkomat InPost WAW01M")
+                                    // Try different patterns for different countries
+                                    const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] 
+                                      || point.name.match(/[A-Z]{2,4}\d{2,3}[A-Z]?/)?.[0] 
+                                      || point.name.split(' ').pop() 
+                                      || point.name;
+                                    setSelectedPickupPoint(pointCode);
+                                    setShowInPostMap(false);
                                   }}
-                                >
-                                  <div style={{ height: '100%', width: '100%' }}>
-                                    <InPostGeowidget
-                                      token={inpostToken}
-                                      version={formData.shipping_country === 'PL' ? 'v5' : 'international'}
-                                      country={formData.shipping_country === 'PL' ? undefined : INPOST_SUPPORTED_COUNTRIES.join(',')}
-                      language={
-                        language === 'EN' ? 'en' : 
-                        language === 'FR' ? 'fr' : 
-                        language === 'PL' ? 'pl' : 
-                        ['IT', 'ES', 'PT'].includes(language as string) ? (language as string).toLowerCase() as 'it' | 'es' | 'pt' :
-                        language === 'DE' ? 'en' : 
-                        language === 'SE' ? 'en' : 
-                        language === 'NO' ? 'en' : 
-                        language === 'DK' ? 'en' : 
-                        'pl'
-                      }
-                                      config="parcelCollect"
-                                      sandbox={process.env.NEXT_PUBLIC_INPOST_SANDBOX === 'true'}
-                                      onPointSelect={(point: InPostPoint) => {
-                                        setSelectedInPostPoint(point);
-                                        // Extract point code from name (e.g., "WAW01M" from "Paczkomat InPost WAW01M")
-                                        // Try different patterns for different countries
-                                        const pointCode = point.name.match(/[A-Z]{3}\d{2}[A-Z]/)?.[0] 
-                                          || point.name.match(/[A-Z]{2,4}\d{2,3}[A-Z]?/)?.[0] 
-                                          || point.name.split(' ').pop() 
-                                          || point.name;
-                                        setSelectedPickupPoint(pointCode);
-                                        setShowInPostMap(false);
-                                      }}
-                                    />
-                                  </div>
-                                </div>
+                                />
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              onClick={() => setShowInPostMap(false)}
+                              className="w-full"
+                            >
+                              {t.checkout.cancel || 'Скасувати'}
+                            </Button>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="flex gap-2">
+                              <input
+                                type="text"
+                                required
+                                value={selectedPickupPoint}
+                                onChange={(e) => setSelectedPickupPoint(e.target.value)}
+                                placeholder="Wpisz kod paczkomatu (np. WAW01M) lub wybierz z mapy"
+                                className="flex-1 px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
+                              />
+                              {hasInPostToken && (
                                 <Button
                                   type="button"
                                   variant="ghost"
-                                  onClick={() => setShowInPostMap(false)}
-                                  className="w-full"
+                                  onClick={() => setShowInPostMap(true)}
+                                  className="whitespace-nowrap"
                                 >
-                                  {t.checkout.cancel || 'Скасувати'}
+                                  {selectedInPostPoint ? t.checkout.changePoint || 'Змінити' : t.checkout.selectFromMap || 'Вибрати з карти'}
                                 </Button>
+                              )}
+                            </div>
+                            {selectedInPostPoint && (
+                              <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
+                                <p className="text-sage text-sm">
+                                  <strong className="text-ivory">Вибрано:</strong> {selectedInPostPoint.name}
+                                  <br />
+                                  <span className="text-xs">
+                                    {selectedInPostPoint.address.street}, {selectedInPostPoint.address.city} {selectedInPostPoint.address.post_code}
+                                  </span>
+                                </p>
                               </div>
-                            ) : (
-                              <>
-                                <div className="flex gap-2">
-                                  <input
-                                    type="text"
-                                    required
-                                    value={selectedPickupPoint}
-                                    onChange={(e) => setSelectedPickupPoint(e.target.value)}
-                                    placeholder="Wpisz kod paczkomatu (np. WAW01M) lub wybierz z mapy"
-                                    className="flex-1 px-4 py-3 bg-deep-black border border-sage/30 text-ivory rounded-sm focus:outline-none focus:border-oxblood focus:ring-2 focus:ring-oxblood/50"
-                                  />
-                                  {hasInPostToken && (
-                                    <Button
-                                      type="button"
-                                      variant="ghost"
-                                      onClick={() => setShowInPostMap(true)}
-                                      className="whitespace-nowrap"
-                                    >
-                                      {selectedInPostPoint ? t.checkout.changePoint || 'Змінити' : t.checkout.selectFromMap || 'Вибрати з карти'}
-                                    </Button>
-                                  )}
-                                </div>
-                                {selectedInPostPoint && (
-                                  <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
-                                    <p className="text-sage text-sm">
-                                      <strong className="text-ivory">Вибрано:</strong> {selectedInPostPoint.name}
-                                      <br />
-                                      <span className="text-xs">
-                                        {selectedInPostPoint.address.street}, {selectedInPostPoint.address.city} {selectedInPostPoint.address.post_code}
-                                      </span>
-                                    </p>
-                                  </div>
-                                )}
-                                {!hasInPostToken && (
-                                  <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
-                                    <p className="text-sage text-xs">
-                                      {t.checkout.paczkomatHint}
-                                    </p>
-                                  </div>
-                                )}
-                              </>
+                            )}
+                            {!hasInPostToken && (
+                              <div className="p-3 bg-sage/10 border border-sage/30 rounded-sm">
+                                <p className="text-sage text-xs">
+                                  {t.checkout.paczkomatHint}
+                                </p>
+                              </div>
                             )}
                           </>
                         )}
