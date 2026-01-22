@@ -229,6 +229,16 @@ async def stripe_webhook(
                     order.payment_intent_id = session.get("payment_intent")
                     if not order.paid_at:
                         order.paid_at = datetime.utcnow()
+                    
+                    # Send email for partial payment (deposit)
+                    db.commit()
+                    db.refresh(order)
+                    background_tasks.add_task(
+                        send_order_status_email,
+                        order=order,
+                        status=OrderStatus.PAID,
+                        db=db
+                    )
                 elif payment_stage == 2:
                     order.payment_status = PaymentStatus.PAID_FULLY
                     order.status = OrderStatus.PAID
