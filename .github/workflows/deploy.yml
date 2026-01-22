@@ -269,16 +269,85 @@ jobs:
           API_URL: ${{ secrets.BACKEND_URL || secrets.NEXT_PUBLIC_API_URL }}
         run: |
           echo "🔐 Отримання admin token..."
-          RESPONSE=$(curl -s -X POST "$API_URL/api/v1/auth/login" \
+          echo "API URL: $API_URL"
+          
+          # Перевірка доступності API
+          echo "Перевірка доступності API..."
+          if curl -f -s --max-time 10 "$API_URL/api/v1/products" > /dev/null 2>&1; then
+            echo "✅ API доступний"
+          else
+            echo "⚠️  API не відповідає, але продовжуємо спробу отримати token..."
+          fi
+          
+          # Отримання token з обробкою помилок
+          set +e  # Не зупинятися на помилках curl
+          RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$API_URL/api/v1/auth/login" \
             -H "Content-Type: application/json" \
-            -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}")
+            -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}" \
+            --max-time 30 \
+            --connect-timeout 10 \
+            --retry 2 \
+            --retry-delay 3 \
+            2>&1)
+          CURL_EXIT=$?
+          set -e
           
-          TOKEN=$(echo $RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin).get('access_token', ''))" 2>/dev/null || echo "")
-          
-          if [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
-            echo "❌ Помилка: Не вдалося отримати token"
+          if [ $CURL_EXIT -ne 0 ]; then
+            echo "❌ Помилка curl запиту (exit code: $CURL_EXIT)"
             echo "Response: $RESPONSE"
-            exit 1
+            echo ""
+            echo "Можливі причини:"
+            echo "  - API недоступний ($API_URL)"
+            echo "  - Проблеми з SSL сертифікатом (exit code 60)"
+            echo "  - Таймаут з'єднання"
+            echo "  - Мережева помилка"
+            echo "⚠️  Bulk import пропущено через помилку отримання token"
+            exit 0  # Не блокуємо deployment
+          fi
+          
+          # Витягуємо HTTP код
+          HTTP_CODE=$(echo "$RESPONSE" | grep -o "HTTP_CODE:[0-9]*" | cut -d: -f2 || echo "000")
+          BODY=$(echo "$RESPONSE" | sed '/HTTP_CODE:/d')
+          
+          echo "HTTP Code: $HTTP_CODE"
+          
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "❌ Помилка API: HTTP $HTTP_CODE"
+            echo "Response body: $BODY"
+            if [ "$HTTP_CODE" == "401" ]; then
+              echo "  Можлива причина: невірний email або пароль"
+            elif [ "$HTTP_CODE" == "000" ]; then
+              echo "  Можлива причина: API недоступний або таймаут"
+            fi
+            echo "⚠️  Bulk import пропущено через помилку отримання token"
+            exit 0  # Не блокуємо deployment
+          fi
+          
+          # Використовуємо Python для парсингу JSON
+          TOKEN=$(echo "$BODY" | python3 -c "
+          import sys, json
+          try:
+              data = json.load(sys.stdin)
+              token = data.get('access_token', '')
+              if not token:
+                  print('Token not found in response', file=sys.stderr)
+              print(token)
+          except json.JSONDecodeError as e:
+              print(f'JSON decode error: {e}', file=sys.stderr)
+              sys.exit(1)
+          except Exception as e:
+              print(f'Error: {e}', file=sys.stderr)
+              sys.exit(1)
+          " 2>&1)
+          PYTHON_EXIT=$?
+          
+          if [ $PYTHON_EXIT -ne 0 ] || [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
+            echo "❌ Помилка: Не вдалося отримати token"
+            echo "Python exit code: $PYTHON_EXIT"
+            echo "Python output: $TOKEN"
+            echo "Response body: $BODY"
+            echo "⚠️  Bulk import пропущено через помилку отримання token"
+            exit 0  # Не блокуємо deployment
           fi
           
           echo "✅ Token отримано"
