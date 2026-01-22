@@ -278,7 +278,7 @@ jobs:
           import requests
           import json
           
-          api_url = os.environ.get('API_URL', 'https://api.runebox.eu')
+          api_url = os.environ.get('API_URL', 'https://runebox.eu')
           admin_email = os.environ.get('ADMIN_EMAIL')
           admin_password = os.environ.get('ADMIN_PASSWORD')
           

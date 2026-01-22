@@ -10,7 +10,7 @@ on:
       api_url:
         description: 'API Base URL'
         required: false
-        default: 'https://api.runebox.eu'
+        default: 'https://runebox.eu'
       skip_errors:
         description: 'Skip errors and continue'
         required: false
@@ -27,7 +27,7 @@ on:
     - cron: '0 3 * * *'
 
 env:
-  API_BASE_URL: ${{ inputs.api_url || 'https://api.runebox.eu' }}
+  API_BASE_URL: ${{ inputs.api_url || 'https://runebox.eu' }}
   PRODUCTS_PATH: ${{ inputs.products_path || 'товари' }}
 
 jobs:
@@ -75,7 +75,7 @@ jobs:
           # Вимкнути попередження про небезпечні запити (якщо потрібно)
           # requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
           
-          api_url = os.environ.get('API_URL', 'https://api.runebox.eu')
+          api_url = os.environ.get('API_URL', 'https://runebox.eu')
           admin_email = os.environ.get('ADMIN_EMAIL')
           admin_password = os.environ.get('ADMIN_PASSWORD')
           
