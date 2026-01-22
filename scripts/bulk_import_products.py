@@ -166,35 +166,56 @@ def process_product(product_dir: Path, session: requests.Session, token: str) ->
     
     # Завантажуємо зображення
     images = []
-    image_files = sorted([
-        f for f in product_dir.iterdir()
-        if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS
-    ])
     
-    for idx, image_path in enumerate(image_files):
-        print(f"    📷 Завантаження зображення {image_path.name}...")
-        image_url = upload_image(session, image_path, token)
-        if image_url:
-            images.append({
-                "image_url": image_url,
-                "alt_text": product_data.get("title_uk", ""),
-                "position": idx,
-                "is_primary": idx == 0  # Перше зображення = головне
-            })
-    
-    # Якщо в product.json вказані зображення, використовуємо їх
-    if "images" in product_data and isinstance(product_data["images"], list):
-        for img in product_data["images"]:
+    # Якщо в product.json вказані зображення, використовуємо їх (пріоритет)
+    if "images" in product_data and isinstance(product_data["images"], list) and len(product_data["images"]) > 0:
+        print(f"    📷 Використовуємо зображення з product.json...")
+        for idx, img in enumerate(product_data["images"]):
             if "filename" in img:
                 img_path = product_dir / img["filename"]
                 if img_path.exists():
                     print(f"    📷 Завантаження зображення {img['filename']}...")
                     image_url = upload_image(session, img_path, token)
                     if image_url:
-                        img["image_url"] = image_url
-                        if "is_primary" not in img:
-                            img["is_primary"] = False
-                        images.append(img)
+                        images.append({
+                            "image_url": image_url,
+                            "alt_text": img.get("alt_text", product_data.get("title_uk", img["filename"])),
+                            "position": img.get("position", idx),
+                            "is_primary": img.get("is_primary", idx == 0)  # Перше = primary якщо не вказано
+                        })
+                else:
+                    print(f"    ⚠️  Файл {img['filename']} не знайдено, пропускаємо")
+    else:
+        # Якщо в product.json немає зображень, знаходимо всі .jpg/.png файли
+        image_files = sorted([
+            f for f in product_dir.iterdir()
+            if f.is_file() and f.suffix.lower() in IMAGE_EXTENSIONS
+        ])
+        
+        if not image_files:
+            print(f"    ⚠️  Не знайдено зображень в папці")
+        else:
+            print(f"    📷 Знайдено {len(image_files)} зображень, завантажуємо...")
+        
+        for idx, image_path in enumerate(image_files):
+            print(f"    📷 Завантаження зображення {image_path.name}...")
+            image_url = upload_image(session, image_path, token)
+            if image_url:
+                # Використовуємо назву файлу для alt_text
+                alt_text = product_data.get("title_uk", "") or image_path.stem
+                images.append({
+                    "image_url": image_url,
+                    "alt_text": alt_text,
+                    "position": idx,
+                    "is_primary": idx == 0  # Перше зображення = головне
+                })
+    
+    # Переконаємося, що є хоча б одне primary зображення
+    if images:
+        has_primary = any(img.get("is_primary", False) for img in images)
+        if not has_primary:
+            images[0]["is_primary"] = True
+            print(f"    ✅ Встановлено перше зображення як primary")
     
     product_data["images"] = images
     
