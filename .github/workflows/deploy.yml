@@ -224,6 +224,15 @@ jobs:
               echo "⚠️  Warning: Migration failed, but continuing..."
             }
             
+            echo "🔄 Updating host nginx configuration..."
+            # Copy nginx config to host nginx (if it exists)
+            if [ -f /etc/nginx/sites-available/runebox ]; then
+              # Update client_max_body_size in host nginx config
+              sed -i 's/client_max_body_size [0-9]*[mMgG];/client_max_body_size 100M;/g' /etc/nginx/sites-available/runebox || true
+              # Reload host nginx
+              nginx -t && systemctl reload nginx || echo "⚠️  Warning: Failed to reload host nginx"
+            fi
+            
             echo "✅ Deployment successful!"
             echo "📊 Container status:"
             docker compose -f docker-compose.prod.yml ps
