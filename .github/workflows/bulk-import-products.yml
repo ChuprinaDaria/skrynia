@@ -51,6 +51,8 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install requests urllib3
+          # Перевірка встановлення
+          python3 -c "import requests; print(f'requests version: {requests.__version__}')"
 
       - name: Get Admin Token
         id: get_token
@@ -62,80 +64,104 @@ jobs:
           echo "🔐 Отримання admin token..."
           echo "API URL: $API_URL"
           
+          # Використовуємо Python requests замість curl (краще обробляє SSL)
+          python3 << 'EOF'
+          import os
+          import sys
+          import requests
+          import json
+          from urllib3.exceptions import InsecureRequestWarning
+          
+          # Вимкнути попередження про небезпечні запити (якщо потрібно)
+          # requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+          
+          api_url = os.environ.get('API_URL', 'https://api.runebox.eu')
+          admin_email = os.environ.get('ADMIN_EMAIL')
+          admin_password = os.environ.get('ADMIN_PASSWORD')
+          
+          if not admin_email or not admin_password:
+              print("❌ Помилка: ADMIN_EMAIL або ADMIN_PASSWORD не встановлені в Secrets")
+              sys.exit(1)
+          
           # Перевірка доступності API
-          echo "Перевірка доступності API..."
-          if ! curl -f -s --max-time 10 "$API_URL/api/v1/products" > /dev/null 2>&1; then
-            echo "⚠️  API не відповідає, але продовжуємо..."
-          else
-            echo "✅ API доступний"
-          fi
-          
-          # Отримання token з обробкою помилок
-          set +e  # Не зупинятися на помилках curl
-          RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" -X POST "$API_URL/api/v1/auth/login" \
-            -H "Content-Type: application/json" \
-            -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}" \
-            --max-time 30 \
-            --connect-timeout 10 \
-            --retry 2 \
-            --retry-delay 3 \
-            2>&1)
-          CURL_EXIT=$?
-          set -e
-          
-          if [ $CURL_EXIT -ne 0 ]; then
-            echo "❌ Помилка curl запиту (exit code: $CURL_EXIT)"
-            echo "Response: $RESPONSE"
-            echo ""
-            echo "Можливі причини:"
-            echo "  - API недоступний ($API_URL)"
-            echo "  - Проблеми з SSL сертифікатом (exit code 60)"
-            echo "  - Таймаут з'єднання"
-            echo "  - Мережева помилка"
-            exit 1
-          fi
-          
-          # Витягуємо HTTP код
-          HTTP_CODE=$(echo "$RESPONSE" | grep -o "HTTP_CODE:[0-9]*" | cut -d: -f2)
-          BODY=$(echo "$RESPONSE" | sed '/HTTP_CODE:/d')
-          
-          echo "HTTP Code: $HTTP_CODE"
-          
-          if [ "$HTTP_CODE" != "200" ]; then
-            echo "❌ Помилка API: HTTP $HTTP_CODE"
-            echo "Response body: $BODY"
-            exit 1
-          fi
-          
-          # Використовуємо Python для парсингу JSON
-          TOKEN=$(echo "$BODY" | python3 -c "
-          import sys, json
+          print("Перевірка доступності API...")
           try:
-              data = json.load(sys.stdin)
-              token = data.get('access_token', '')
-              if not token:
-                  print('Token not found in response', file=sys.stderr)
-              print(token)
-          except json.JSONDecodeError as e:
-              print(f'JSON decode error: {e}', file=sys.stderr)
+              response = requests.get(f"{api_url}/api/v1/products", timeout=10, verify=True)
+              if response.status_code == 200:
+                  print("✅ API доступний")
+              else:
+                  print(f"⚠️  API відповідає з кодом {response.status_code}, але продовжуємо...")
+          except requests.exceptions.RequestException as e:
+              print(f"⚠️  API не відповідає: {e}")
+              print("Продовжуємо спробу отримати token...")
+          
+          # Отримання token
+          login_url = f"{api_url}/api/v1/auth/login"
+          payload = {
+              "email": admin_email,
+              "password": admin_password
+          }
+          
+          try:
+              print(f"Відправка запиту на {login_url}...")
+              response = requests.post(
+                  login_url,
+                  json=payload,
+                  headers={"Content-Type": "application/json"},
+                  timeout=30,
+                  verify=True  # Перевіряти SSL сертифікат
+              )
+              
+              print(f"HTTP Code: {response.status_code}")
+              
+              if response.status_code != 200:
+                  print(f"❌ Помилка API: HTTP {response.status_code}")
+                  print(f"Response: {response.text}")
+                  if response.status_code == 401:
+                      print("  Можлива причина: невірний email або пароль")
+                  elif response.status_code == 404:
+                      print("  Можлива причина: неправильний URL API")
+                  sys.exit(1)
+              
+              try:
+                  data = response.json()
+                  token = data.get('access_token', '')
+                  
+                  if not token:
+                      print("❌ Помилка: Token не знайдено в відповіді")
+                      print(f"Response: {response.text}")
+                      sys.exit(1)
+                  
+                  print("✅ Token отримано")
+                  # Виводимо token для GitHub Actions output
+                  print(f"::add-mask::{token}")
+                  print(f"token={token}", file=open(os.environ.get('GITHUB_OUTPUT', '/dev/stdout'), 'a'))
+                  
+              except json.JSONDecodeError as e:
+                  print(f"❌ Помилка парсингу JSON: {e}")
+                  print(f"Response: {response.text}")
+                  sys.exit(1)
+                  
+          except requests.exceptions.SSLError as e:
+              print(f"❌ Помилка SSL: {e}")
+              print("Можливі причини:")
+              print("  - Невалідний SSL сертифікат")
+              print("  - Проблеми з сертифікатом сервера")
+              print("  - Неправильний домен")
+              sys.exit(1)
+          except requests.exceptions.Timeout:
+              print("❌ Помилка: Таймаут з'єднання")
+              sys.exit(1)
+          except requests.exceptions.ConnectionError as e:
+              print(f"❌ Помилка з'єднання: {e}")
+              print("Можливі причини:")
+              print(f"  - API недоступний ({api_url})")
+              print("  - Проблеми з мережею")
               sys.exit(1)
           except Exception as e:
-              print(f'Error: {e}', file=sys.stderr)
+              print(f"❌ Неочікувана помилка: {e}")
               sys.exit(1)
-          " 2>&1)
-          PYTHON_EXIT=$?
-          
-          if [ $PYTHON_EXIT -ne 0 ] || [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
-            echo "❌ Помилка: Не вдалося отримати token"
-            echo "Python exit code: $PYTHON_EXIT"
-            echo "Python output: $TOKEN"
-            echo "Response body: $BODY"
-            exit 1
-          fi
-          
-          echo "✅ Token отримано"
-          echo "::add-mask::$TOKEN"
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+          EOF
 
       - name: Check products folder exists
         run: |
