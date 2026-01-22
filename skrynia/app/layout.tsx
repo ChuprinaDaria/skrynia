@@ -70,24 +70,22 @@ export const metadata: Metadata = {
   },
   
   // Open Graph - для Facebook, Threads, LinkedIn
-  // ВАЖЛИВО: Це базові налаштування ТІЛЬКИ для головної сторінки (/) та загальних сторінок.
-  // Сторінки продуктів (/products/[slug]) мають власні метадані через generateMetadata() і НЕ використовують цей fallback.
-  // Сторінки категорій (/collections/[category]) мають власні метадані через generateMetadata() і НЕ використовують цей fallback.
-  // Сторінки блогу (/blog/[slug]) мають власні метадані через generateMetadata() і НЕ використовують цей fallback.
-  // В Next.js 13+ метадані з дочірніх сторінок мають пріоритет над батьківськими.
+  // ВАЖЛИВО: Це базові налаштування (fallback) для сторінок без власних метаданих.
+  // Сторінки продуктів, категорій, блогу мають власні метадані через generateMetadata().
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteUrl,
     siteName: "Rune Box",
     title: "Rune Box - Unique Handmade Jewelry",
-    description: "Create your unique necklace! Jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral and 925 silver.",
+    description: "Discover authentic handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral, 925 silver, unique necklaces crafted with love.",
     images: [
       {
-        url: `${siteUrl}/images/logo/logo-white-pink-1.png`,
-        width: 1200,
-        height: 630,
-        alt: "Rune Box - Unique Handmade Jewelry",
+        url: `${siteUrl}/images/hero/hero-gemini.png`,
+        width: 1232,
+        height: 864,
+        alt: "Rune Box - Handmade Slavic, Viking & Celtic Jewelry",
+        type: "image/png",
       }
     ],
   },
@@ -96,8 +94,8 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Rune Box - Unique Handmade Jewelry",
-    description: "Create your unique necklace! Jewelry inspired by Slavic, Viking and Celtic cultures.",
-    images: [`${siteUrl}/images/logo/logo-white-pink-1.png`],
+    description: "Discover authentic handmade jewelry inspired by Slavic, Viking and Celtic cultures. Natural coral & 925 silver.",
+    images: [`${siteUrl}/images/hero/hero-gemini.png`],
     creator: "@runebox",
     site: "@runebox",
   },
