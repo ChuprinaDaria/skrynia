@@ -191,7 +191,7 @@ def test_create_checkout_session(api_url: str, order: Dict) -> Optional[Dict]:
     
     try:
         response = requests.post(
-            f"{api_url}/api/v1/payments/checkout-session",
+            f"{api_url}/api/v1/payments/create-checkout-session",
             json={"order_id": order["id"]},
             timeout=30
         )
@@ -221,7 +221,7 @@ def test_inpost_shipment(api_url: str, order: Dict, token: str) -> Optional[Dict
     shipment_data = {
         "order_id": order["id"],
         "provider": "inpost",
-        "paczkomat_id": "WAW01A"  # Test paczkomat
+        "paczkomat_id": "PNET0900"  # Real paczkomat from Warsaw (found in Step 6)
     }
     
     headers = {"Authorization": f"Bearer {token}"}
