@@ -133,7 +133,7 @@ def test_create_order(api_url: str, product: Dict) -> Optional[Dict]:
     
     try:
         response = requests.post(
-            f"{api_url}/api/v1/orders",
+            f"{api_url}/api/v1/orders/",  # Trailing slash required
             json=order_data,
             timeout=30
         )

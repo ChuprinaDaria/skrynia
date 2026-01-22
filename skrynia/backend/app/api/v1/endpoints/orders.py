@@ -14,7 +14,7 @@ from app.schemas.order import (
     OrderUpdate,
     OrderList
 )
-from app.core.security import get_current_admin_user, get_current_user
+from app.core.security import get_current_admin_user, get_current_user, get_current_user_optional
 from app.services.bonus_service import (
     can_use_bonus_points,
     apply_bonus_to_order,
@@ -54,7 +54,7 @@ def generate_order_number() -> str:
 def create_order(
     order_in: OrderCreate,
     db: Session = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user)  # Optional - guest checkout allowed
+    current_user: Optional[User] = Depends(get_current_user_optional)  # Optional - guest checkout allowed
 ):
     """Create a new order. Supports bonus points if user is authenticated."""
     # Validate products and calculate totals
