@@ -122,10 +122,7 @@ def test_create_order(api_url: str, product: Dict) -> Optional[Dict]:
         "shipping_city": "Warszawa",
         "shipping_postal_code": "00-001",
         "shipping_country": "PL",
-        "shipping_method": "inpost",
-        "payment_details": {
-            "inpost_box_id": "WAW01A"  # Test paczkomat
-        },
+        "payment_method": "stripe",  # Required field
         "items": [
             {
                 "product_id": product["id"],
@@ -313,11 +310,12 @@ def test_email_templates(api_url: str) -> bool:
 
 
 def test_api_health(api_url: str) -> bool:
-    """Test API health endpoint."""
+    """Test API health by checking products endpoint."""
     print_step(0, "Checking API Health")
     
     try:
-        response = requests.get(f"{api_url}/health", timeout=10)
+        # Check products endpoint as health indicator
+        response = requests.get(f"{api_url}/api/v1/products", params={"limit": 1}, timeout=10)
         
         if response.status_code == 200:
             print_success("API is healthy")
@@ -377,6 +375,10 @@ def main():
     if product and not args.skip_order:
         order = test_create_order(api_url, product)
         results["create_order"] = order is not None
+        
+        if not order:
+            print_warning("Order creation failed - this might indicate the orders endpoint is not deployed")
+            print_info("Try running: ssh root@server 'cd /app/runebox && docker compose -f docker-compose.prod.yml logs backend | tail -50'")
     else:
         print_step(2, "Skipping order creation")
         print_warning("No product available or --skip-order flag set")
