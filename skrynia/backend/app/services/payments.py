@@ -6,6 +6,31 @@ from sqlalchemy.orm import Session
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
+# Map currency symbols to Stripe currency codes
+CURRENCY_MAP = {
+    "zł": "pln",
+    "PLN": "pln",
+    "€": "eur",
+    "EUR": "eur",
+    "$": "usd",
+    "USD": "usd",
+    "₴": "uah",
+    "UAH": "uah",
+    "£": "gbp",
+    "GBP": "gbp",
+    "kr": "sek",
+    "SEK": "sek",
+    "NOK": "nok",
+    "DKK": "dkk",
+}
+
+
+def get_stripe_currency(currency: str) -> str:
+    """Convert currency symbol/code to Stripe-compatible currency code."""
+    if not currency:
+        return "eur"
+    return CURRENCY_MAP.get(currency, currency.lower())
+
 
 def create_checkout_session(
     order: Order,
@@ -56,6 +81,9 @@ def create_checkout_session(
     
     line_items = []
     
+    # Get Stripe-compatible currency code
+    stripe_currency = get_stripe_currency(order.currency)
+    
     if subtotal_amount > 0:
         product_name = order.items[0].product_title if order.items else "Order"
         image_url = order.items[0].product_image if order.items and order.items[0].product_image else None
@@ -65,7 +93,7 @@ def create_checkout_session(
         
         line_items.append({
             'price_data': {
-                'currency': order.currency.lower() if order.currency else 'eur',
+                'currency': stripe_currency,
                 'product_data': {
                     'name': f"{product_name} (Part {stage}/2)" if (is_preorder and stage == 1) else product_name,
                     'images': [image_url] if image_url else [],
@@ -82,7 +110,7 @@ def create_checkout_session(
         
         line_items.append({
             'price_data': {
-                'currency': order.currency.lower() if order.currency else 'eur',
+                'currency': stripe_currency,
                 'product_data': {
                     'name': shipping_name,
                     'description': f"Delivery to {order.shipping_country}",

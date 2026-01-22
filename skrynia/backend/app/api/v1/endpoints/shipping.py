@@ -217,9 +217,16 @@ async def create_shipment(
                 reference=order.order_number
             )
 
+            # Handle case where tracking_number might be None (sandbox mode)
+            tracking_number = result.get("tracking_number") or result.get("shipment_id") or str(result.get("shipment_id", ""))
+            if not tracking_number:
+                # Generate temporary tracking number for sandbox
+                import uuid
+                tracking_number = f"SANDBOX-{uuid.uuid4().hex[:8].upper()}"
+            
             shipment_data = {
-                "tracking_number": result["tracking_number"],
-                "tracking_url": f"https://inpost.pl/sledzenie-przesylek?number={result['tracking_number']}",
+                "tracking_number": tracking_number,
+                "tracking_url": f"https://inpost.pl/sledzenie-przesylek?number={tracking_number}",
                 "label_url": result.get("label_url"),
                 "locker_id": request.paczkomat_id,
                 "shipment_id": result.get("shipment_id")  # Store for webhook matching
