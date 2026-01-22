@@ -1,0 +1,242 @@
+{
+    "title_uk": "Намисто з натурального коралу та латуні з дзвіночками",
+    "title_en": "Natural Coral and Brass Necklace with Bells",
+    "title_de": "Halskette aus natürlicher Koralle und Messing mit Glöckchen",
+    "title_pl": "Naszyjnik z naturalnego koralu i mosiądzu z dzwoneczkami",
+    "title_se": "Halsband av naturlig korall och mässing med bjällror",
+    "title_no": "Halskjede av naturlig korall og messing med bjeller",
+    "title_dk": "Halskæde af naturlig koral og messing med klokker",
+    "title_fr": "Collier en corail naturel et laiton avec clochettes",
+    
+    "slug": "coral-brass-necklace-with-bells",
+    
+    "description_uk_file": "description-uk.md",
+    "description_en_file": "description-en.md",
+    "description_de_file": "description-de.md",
+    "description_pl_file": "description-pl.md",
+    "description_se_file": "description-se.md",
+    "description_no_file": "description-no.md",
+    "description_dk_file": "description-dk.md",
+    "description_fr_file": "description-fr.md",
+    
+    "legend_title_uk": "Символіка коралового намиста",
+    "legend_title_en": "Symbolism of Coral Necklace",
+    "legend_title_de": "Symbolik der Korallenhalskette",
+    "legend_title_pl": "Symbolika naszyjnika koralowego",
+    "legend_title_se": "Symbolik i korallhalsband",
+    "legend_title_no": "Symbolikken i korallhalskjede",
+    "legend_title_dk": "Symbolik i koralhalskæde",
+    "legend_title_fr": "Symbolisme du collier de corail",
+    
+    "legend_content_uk_file": "legend-content-uk.md",
+    "legend_content_en_file": "legend-content-en.md",
+    "legend_content_de_file": "legend-content-de.md",
+    "legend_content_pl_file": "legend-content-pl.md",
+    "legend_content_se_file": "legend-content-se.md",
+    "legend_content_no_file": "legend-content-no.md",
+    "legend_content_dk_file": "legend-content-dk.md",
+    "legend_content_fr_file": "legend-content-fr.md",
+    
+    "price": 480.00,
+    "currency": "zł",
+    
+    "stock_quantity": 1,
+    "sku": "CORAL-BRASS-BELLS-001",
+    
+    "materials_uk": [
+      "натуральний корал",
+      "латунь (дзвіночки та прикраси)",
+      "бронзова фурнітура",
+      "вовняні помпони ручної роботи"
+    ],
+    "materials_en": [
+      "natural coral",
+      "brass (bells and ornaments)",
+      "bronze fittings",
+      "handmade wool pompoms"
+    ],
+    "materials_de": [
+      "natürliche Koralle",
+      "Messing (Glöckchen und Ornamente)",
+      "Bronzebeschläge",
+      "handgefertigte Wollpompons"
+    ],
+    "materials_pl": [
+      "naturalny koral",
+      "mosiądz (dzwoneczki i ozdoby)",
+      "brązowe okucia",
+      "ręcznie robione wełniane pompony"
+    ],
+    "materials_se": [
+      "naturlig korall",
+      "mässing (bjällror och ornament)",
+      "bronsbeslag",
+      "handgjorda ullpomponger"
+    ],
+    "materials_no": [
+      "naturlig korall",
+      "messing (bjeller og ornamenter)",
+      "bronsebeslag",
+      "håndlagde ullpomponger"
+    ],
+    "materials_dk": [
+      "naturlig koral",
+      "messing (klokker og ornamenter)",
+      "bronzebeslag",
+      "håndlavede uldpomponger"
+    ],
+    "materials_fr": [
+      "corail naturel",
+      "laiton (clochettes et ornements)",
+      "ferrures en bronze",
+      "pompons en laine faits main"
+    ],
+    
+    "specifications": {
+      "Довжина": "45-50 см",
+      "Кількість рядів": "3",
+      "Дзвіночки": "6 шт",
+      "Вага": "~180 г"
+    },
+    
+    "is_handmade": true,
+    "category_id": 1,
+    
+    "tags_uk": [
+      "українське намисто",
+      "корал",
+      "дзвіночки",
+      "етно",
+      "бохо",
+      "весільні прикраси"
+    ],
+    "tags_en": [
+      "ukrainian necklace",
+      "coral",
+      "bells",
+      "ethnic",
+      "boho",
+      "wedding jewelry"
+    ],
+    "tags_de": [
+      "ukrainische Halskette",
+      "Koralle",
+      "Glöckchen",
+      "ethnisch",
+      "boho",
+      "Hochzeitsschmuck"
+    ],
+    "tags_pl": [
+      "ukraiński naszyjnik",
+      "koral",
+      "dzwoneczki",
+      "etno",
+      "boho",
+      "biżuteria ślubna"
+    ],
+    "tags_se": [
+      "ukrainskt halsband",
+      "korall",
+      "bjällror",
+      "etnisk",
+      "boho",
+      "bröllopssmycken"
+    ],
+    "tags_no": [
+      "ukrainsk halskjede",
+      "korall",
+      "bjeller",
+      "etnisk",
+      "boho",
+      "bryllupssmykker"
+    ],
+    "tags_dk": [
+      "ukrainsk halskæde",
+      "koral",
+      "klokker",
+      "etnisk",
+      "boho",
+      "bryllupssmykker"
+    ],
+    "tags_fr": [
+      "collier ukrainien",
+      "corail",
+      "clochettes",
+      "ethnique",
+      "boho",
+      "bijoux de mariage"
+    ],
+    
+    "symbols": ["protection", "joy", "femininity"],
+    
+    "is_active": true,
+    "is_featured": true,
+    
+    "is_made_to_order": false,
+    
+    "meta_description_uk": "Унікальне намисто з натурального коралу та латунних дзвіночків. Українська етно прикраса ручної роботи. Доставка по ЄС.",
+    "meta_description_en": "Unique necklace with natural coral and brass bells. Ukrainian ethnic handmade jewelry. EU delivery.",
+    "meta_description_de": "Einzigartige Halskette mit natürlicher Koralle und Messingglöckchen. Ukrainischer ethnischer handgefertigter Schmuck. EU-Lieferung.",
+    "meta_description_pl": "Unikalny naszyjnik z naturalnego koralu i mosiężnych dzwoneczków. Ukraińska biżuteria etniczna ręcznie robiona. Dostawa w UE.",
+    "meta_description_se": "Unikt halsband med naturlig korall och mässingsbjällror. Ukrainskt etniskt handgjort smycke. EU-leverans.",
+    "meta_description_no": "Unikt halskjede med naturlig korall og messingbjeller. Ukrainsk etnisk håndlaget smykke. EU-levering.",
+    "meta_description_dk": "Unik halskæde med naturlig koral og messingklokker. Ukrainsk etnisk håndlavet smykke. EU-levering.",
+    "meta_description_fr": "Collier unique en corail naturel et clochettes en laiton. Bijou ethnique ukrainien fait main. Livraison UE.",
+    
+    "meta_keywords_uk": [
+      "українське намисто",
+      "коралове намисто",
+      "етно прикраси",
+      "весільні прикраси",
+      "ручна робота"
+    ],
+    "meta_keywords_en": [
+      "ukrainian necklace",
+      "coral necklace",
+      "ethnic jewelry",
+      "wedding jewelry",
+      "handmade"
+    ],
+    "meta_keywords_de": [
+      "ukrainische Halskette",
+      "Korallenhalskette",
+      "ethnischer Schmuck",
+      "Hochzeitsschmuck",
+      "handgefertigt"
+    ],
+    "meta_keywords_pl": [
+      "ukraiński naszyjnik",
+      "koralowy naszyjnik",
+      "biżuteria etniczna",
+      "biżuteria ślubna",
+      "ręcznie robione"
+    ],
+    "meta_keywords_se": [
+      "ukrainskt halsband",
+      "korallhalsband",
+      "etniska smycken",
+      "bröllopssmycken",
+      "handgjord"
+    ],
+    "meta_keywords_no": [
+      "ukrainsk halskjede",
+      "korallhalskjede",
+      "etniske smykker",
+      "bryllupssmykker",
+      "håndlaget"
+    ],
+    "meta_keywords_dk": [
+      "ukrainsk halskæde",
+      "koralhalskæde",
+      "etniske smykker",
+      "bryllupssmykker",
+      "håndlavet"
+    ],
+    "meta_keywords_fr": [
+      "collier ukrainien",
+      "collier de corail",
+      "bijoux ethniques",
+      "bijoux de mariage",
+      "fait main"
+    ]
+  }
