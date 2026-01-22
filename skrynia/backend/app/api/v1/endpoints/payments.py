@@ -52,10 +52,23 @@ def create_payment_intent(
 
     try:
         if request.payment_method == PaymentMethod.STRIPE:
+            # Map currency symbols to Stripe currency codes
+            currency_map = {
+                "zł": "pln",
+                "PLN": "pln",
+                "EUR": "eur",
+                "€": "eur",
+                "USD": "usd",
+                "$": "usd",
+                "UAH": "uah",
+                "₴": "uah",
+            }
+            stripe_currency = currency_map.get(order.currency, "pln")
+            
             # Create Stripe payment intent
             payment_data = StripePaymentService.create_payment_intent(
                 amount=order.total,
-                currency="pln",
+                currency=stripe_currency,
                 metadata={
                     "order_id": order.id,
                     "order_number": order.order_number,

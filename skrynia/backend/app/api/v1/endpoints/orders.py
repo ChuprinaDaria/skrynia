@@ -61,6 +61,7 @@ def create_order(
     subtotal = 0.0
     order_items_data = []
     has_made_to_order = False  # Track if order contains made-to-order items
+    order_currency = "PLN"  # Default currency, will be set from first product
 
     for item_data in order_in.items:
         product = db.query(Product).filter(Product.id == item_data.product_id).first()
@@ -87,6 +88,10 @@ def create_order(
         # Track if order contains made-to-order items
         if product.is_made_to_order:
             has_made_to_order = True
+
+        # Set order currency from first product
+        if not order_items_data:  # First item
+            order_currency = product.currency or "PLN"
 
         item_subtotal = product.price * item_data.quantity
         subtotal += item_subtotal
@@ -160,7 +165,7 @@ def create_order(
         "bonus_points_used": bonus_points_used,
         "bonus_points_earned": bonus_points_earned,  # Will be calculated after payment
         "total": total,
-        "currency": "PLN",
+        "currency": order_currency,
         "status": OrderStatus.PENDING,
         "payment_status": PaymentStatus.PENDING,
         "is_made_to_order": has_made_to_order,
