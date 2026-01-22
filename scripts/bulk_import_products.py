@@ -13,6 +13,7 @@ import json
 import os
 import sys
 import argparse
+import time
 from pathlib import Path
 from typing import Dict, List, Optional
 import requests
@@ -35,9 +36,10 @@ def create_session_with_retry():
     """Створює requests session з retry логікою."""
     session = requests.Session()
     retry_strategy = Retry(
-        total=3,
-        backoff_factor=1,
+        total=5,  # Increased from 3 to 5
+        backoff_factor=2,  # Increased from 1 to 2 (exponential backoff)
         status_forcelist=[429, 500, 502, 503, 504],
+        respect_retry_after_header=True,  # Respect Retry-After header from server
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("http://", adapter)
@@ -251,7 +253,7 @@ def process_product(product_dir: Path, session: requests.Session, token: str) ->
     if "videos" in product_data:
         del product_data["videos"]
     
-    # Створюємо товар через API
+    # Створюємо або оновлюємо товар через API
     try:
         headers = {
             "Authorization": f"Bearer {token}",
@@ -267,8 +269,27 @@ def process_product(product_dir: Path, session: requests.Session, token: str) ->
         
         if check_response.status_code == 200:
             # Товар існує - оновлюємо
-            product_id = check_response.json().get("id")
+            existing_product = check_response.json()
+            product_id = existing_product.get("id")
+            existing_images = existing_product.get("images", [])
+            existing_image_urls = {img.get("image_url") for img in existing_images}
+            
             if product_id:
+                # Фільтруємо тільки нові зображення (які ще не існують)
+                new_images = [
+                    img for img in product_data.get("images", [])
+                    if img.get("image_url") not in existing_image_urls
+                ]
+                
+                if new_images:
+                    print(f"    📷 Додаємо {len(new_images)} нових зображень до існуючого товару")
+                    product_data["images"] = new_images
+                else:
+                    # Немає нових зображень - видаляємо поле images
+                    if "images" in product_data:
+                        del product_data["images"]
+                    print(f"    ℹ️  Всі зображення вже існують, оновлюємо тільки описи")
+                
                 response = session.patch(
                     f"{API_BASE_URL}/api/v1/products/{product_id}",
                     json=product_data,
@@ -276,6 +297,7 @@ def process_product(product_dir: Path, session: requests.Session, token: str) ->
                     timeout=60
                 )
                 action = "оновлено"
+                images_added = len(new_images) if new_images else 0
             else:
                 response = session.post(
                     f"{API_BASE_URL}/api/v1/products",
@@ -284,6 +306,7 @@ def process_product(product_dir: Path, session: requests.Session, token: str) ->
                     timeout=60
                 )
                 action = "створено"
+                images_added = len(images)
         else:
             # Товар не існує - створюємо
             response = session.post(
@@ -293,13 +316,14 @@ def process_product(product_dir: Path, session: requests.Session, token: str) ->
                 timeout=60
             )
             action = "створено"
+            images_added = len(images)
         
         if response.status_code in [200, 201]:
             return {
                 "success": True,
                 "slug": slug,
                 "action": action,
-                "images_count": len(images),
+                "images_count": images_added if 'images_added' in dir() else len(images),
                 "videos_count": len(videos)
             }
         else:
@@ -380,6 +404,10 @@ def main():
         else:
             print(f"  ❌ Помилка: {result['error']}")
         print()
+        
+        # Delay between products to avoid rate limiting (429)
+        if idx < len(product_dirs):
+            time.sleep(2)  # 2 second delay between products
     
     # Підсумок
     successful = sum(1 for r in results if r["success"])

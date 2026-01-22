@@ -471,7 +471,11 @@ def update_product(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_admin_user)
 ):
-    """Update a product (admin only)."""
+    """Update a product (admin only). 
+    
+    If images are provided, they will be ADDED to existing images (not replaced).
+    To replace all images, first delete the product images via a separate endpoint.
+    """
     product = db.query(Product).filter(Product.id == product_id).first()
 
     if not product:
@@ -480,10 +484,59 @@ def update_product(
             detail="Product not found"
         )
 
-    # Update fields
-    update_data = product_in.model_dump(exclude_unset=True)
+    # Get update data, excluding images (handled separately)
+    update_data = product_in.model_dump(exclude_unset=True, exclude={"images"})
+    
+    # Update regular fields
     for field, value in update_data.items():
         setattr(product, field, value)
+
+    # Handle images - ADD new images to existing ones
+    if product_in.images is not None and len(product_in.images) > 0:
+        # Get current max position
+        existing_images = db.query(ProductImage).filter(
+            ProductImage.product_id == product_id
+        ).all()
+        max_position = max([img.position for img in existing_images], default=-1)
+        
+        # Check if any existing image is primary
+        has_primary = any(img.is_primary for img in existing_images)
+        
+        # Add new images
+        for idx, image_data in enumerate(product_in.images):
+            # Check if image with same URL already exists
+            existing_url = db.query(ProductImage).filter(
+                ProductImage.product_id == product_id,
+                ProductImage.image_url == image_data.image_url
+            ).first()
+            
+            if existing_url:
+                # Update existing image
+                existing_url.alt_text = image_data.alt_text or existing_url.alt_text
+                existing_url.position = image_data.position if image_data.position is not None else existing_url.position
+                if image_data.is_primary:
+                    # If this image is set as primary, unset others
+                    for img in existing_images:
+                        img.is_primary = False
+                    existing_url.is_primary = True
+            else:
+                # Create new image
+                new_position = max_position + idx + 1
+                is_primary = image_data.is_primary if has_primary else (idx == 0 and not has_primary)
+                
+                # If this image is set as primary, unset others
+                if is_primary:
+                    for img in existing_images:
+                        img.is_primary = False
+                
+                new_image = ProductImage(
+                    product_id=product_id,
+                    image_url=image_data.image_url,
+                    alt_text=image_data.alt_text or product.title_uk,
+                    position=new_position,
+                    is_primary=is_primary
+                )
+                db.add(new_image)
 
     db.commit()
     db.refresh(product)

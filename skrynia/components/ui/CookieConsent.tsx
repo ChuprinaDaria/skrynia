@@ -95,25 +95,25 @@ export default function CookieConsent() {
     <div className="fixed inset-0 z-[9999] flex items-end justify-center p-4 sm:items-center">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/70 backdrop-blur-sm"
         onClick={() => {}} // Prevent closing on backdrop click
       />
       
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden animate-slide-up">
+      <div className="relative bg-deep-black border border-sage/30 rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-hidden animate-slide-up">
         {/* Header */}
-        <div className="bg-burgundy px-6 py-4">
-          <h2 className="text-xl font-cinzel text-ivory">
-            🍪 Cookie Settings
+        <div className="bg-gradient-to-r from-oxblood to-burgundy px-6 py-4">
+          <h2 className="text-xl font-cinzel text-ivory flex items-center gap-2">
+            <span className="text-2xl">🍪</span> Cookie Settings
           </h2>
         </div>
 
         {/* Content */}
-        <div className="p-6 max-h-[60vh] overflow-y-auto">
+        <div className="p-6 max-h-[60vh] overflow-y-auto bg-deep-black">
           {!showDetails ? (
             // Simple view
             <div className="space-y-4">
-              <p className="text-charcoal font-inter text-sm leading-relaxed">
+              <p className="text-ivory/90 font-inter text-sm leading-relaxed">
                 We use cookies to personalize content and ads, to provide social media features, 
                 and to analyze our traffic. We also share information about your use of our site 
                 with our social media, advertising, and analytics partners who may combine it 
@@ -123,7 +123,7 @@ export default function CookieConsent() {
               
               <button
                 onClick={() => setShowDetails(true)}
-                className="text-burgundy hover:text-burgundy/80 text-sm font-medium underline transition-colors"
+                className="text-sage hover:text-sage-light text-sm font-medium underline underline-offset-2 transition-colors"
               >
                 Show details →
               </button>
@@ -131,15 +131,15 @@ export default function CookieConsent() {
           ) : (
             // Detailed view
             <div className="space-y-4">
-              <p className="text-charcoal font-inter text-sm leading-relaxed mb-4">
+              <p className="text-ivory/90 font-inter text-sm leading-relaxed mb-4">
                 Manage your cookie preferences below. You can enable or disable different types of cookies.
               </p>
 
               {/* Necessary cookies */}
-              <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="flex items-center justify-between py-3 border-b border-sage/20">
                 <div className="flex-1 pr-4">
-                  <h3 className="font-semibold text-charcoal">Necessary</h3>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <h3 className="font-semibold text-ivory">Necessary</h3>
+                  <p className="text-xs text-ivory/60 mt-1">
                     Essential for the website to function. Cannot be disabled.
                   </p>
                 </div>
@@ -150,17 +150,17 @@ export default function CookieConsent() {
                     disabled
                     className="sr-only"
                   />
-                  <div className="w-11 h-6 bg-burgundy rounded-full cursor-not-allowed">
-                    <div className="absolute right-1 top-1 bg-white w-4 h-4 rounded-full" />
+                  <div className="w-11 h-6 bg-oxblood rounded-full cursor-not-allowed">
+                    <div className="absolute right-1 top-1 bg-ivory w-4 h-4 rounded-full" />
                   </div>
                 </div>
               </div>
 
               {/* Preferences cookies */}
-              <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="flex items-center justify-between py-3 border-b border-sage/20">
                 <div className="flex-1 pr-4">
-                  <h3 className="font-semibold text-charcoal">Preferences</h3>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <h3 className="font-semibold text-ivory">Preferences</h3>
+                  <p className="text-xs text-ivory/60 mt-1">
                     Remember your settings and preferences for a better experience.
                   </p>
                 </div>
@@ -169,9 +169,9 @@ export default function CookieConsent() {
                   className="relative"
                 >
                   <div className={`w-11 h-6 rounded-full transition-colors ${
-                    preferences.preferences ? 'bg-burgundy' : 'bg-gray-300'
+                    preferences.preferences ? 'bg-oxblood' : 'bg-charcoal'
                   }`}>
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    <div className={`absolute top-1 w-4 h-4 bg-ivory rounded-full transition-transform ${
                       preferences.preferences ? 'right-1' : 'left-1'
                     }`} />
                   </div>
@@ -179,10 +179,10 @@ export default function CookieConsent() {
               </div>
 
               {/* Statistics cookies */}
-              <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div className="flex items-center justify-between py-3 border-b border-sage/20">
                 <div className="flex-1 pr-4">
-                  <h3 className="font-semibold text-charcoal">Statistics</h3>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <h3 className="font-semibold text-ivory">Statistics</h3>
+                  <p className="text-xs text-ivory/60 mt-1">
                     Help us understand how visitors interact with our website.
                   </p>
                 </div>
@@ -191,9 +191,9 @@ export default function CookieConsent() {
                   className="relative"
                 >
                   <div className={`w-11 h-6 rounded-full transition-colors ${
-                    preferences.statistics ? 'bg-burgundy' : 'bg-gray-300'
+                    preferences.statistics ? 'bg-oxblood' : 'bg-charcoal'
                   }`}>
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    <div className={`absolute top-1 w-4 h-4 bg-ivory rounded-full transition-transform ${
                       preferences.statistics ? 'right-1' : 'left-1'
                     }`} />
                   </div>
@@ -203,8 +203,8 @@ export default function CookieConsent() {
               {/* Marketing cookies */}
               <div className="flex items-center justify-between py-3">
                 <div className="flex-1 pr-4">
-                  <h3 className="font-semibold text-charcoal">Marketing</h3>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <h3 className="font-semibold text-ivory">Marketing</h3>
+                  <p className="text-xs text-ivory/60 mt-1">
                     Used to track visitors across websites for advertising purposes.
                   </p>
                 </div>
@@ -213,9 +213,9 @@ export default function CookieConsent() {
                   className="relative"
                 >
                   <div className={`w-11 h-6 rounded-full transition-colors ${
-                    preferences.marketing ? 'bg-burgundy' : 'bg-gray-300'
+                    preferences.marketing ? 'bg-oxblood' : 'bg-charcoal'
                   }`}>
-                    <div className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                    <div className={`absolute top-1 w-4 h-4 bg-ivory rounded-full transition-transform ${
                       preferences.marketing ? 'right-1' : 'left-1'
                     }`} />
                   </div>
@@ -224,7 +224,7 @@ export default function CookieConsent() {
 
               <button
                 onClick={() => setShowDetails(false)}
-                className="text-burgundy hover:text-burgundy/80 text-sm font-medium underline transition-colors"
+                className="text-sage hover:text-sage-light text-sm font-medium underline underline-offset-2 transition-colors"
               >
                 ← Back to summary
               </button>
@@ -233,35 +233,35 @@ export default function CookieConsent() {
         </div>
 
         {/* Actions */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 space-y-2">
+        <div className="px-6 py-4 bg-charcoal/50 border-t border-sage/20 space-y-2">
           {showDetails ? (
             <button
               onClick={acceptSelected}
-              className="w-full py-3 px-4 bg-burgundy hover:bg-burgundy/90 text-ivory font-inter font-medium rounded-lg transition-colors"
+              className="w-full py-3 px-4 bg-gradient-to-r from-oxblood to-burgundy hover:from-burgundy hover:to-oxblood text-ivory font-inter font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-oxblood/20"
             >
               Save Preferences
             </button>
           ) : (
             <button
               onClick={acceptAll}
-              className="w-full py-3 px-4 bg-burgundy hover:bg-burgundy/90 text-ivory font-inter font-medium rounded-lg transition-colors"
+              className="w-full py-3 px-4 bg-gradient-to-r from-oxblood to-burgundy hover:from-burgundy hover:to-oxblood text-ivory font-inter font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-oxblood/20"
             >
               Accept All
             </button>
           )}
           <button
             onClick={rejectAll}
-            className="w-full py-3 px-4 bg-gray-200 hover:bg-gray-300 text-charcoal font-inter font-medium rounded-lg transition-colors"
+            className="w-full py-3 px-4 bg-charcoal hover:bg-charcoal/80 text-ivory/80 hover:text-ivory font-inter font-medium rounded-lg transition-colors border border-sage/20"
           >
             Reject All
           </button>
         </div>
 
         {/* Footer link */}
-        <div className="px-6 py-3 bg-gray-100 text-center">
+        <div className="px-6 py-3 bg-deep-black border-t border-sage/10 text-center">
           <a 
             href="/polityka-prywatnosci" 
-            className="text-xs text-gray-500 hover:text-burgundy transition-colors"
+            className="text-xs text-ivory/50 hover:text-sage transition-colors"
           >
             Learn more about our Privacy Policy
           </a>
@@ -286,4 +286,3 @@ export default function CookieConsent() {
     </div>
   );
 }
-

@@ -193,6 +193,9 @@ class ProductUpdate(BaseModel):
     meta_keywords_no: Optional[List[str]] = None
     meta_keywords_dk: Optional[List[str]] = None
     meta_keywords_fr: Optional[List[str]] = None
+    
+    # Images - for adding/updating images
+    images: Optional[List[ProductImageCreate]] = None
 
 
 class Product(ProductBase):
