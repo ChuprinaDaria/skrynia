@@ -275,8 +275,9 @@ def get_products_catalog_csv(
             
             # Format materials (max 200 chars per Meta requirements)
             material_str = None
-            if product.materials and isinstance(product.materials, list):
-                material_str = ", ".join(product.materials[:3])  # Limit to 3 materials
+            materials = get_field(product, "materials", lang_code)
+            if materials and isinstance(materials, list):
+                material_str = ", ".join(str(m) for m in materials[:3])  # Limit to 3 materials
                 if len(material_str) > 200:
                     material_str = material_str[:197] + "..."
             
