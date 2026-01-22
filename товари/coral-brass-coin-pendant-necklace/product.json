@@ -1,0 +1,243 @@
+{
+    "title_uk": "Намисто з фарбованого коралу з латунними підвісками-монетами",
+    "title_en": "Dyed Coral Necklace with Brass Coin Pendants",
+    "title_de": "Halskette aus gefärbter Koralle mit Messingmünzenanhängern",
+    "title_pl": "Naszyjnik z barwionego koralu z mosiężnymi zawieszkami-monetami",
+    "title_se": "Halsband av färgad korall med mässingsmyntberlocker",
+    "title_no": "Halskjede av farget korall med messingmyntanheng",
+    "title_dk": "Halskæde af farvet koral med messingmøntvedhæng",
+    "title_fr": "Collier en corail teint avec pendentifs pièces en laiton",
+    
+    "slug": "coral-brass-coin-pendant-necklace",
+    
+    "description_uk_file": "description-uk.md",
+    "description_en_file": "description-en.md",
+    "description_de_file": "description-de.md",
+    "description_pl_file": "description-pl.md",
+    "description_se_file": "description-se.md",
+    "description_no_file": "description-no.md",
+    "description_dk_file": "description-dk.md",
+    "description_fr_file": "description-fr.md",
+    
+    "legend_title_uk": "Монети-обереги в слов'янській традиції",
+    "legend_title_en": "Coin Amulets in Slavic Tradition",
+    "legend_title_de": "Münzenamulette in slawischer Tradition",
+    "legend_title_pl": "Monety-amulety w tradycji słowiańskiej",
+    "legend_title_se": "Myntamuletter i slavisk tradition",
+    "legend_title_no": "Myntamuletter i slavisk tradisjon",
+    "legend_title_dk": "Møntamuletter i slavisk tradition",
+    "legend_title_fr": "Amulettes-pièces dans la tradition slave",
+    
+    "legend_content_uk_file": "legend-content-uk.md",
+    "legend_content_en_file": "legend-content-en.md",
+    "legend_content_de_file": "legend-content-de.md",
+    "legend_content_pl_file": "legend-content-pl.md",
+    "legend_content_se_file": "legend-content-se.md",
+    "legend_content_no_file": "legend-content-no.md",
+    "legend_content_dk_file": "legend-content-dk.md",
+    "legend_content_fr_file": "legend-content-fr.md",
+    
+    "price": 460.00,
+    "currency": "zł",
+    
+    "stock_quantity": 0,
+    "sku": "CORAL-BRASS-COIN-001",
+    
+    "materials_uk": [
+      "фарбований натуральний корал (дрібні намистини)",
+      "латунні підвіски-монети з орнаментом",
+      "декоративні латунні намистини",
+      "металева фурнітура"
+    ],
+    "materials_en": [
+      "dyed natural coral (small beads)",
+      "brass coin pendants with ornament",
+      "decorative brass beads",
+      "metal fittings"
+    ],
+    "materials_de": [
+      "gefärbte natürliche Koralle (kleine Perlen)",
+      "Messingmünzenanhänger mit Ornament",
+      "dekorative Messingperlen",
+      "Metallbeschläge"
+    ],
+    "materials_pl": [
+      "barwiony naturalny koral (drobne koraliki)",
+      "mosiężne zawieszki-monety z ornamentem",
+      "ozdobne mosiężne koraliki",
+      "metalowe okucia"
+    ],
+    "materials_se": [
+      "färgad naturlig korall (små pärlor)",
+      "mässingsmyntberlocker med ornament",
+      "dekorativa mässingspärlor",
+      "metallbeslag"
+    ],
+    "materials_no": [
+      "farget naturlig korall (små perler)",
+      "messingmyntanheng med ornament",
+      "dekorative messingperler",
+      "metallbeslag"
+    ],
+    "materials_dk": [
+      "farvet naturlig koral (små perler)",
+      "messingmøntvedhæng med ornament",
+      "dekorative messingperler",
+      "metalbeslag"
+    ],
+    "materials_fr": [
+      "corail naturel teint (petites perles)",
+      "pendentifs pièces en laiton avec ornement",
+      "perles décoratives en laiton",
+      "ferrures métalliques"
+    ],
+    
+    "specifications": {
+      "Довжина": "45-50 см",
+      "Кількість рядів": "3",
+      "Підвіски": "5 латунних монет",
+      "Вага": "~100 г"
+    },
+    
+    "is_handmade": true,
+    "category_id": 1,
+    
+    "tags_uk": [
+      "коралове намисто",
+      "підвіски монети",
+      "етно",
+      "бохо",
+      "латунь",
+      "фарбований корал"
+    ],
+    "tags_en": [
+      "coral necklace",
+      "coin pendants",
+      "ethnic",
+      "boho",
+      "brass",
+      "dyed coral"
+    ],
+    "tags_de": [
+      "Korallenkette",
+      "Münzenanhänger",
+      "ethnisch",
+      "boho",
+      "Messing",
+      "gefärbte Koralle"
+    ],
+    "tags_pl": [
+      "naszyjnik koralowy",
+      "zawieszki monety",
+      "etno",
+      "boho",
+      "mosiądz",
+      "barwiony koral"
+    ],
+    "tags_se": [
+      "korallhalsband",
+      "myntberlocker",
+      "etnisk",
+      "boho",
+      "mässing",
+      "färgad korall"
+    ],
+    "tags_no": [
+      "korallhalskjede",
+      "myntanheng",
+      "etnisk",
+      "boho",
+      "messing",
+      "farget korall"
+    ],
+    "tags_dk": [
+      "koralhalskæde",
+      "møntvedhæng",
+      "etnisk",
+      "boho",
+      "messing",
+      "farvet koral"
+    ],
+    "tags_fr": [
+      "collier corail",
+      "pendentifs pièces",
+      "ethnique",
+      "boho",
+      "laiton",
+      "corail teint"
+    ],
+    
+    "symbols": ["prosperity", "protection", "abundance"],
+    
+    "is_active": true,
+    "is_featured": false,
+    
+    "is_made_to_order": true,
+    "made_to_order_duration": "2-3 тижні + час доставки",
+    
+    "meta_description_uk": "Яскраве намисто з фарбованого коралу та латунними підвісками-монетами. Етно прикраса ручної роботи. Під замовлення. Доставка по ЄС.",
+    "meta_description_en": "Bright necklace with dyed coral and brass coin pendants. Ethnic handmade jewelry. Made to order. EU delivery.",
+    "meta_description_de": "Helle Halskette mit gefärbter Koralle und Messingmünzenanhängern. Ethnischer handgefertigter Schmuck. Auf Bestellung. EU-Lieferung.",
+    "meta_description_pl": "Jasny naszyjnik z barwionego koralu i mosiężnymi zawieszkami-monetami. Biżuteria etniczna ręcznie robiona. Na zamówienie. Dostawa w UE.",
+    "meta_description_se": "Ljust halsband med färgad korall och mässingsmyntberlocker. Etniskt handgjort smycke. Beställningsvara. EU-leverans.",
+    "meta_description_no": "Lyst halskjede med farget korall og messingmyntanheng. Etnisk håndlaget smykke. Bestillingsvare. EU-levering.",
+    "meta_description_dk": "Lyst halskæde med farvet koral og messingmøntvedhæng. Etnisk håndlavet smykke. Bestillingsvare. EU-levering.",
+    "meta_description_fr": "Collier lumineux en corail teint et pendentifs pièces en laiton. Bijou ethnique fait main. Sur commande. Livraison UE.",
+    
+    "meta_keywords_uk": [
+      "коралове намисто",
+      "підвіски монети",
+      "етно прикраси",
+      "бохо стиль",
+      "латунь"
+    ],
+    "meta_keywords_en": [
+      "coral necklace",
+      "coin pendants",
+      "ethnic jewelry",
+      "boho style",
+      "brass"
+    ],
+    "meta_keywords_de": [
+      "Korallenkette",
+      "Münzenanhänger",
+      "ethnischer Schmuck",
+      "Boho-Stil",
+      "Messing"
+    ],
+    "meta_keywords_pl": [
+      "naszyjnik koralowy",
+      "zawieszki monety",
+      "biżuteria etniczna",
+      "styl boho",
+      "mosiądz"
+    ],
+    "meta_keywords_se": [
+      "korallhalsband",
+      "myntberlocker",
+      "etniska smycken",
+      "boho stil",
+      "mässing"
+    ],
+    "meta_keywords_no": [
+      "korallhalskjede",
+      "myntanheng",
+      "etniske smykker",
+      "boho stil",
+      "messing"
+    ],
+    "meta_keywords_dk": [
+      "koralhalskæde",
+      "møntvedhæng",
+      "etniske smykker",
+      "boho stil",
+      "messing"
+    ],
+    "meta_keywords_fr": [
+      "collier corail",
+      "pendentifs pièces",
+      "bijoux ethniques",
+      "style boho",
+      "laiton"
+    ]
+  }

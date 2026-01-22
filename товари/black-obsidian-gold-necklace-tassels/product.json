@@ -1,0 +1,243 @@
+{
+    "title_uk": "Намисто з чорного обсідіану та золотистою фурнітурою з китицями",
+    "title_en": "Black Obsidian and Gold Necklace with Tassels",
+    "title_de": "Halskette aus schwarzem Obsidian und Gold mit Quasten",
+    "title_pl": "Naszyjnik z czarnego obsydianu i złotymi okuciami z chwostami",
+    "title_se": "Halsband av svart obsidian och guld med tofsar",
+    "title_no": "Halskjede av svart obsidian og gull med dusker",
+    "title_dk": "Halskæde af sort obsidian og guld med kvaster",
+    "title_fr": "Collier en obsidienne noire et or avec pompons",
+    
+    "slug": "black-obsidian-gold-necklace-tassels",
+    
+    "description_uk_file": "description-uk.md",
+    "description_en_file": "description-en.md",
+    "description_de_file": "description-de.md",
+    "description_pl_file": "description-pl.md",
+    "description_se_file": "description-se.md",
+    "description_no_file": "description-no.md",
+    "description_dk_file": "description-dk.md",
+    "description_fr_file": "description-fr.md",
+    
+    "legend_title_uk": "Сила чорного обсідіану",
+    "legend_title_en": "Power of Black Obsidian",
+    "legend_title_de": "Kraft des schwarzen Obsidians",
+    "legend_title_pl": "Moc czarnego obsydianu",
+    "legend_title_se": "Kraften i svart obsidian",
+    "legend_title_no": "Kraften i svart obsidian",
+    "legend_title_dk": "Kraften i sort obsidian",
+    "legend_title_fr": "Pouvoir de l'obsidienne noire",
+    
+    "legend_content_uk_file": "legend-content-uk.md",
+    "legend_content_en_file": "legend-content-en.md",
+    "legend_content_de_file": "legend-content-de.md",
+    "legend_content_pl_file": "legend-content-pl.md",
+    "legend_content_se_file": "legend-content-se.md",
+    "legend_content_no_file": "legend-content-no.md",
+    "legend_content_dk_file": "legend-content-dk.md",
+    "legend_content_fr_file": "legend-content-fr.md",
+    
+    "price": 520.00,
+    "currency": "zł",
+    
+    "stock_quantity": 0,
+    "sku": "OBS-GOLD-TASSEL-001",
+    
+    "materials_uk": [
+      "чорний обсідіан (натуральний камінь)",
+      "золотиста металева фурнітура",
+      "текстильні китиці (чорні та зелені)",
+      "плетені шнури"
+    ],
+    "materials_en": [
+      "black obsidian (natural stone)",
+      "gold metal fittings",
+      "textile tassels (black and green)",
+      "braided cords"
+    ],
+    "materials_de": [
+      "schwarzer Obsidian (Naturstein)",
+      "goldene Metallbeschläge",
+      "Textilquasten (schwarz und grün)",
+      "geflochtene Schnüre"
+    ],
+    "materials_pl": [
+      "czarny obsydian (naturalny kamień)",
+      "złote okucia metalowe",
+      "tekstylne chwosty (czarne i zielone)",
+      "plecione sznury"
+    ],
+    "materials_se": [
+      "svart obsidian (natursten)",
+      "guldmetallbeslag",
+      "textiltofsar (svarta och gröna)",
+      "flätade snören"
+    ],
+    "materials_no": [
+      "svart obsidian (naturstein)",
+      "gullmetallbeslag",
+      "tekstildusker (svarte og grønne)",
+      "flettede snorer"
+    ],
+    "materials_dk": [
+      "sort obsidian (natursten)",
+      "guldmetalbeslag",
+      "tekstilkvaster (sorte og grønne)",
+      "flettede snore"
+    ],
+    "materials_fr": [
+      "obsidienne noire (pierre naturelle)",
+      "ferrures métalliques dorées",
+      "pompons textiles (noirs et verts)",
+      "cordons tressés"
+    ],
+    
+    "specifications": {
+      "Довжина": "регулюється",
+      "Кількість рядів": "4",
+      "Китиці": "2 шт (чорна + зелена)",
+      "Вага": "~150 г"
+    },
+    
+    "is_handmade": true,
+    "category_id": 1,
+    
+    "tags_uk": [
+      "обсідіан",
+      "готичні прикраси",
+      "чорне намисто",
+      "етно",
+      "захист",
+      "мінімалізм"
+    ],
+    "tags_en": [
+      "obsidian",
+      "gothic jewelry",
+      "black necklace",
+      "ethnic",
+      "protection",
+      "minimalist"
+    ],
+    "tags_de": [
+      "Obsidian",
+      "gotischer Schmuck",
+      "schwarze Halskette",
+      "ethnisch",
+      "Schutz",
+      "minimalistisch"
+    ],
+    "tags_pl": [
+      "obsydian",
+      "gotycka biżuteria",
+      "czarny naszyjnik",
+      "etno",
+      "ochrona",
+      "minimalizm"
+    ],
+    "tags_se": [
+      "obsidian",
+      "gotiska smycken",
+      "svart halsband",
+      "etnisk",
+      "skydd",
+      "minimalistisk"
+    ],
+    "tags_no": [
+      "obsidian",
+      "gotiske smykker",
+      "svart halskjede",
+      "etnisk",
+      "beskyttelse",
+      "minimalistisk"
+    ],
+    "tags_dk": [
+      "obsidian",
+      "gotiske smykker",
+      "sort halskæde",
+      "etnisk",
+      "beskyttelse",
+      "minimalistisk"
+    ],
+    "tags_fr": [
+      "obsidienne",
+      "bijoux gothiques",
+      "collier noir",
+      "ethnique",
+      "protection",
+      "minimaliste"
+    ],
+    
+    "symbols": ["protection", "strength", "grounding"],
+    
+    "is_active": true,
+    "is_featured": true,
+    
+    "is_made_to_order": true,
+    "made_to_order_duration": "2-3 тижні + час доставки",
+    
+    "meta_description_uk": "Елегантне намисто з натурального чорного обсідіану та золотистою фурнітурою. Готична етно прикраса ручної роботи. Під замовлення. Доставка по ЄС.",
+    "meta_description_en": "Elegant necklace with natural black obsidian and gold fittings. Gothic ethnic handmade jewelry. Made to order. EU delivery.",
+    "meta_description_de": "Elegante Halskette aus natürlichem schwarzem Obsidian und Goldbeschlägen. Gotischer ethnischer handgefertigter Schmuck. Auf Bestellung. EU-Lieferung.",
+    "meta_description_pl": "Elegancki naszyjnik z naturalnego czarnego obsydianu i złotymi okuciami. Gotycka biżuteria etniczna ręcznie robiona. Na zamówienie. Dostawa w UE.",
+    "meta_description_se": "Elegant halsband med naturlig svart obsidian och guldbeslag. Gotiskt etniskt handgjort smycke. Beställningsvara. EU-leverans.",
+    "meta_description_no": "Elegant halskjede med naturlig svart obsidian og gullbeslag. Gotisk etnisk håndlaget smykke. Bestillingsvare. EU-levering.",
+    "meta_description_dk": "Elegant halskæde med naturlig sort obsidian og guldbeslag. Gotisk etnisk håndlavet smykke. Bestillingsvare. EU-levering.",
+    "meta_description_fr": "Collier élégant en obsidienne noire naturelle et ferrures dorées. Bijou ethnique gothique fait main. Sur commande. Livraison UE.",
+    
+    "meta_keywords_uk": [
+      "обсідіан намисто",
+      "чорні прикраси",
+      "готичний стиль",
+      "захисний камінь",
+      "етно"
+    ],
+    "meta_keywords_en": [
+      "obsidian necklace",
+      "black jewelry",
+      "gothic style",
+      "protection stone",
+      "ethnic"
+    ],
+    "meta_keywords_de": [
+      "Obsidian Halskette",
+      "schwarzer Schmuck",
+      "gotischer Stil",
+      "Schutzstein",
+      "ethnisch"
+    ],
+    "meta_keywords_pl": [
+      "naszyjnik obsydianowy",
+      "czarna biżuteria",
+      "styl gotycki",
+      "kamień ochronny",
+      "etno"
+    ],
+    "meta_keywords_se": [
+      "obsidian halsband",
+      "svarta smycken",
+      "gotisk stil",
+      "skyddssten",
+      "etnisk"
+    ],
+    "meta_keywords_no": [
+      "obsidian halskjede",
+      "svarte smykker",
+      "gotisk stil",
+      "beskyttelsesstein",
+      "etnisk"
+    ],
+    "meta_keywords_dk": [
+      "obsidian halskæde",
+      "sorte smykker",
+      "gotisk stil",
+      "beskyttelsessten",
+      "etnisk"
+    ],
+    "meta_keywords_fr": [
+      "collier obsidienne",
+      "bijoux noirs",
+      "style gothique",
+      "pierre de protection",
+      "ethnique"
+    ]
+  }

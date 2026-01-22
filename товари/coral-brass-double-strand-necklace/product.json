@@ -1,0 +1,235 @@
+{
+    "title_uk": "Намисто з натурального коралу та латуні дворядне із завязками",
+    "title_en": "Natural Coral and Brass Double Strand Necklace with Ties",
+    "title_de": "Doppelstranghalskette aus natürlicher Koralle und Messing mit Bändern",
+    "title_pl": "Dwurzędowy naszyjnik z naturalnego koralu i mosiądzu z wiązaniami",
+    "title_se": "Dubbelsträngat halsband av naturlig korall och mässing medband",
+    "title_no": "Dobbeltstrenget halskjede av naturlig korall og messing med bånd",
+    "title_dk": "Dobbeltstrenget halskæde af naturlig koral og messing med bånd",
+    "title_fr": "Collier double rang en corail naturel et laiton avec liens",
+    
+    "slug": "coral-brass-double-strand-necklace",
+    
+    "description_uk_file": "description-uk.md",
+    "description_en_file": "description-en.md",
+    "description_de_file": "description-de.md",
+    "description_pl_file": "description-pl.md",
+    "description_se_file": "description-se.md",
+    "description_no_file": "description-no.md",
+    "description_dk_file": "description-dk.md",
+    "description_fr_file": "description-fr.md",
+    
+    "legend_title_uk": "Сила коралу в слов'янській традиції",
+    "legend_title_en": "Power of Coral in Slavic Tradition",
+    "legend_title_de": "Kraft der Koralle in slawischer Tradition",
+    "legend_title_pl": "Moc koralu w tradycji słowiańskiej",
+    "legend_title_se": "Kraften i korall i slavisk tradition",
+    "legend_title_no": "Kraften i korall i slavisk tradisjon",
+    "legend_title_dk": "Kraften i koral i slavisk tradition",
+    "legend_title_fr": "Pouvoir du corail dans la tradition slave",
+    
+    "legend_content_uk_file": "legend-content-uk.md",
+    "legend_content_en_file": "legend-content-en.md",
+    "legend_content_de_file": "legend-content-de.md",
+    "legend_content_pl_file": "legend-content-pl.md",
+    "legend_content_se_file": "legend-content-se.md",
+    "legend_content_no_file": "legend-content-no.md",
+    "legend_content_dk_file": "legend-content-dk.md",
+    "legend_content_fr_file": "legend-content-fr.md",
+    
+    "price": 380.00,
+    "currency": "zł",
+    
+    "stock_quantity": 0,
+    "sku": "CORAL-BRASS-2STR-001",
+    
+    "materials_uk": [
+      "натуральний корал (циліндричні та дрібні намистини)",
+      "латунні декоративні намистини",
+      "текстильні шнури з китицями (оранжеві)",
+      "металева фурнітура"
+    ],
+    "materials_en": [
+      "natural coral (cylindrical and small beads)",
+      "brass decorative beads",
+      "textile cords with tassels (orange)",
+      "metal fittings"
+    ],
+    "materials_de": [
+      "natürliche Koralle (zylindrische und kleine Perlen)",
+      "dekorative Messingperlen",
+      "Textilschnüre mit Quasten (orange)",
+      "Metallbeschläge"
+    ],
+    "materials_pl": [
+      "naturalny koral (cylindryczne i drobne koraliki)",
+      "mosiężne ozdobne koraliki",
+      "tekstylne sznury z chwostami (pomarańczowe)",
+      "metalowe okucia"
+    ],
+    "materials_se": [
+      "naturlig korall (cylindriska och små pärlor)",
+      "dekorativa mässingspärlor",
+      "textilsnören med tofsar (orange)",
+      "metallbeslag"
+    ],
+    "materials_no": [
+      "naturlig korall (sylindriske og små perler)",
+      "dekorative messingperler",
+      "tekstilsnorer med dusker (oransje)",
+      "metallbeslag"
+    ],
+    "materials_dk": [
+      "naturlig koral (cylindriske og små perler)",
+      "dekorative messingperler",
+      "tekstilsnore med kvaster (orange)",
+      "metalbeslag"
+    ],
+    "materials_fr": [
+      "corail naturel (perles cylindriques et petites)",
+      "perles décoratives en laiton",
+      "cordons textiles avec pompons (orange)",
+      "ferrures métalliques"
+    ],
+    
+    "specifications": {
+      "Довжина": "регулюється за допомогою завязок",
+      "Кількість рядів": "2",
+      "Китиці": "2 шт (оранжеві)",
+      "Вага": "~60 г"
+    },
+    
+    "is_handmade": true,
+    "category_id": 1,
+    
+    "tags_uk": [
+      "коралове намисто",
+      "етно",
+      "мінімалізм",
+      "двошарове",
+      "український стиль"
+    ],
+    "tags_en": [
+      "coral necklace",
+      "ethnic",
+      "minimalist",
+      "double strand",
+      "ukrainian style"
+    ],
+    "tags_de": [
+      "Korallenkette",
+      "ethnisch",
+      "minimalistisch",
+      "doppelsträngig",
+      "ukrainischer Stil"
+    ],
+    "tags_pl": [
+      "naszyjnik koralowy",
+      "etno",
+      "minimalistyczny",
+      "dwurzędowy",
+      "styl ukraiński"
+    ],
+    "tags_se": [
+      "korallhalsband",
+      "etnisk",
+      "minimalistisk",
+      "dubbelsträngad",
+      "ukrainsk stil"
+    ],
+    "tags_no": [
+      "korallhalskjede",
+      "etnisk",
+      "minimalistisk",
+      "dobbeltstrenget",
+      "ukrainsk stil"
+    ],
+    "tags_dk": [
+      "koralhalskæde",
+      "etnisk",
+      "minimalistisk",
+      "dobbeltstrenget",
+      "ukrainsk stil"
+    ],
+    "tags_fr": [
+      "collier de corail",
+      "ethnique",
+      "minimaliste",
+      "double rang",
+      "style ukrainien"
+    ],
+    
+    "symbols": ["vitality", "protection", "warmth"],
+    
+    "is_active": true,
+    "is_featured": false,
+    
+    "is_made_to_order": true,
+    "made_to_order_duration": "2-3 тижні + час доставки",
+    
+    "meta_description_uk": "Елегантне дворядне намисто з натурального коралу та латуні із завязками. Мінімалістична етно прикраса ручної роботи. Під замовлення. Доставка по ЄС.",
+    "meta_description_en": "Elegant double strand necklace with natural coral and brass with ties. Minimalist ethnic handmade jewelry. Made to order. EU delivery.",
+    "meta_description_de": "Elegante doppelsträngige Halskette aus natürlicher Koralle und Messing mit Bändern. Minimalistische ethnische handgefertigte Schmuck. Auf Bestellung. EU-Lieferung.",
+    "meta_description_pl": "Elegancki dwurzędowy naszyjnik z naturalnego koralu i mosiądzu z wiązaniami. Minimalistyczna biżuteria etniczna ręcznie robiona. Na zamówienie. Dostawa w UE.",
+    "meta_description_se": "Elegant dubbelsträngat halsband med naturlig korall och mässing med band. Minimalistiskt etniskt handgjort smycke. Beställningsvara. EU-leverans.",
+    "meta_description_no": "Elegant dobbeltstrenget halskjede med naturlig korall og messing med bånd. Minimalistisk etnisk håndlaget smykke. Bestillingsvare. EU-levering.",
+    "meta_description_dk": "Elegant dobbeltstrenget halskæde med naturlig koral og messing med bånd. Minimalistisk etnisk håndlavet smykke. Bestillingsvare. EU-levering.",
+    "meta_description_fr": "Collier élégant double rang en corail naturel et laiton avec liens. Bijou ethnique minimaliste fait main. Sur commande. Livraison UE.",
+    
+    "meta_keywords_uk": [
+      "коралове намисто",
+      "мінімалізм",
+      "етно прикраси",
+      "українські прикраси",
+      "натуральний корал"
+    ],
+    "meta_keywords_en": [
+      "coral necklace",
+      "minimalist",
+      "ethnic jewelry",
+      "ukrainian jewelry",
+      "natural coral"
+    ],
+    "meta_keywords_de": [
+      "Korallenkette",
+      "minimalistisch",
+      "ethnischer Schmuck",
+      "ukrainischer Schmuck",
+      "natürliche Koralle"
+    ],
+    "meta_keywords_pl": [
+      "naszyjnik koralowy",
+      "minimalistyczny",
+      "biżuteria etniczna",
+      "ukraińska biżuteria",
+      "naturalny koral"
+    ],
+    "meta_keywords_se": [
+      "korallhalsband",
+      "minimalistisk",
+      "etniska smycken",
+      "ukrainska smycken",
+      "naturlig korall"
+    ],
+    "meta_keywords_no": [
+      "korallhalskjede",
+      "minimalistisk",
+      "etniske smykker",
+      "ukrainske smykker",
+      "naturlig korall"
+    ],
+    "meta_keywords_dk": [
+      "koralhalskæde",
+      "minimalistisk",
+      "etniske smykker",
+      "ukrainske smykker",
+      "naturlig koral"
+    ],
+    "meta_keywords_fr": [
+      "collier de corail",
+      "minimaliste",
+      "bijoux ethniques",
+      "bijoux ukrainiens",
+      "corail naturel"
+    ]
+  }

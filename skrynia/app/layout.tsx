@@ -5,6 +5,7 @@ import Footer from "@/components/layout/Footer";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import CartDrawerWrapper from "@/components/cart/CartDrawerWrapper";
+import CookieConsent from "@/components/ui/CookieConsent";
 import Script from 'next/script';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://runebox.eu';
@@ -405,6 +406,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             </main>
             <Footer />
             <CartDrawerWrapper />
+            <CookieConsent />
           </CartProvider>
         </LanguageProvider>
       </body>
