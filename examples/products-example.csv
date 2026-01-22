@@ -1,0 +1,5 @@
+title_uk,title_en,slug,price,currency,stock_quantity,sku,description_uk,description_en,materials_uk,materials_en,tags_uk,tags_en,is_active,is_featured,category_id
+"Лунниця з перлами","Lunnytsya with Pearls",lunnytsya-z-perlamy,450.00,zł,5,LUN-001,"Унікальна лунниця з натуральними річковими перлами","Unique lunnytsya with natural river pearls","натуральні річкові перли, металевий сплав, посріблена фурнітура","natural river pearls, metal alloy, silvered fittings","слов'янський оберіг, лунниця, перли, ручна робота","slavic amulet, lunnytsya, pearls, handmade",true,true,1
+"Оберіг захисту","Protection Amulet",oberig-zahystu,320.00,zł,3,OBR-001,"Слов'янський оберіг захисту з символом щита","Slavic protection amulet with shield symbol","срібло 925, натуральний камінь","silver 925, natural stone","захист, оберіг, слов'янський","protection, amulet, slavic",true,false,1
+"Брошка з квітами","Flower Brooch",broshka-z-kvitamy,280.00,zł,8,BRK-001,"Ручна брошка з квітковим орнаментом","Handmade brooch with floral ornament","посріблена бронза, емаль","silvered bronze, enamel","брошка, квіти, ручна робота","brooch, flowers, handmade",true,false,1
+

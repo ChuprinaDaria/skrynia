@@ -47,6 +47,17 @@ Ten repozytorium zawiera kilka workflow GitHub Actions do automatyzacji CI/CD.
 - Build i push obrazów Docker
 - Security scanning przed deployem
 - Deployment notification
+- **Bulk import товарів** (автоматично після deployment)
+
+### 6. `bulk-import-products.yml` - Bulk Import Товарів
+**Trigger**: Push do `товари/`, manualny, schedule (щодня)
+
+**Zadania**:
+- Завантаження товарів з папки `товари/` на сервер
+- Завантаження зображень та відео
+- Автоматичне створення/оновлення товарів
+
+**Детальна інструкція**: Дивіться [README_BULK_IMPORT.md](README_BULK_IMPORT.md)
 
 ## Secrets Required
 
@@ -62,6 +73,11 @@ Ustaw w Settings → Secrets and variables → Actions:
 - `SSH_PRIVATE_KEY` - Klucz SSH
 - `FRONTEND_URL` - URL frontendu (dla notyfikacji)
 
+### Dla Bulk Import:
+- `ADMIN_EMAIL` - Email адміністратора
+- `ADMIN_PASSWORD` - Пароль адміністратора
+- `BACKEND_URL` - URL API сервера (або використовується `NEXT_PUBLIC_API_URL`)
+
 ## Użycie
 
 ### Automatyczny deploy przy push do main:
@@ -74,6 +90,15 @@ git push origin main
 2. Kliknij "Run workflow"
 3. Wybierz branch i opcje deployu
 4. Kliknij "Run workflow"
+
+### Bulk Import товарів:
+1. Przejdź do Actions → Bulk Import Products
+2. Kliknij "Run workflow"
+3. Wybierz branch (зазвичай `main`)
+4. Налаштуйте параметри (опціонально)
+5. Kliknij "Run workflow"
+
+**Або автоматично**: Просто push в `товари/` - workflow запуститься автоматично
 
 ### Sprawdzenie statusu:
 - Przejdź do zakładki "Actions" w GitHub

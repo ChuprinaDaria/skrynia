@@ -1,0 +1,125 @@
+name: Bulk Import Products
+
+on:
+  workflow_dispatch:
+    inputs:
+      products_path:
+        description: 'Path to products folder'
+        required: false
+        default: 'товари'
+      api_url:
+        description: 'API Base URL'
+        required: false
+        default: 'https://api.runebox.eu'
+      skip_errors:
+        description: 'Skip errors and continue'
+        required: false
+        default: 'false'
+        type: boolean
+  push:
+    branches:
+      - main
+    paths:
+      - 'товари/**'
+      - 'scripts/bulk_import_products.py'
+  schedule:
+    # Запускати щодня о 3:00 UTC (опціонально)
+    - cron: '0 3 * * *'
+
+env:
+  API_BASE_URL: ${{ inputs.api_url || 'https://api.runebox.eu' }}
+  PRODUCTS_PATH: ${{ inputs.products_path || 'товари' }}
+
+jobs:
+  bulk-import:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests urllib3
+
+      - name: Get Admin Token
+        id: get_token
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          API_URL: ${{ env.API_BASE_URL }}
+        run: |
+          echo "🔐 Отримання admin token..."
+          RESPONSE=$(curl -s -X POST "$API_URL/api/v1/auth/login" \
+            -H "Content-Type: application/json" \
+            -d "{\"email\":\"$ADMIN_EMAIL\",\"password\":\"$ADMIN_PASSWORD\"}")
+          
+          # Використовуємо Python для парсингу JSON (більш надійно)
+          TOKEN=$(echo $RESPONSE | python3 -c "import sys, json; print(json.load(sys.stdin).get('access_token', ''))" 2>/dev/null || echo "")
+          
+          if [ -z "$TOKEN" ] || [ "$TOKEN" == "null" ]; then
+            echo "❌ Помилка: Не вдалося отримати token"
+            echo "Response: $RESPONSE"
+            exit 1
+          fi
+          
+          echo "✅ Token отримано"
+          echo "::add-mask::$TOKEN"
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Check products folder exists
+        run: |
+          if [ ! -d "${{ env.PRODUCTS_PATH }}" ]; then
+            echo "❌ Папка '${{ env.PRODUCTS_PATH }}' не існує"
+            exit 1
+          fi
+          
+          PRODUCT_COUNT=$(find "${{ env.PRODUCTS_PATH }}" -name "product.json" -type f | wc -l)
+          echo "📦 Знайдено $PRODUCT_COUNT товарів для імпорту"
+          
+          if [ "$PRODUCT_COUNT" -eq 0 ]; then
+            echo "⚠️  Не знайдено товарів для імпорту"
+            exit 0
+          fi
+
+      - name: Run bulk import script
+        env:
+          ADMIN_TOKEN: ${{ steps.get_token.outputs.token }}
+          API_BASE_URL: ${{ env.API_BASE_URL }}
+        run: |
+          echo "🚀 Запуск bulk import..."
+          python scripts/bulk_import_products.py \
+            --path "${{ env.PRODUCTS_PATH }}" \
+            --api-url "${{ env.API_BASE_URL }}" \
+            --token "$ADMIN_TOKEN" || {
+            if [ "${{ inputs.skip_errors }}" == "true" ]; then
+              echo "⚠️  Помилки ігноровані (skip_errors=true)"
+              exit 0
+            else
+              echo "❌ Bulk import завершився з помилками"
+              exit 1
+            fi
+          }
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 📊 Bulk Import Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Products Path**: \`${{ env.PRODUCTS_PATH }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **API URL**: \`${{ env.API_BASE_URL }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Trigger**: \`${{ github.event_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit**: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Bulk import завершено!" >> $GITHUB_STEP_SUMMARY
+

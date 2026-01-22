@@ -115,7 +115,14 @@ interface ProductFormData {
   sku: string;
 
   // Details
-  materials: string[];
+  materials_uk: string[];
+  materials_en: string[];
+  materials_de: string[];
+  materials_pl: string[];
+  materials_se: string[];
+  materials_no: string[];
+  materials_dk: string[];
+  materials_fr: string[];
   specifications: Record<string, string>;
   is_handmade: boolean;
 
@@ -140,8 +147,22 @@ interface ProductFormData {
   made_to_order_duration: string | null;
 
   // SEO
-  meta_description: string;
-  meta_keywords: string[];
+  meta_description_uk: string;
+  meta_description_en: string;
+  meta_description_de: string;
+  meta_description_pl: string;
+  meta_description_se: string;
+  meta_description_no: string;
+  meta_description_dk: string;
+  meta_description_fr: string;
+  meta_keywords_uk: string[];
+  meta_keywords_en: string[];
+  meta_keywords_de: string[];
+  meta_keywords_pl: string[];
+  meta_keywords_se: string[];
+  meta_keywords_no: string[];
+  meta_keywords_dk: string[];
+  meta_keywords_fr: string[];
 
   // Payment & Shipping
   payment_methods: string[];
@@ -204,7 +225,14 @@ function ProductEditorContent() {
     compare_at_price: null,
     stock_quantity: 0,
     sku: '',
-    materials: [],
+    materials_uk: [],
+    materials_en: [],
+    materials_de: [],
+    materials_pl: [],
+    materials_se: [],
+    materials_no: [],
+    materials_dk: [],
+    materials_fr: [],
     specifications: {},
     is_handmade: true,
     category_id: null,
@@ -221,8 +249,22 @@ function ProductEditorContent() {
     is_featured: false,
     is_made_to_order: false,
     made_to_order_duration: null,
-    meta_description: '',
-    meta_keywords: [],
+    meta_description_uk: '',
+    meta_description_en: '',
+    meta_description_de: '',
+    meta_description_pl: '',
+    meta_description_se: '',
+    meta_description_no: '',
+    meta_description_dk: '',
+    meta_description_fr: '',
+    meta_keywords_uk: [],
+    meta_keywords_en: [],
+    meta_keywords_de: [],
+    meta_keywords_pl: [],
+    meta_keywords_se: [],
+    meta_keywords_no: [],
+    meta_keywords_dk: [],
+    meta_keywords_fr: [],
     payment_methods: [],
     shipping_providers: [],
     images: [],
@@ -268,7 +310,14 @@ function ProductEditorContent() {
         setFormData({
           ...formData,
           ...data,
-          materials: data.materials || [],
+          materials_uk: data.materials_uk || [],
+          materials_en: data.materials_en || [],
+          materials_de: data.materials_de || [],
+          materials_pl: data.materials_pl || [],
+          materials_se: data.materials_se || [],
+          materials_no: data.materials_no || [],
+          materials_dk: data.materials_dk || [],
+          materials_fr: data.materials_fr || [],
           tags_uk: data.tags_uk || [],
           tags_en: data.tags_en || [],
           tags_de: data.tags_de || [],
@@ -278,7 +327,22 @@ function ProductEditorContent() {
           tags_dk: data.tags_dk || [],
           tags_fr: data.tags_fr || [],
           symbols: data.symbols || [],
-          meta_keywords: data.meta_keywords || [],
+          meta_description_uk: data.meta_description_uk || '',
+          meta_description_en: data.meta_description_en || '',
+          meta_description_de: data.meta_description_de || '',
+          meta_description_pl: data.meta_description_pl || '',
+          meta_description_se: data.meta_description_se || '',
+          meta_description_no: data.meta_description_no || '',
+          meta_description_dk: data.meta_description_dk || '',
+          meta_description_fr: data.meta_description_fr || '',
+          meta_keywords_uk: data.meta_keywords_uk || [],
+          meta_keywords_en: data.meta_keywords_en || [],
+          meta_keywords_de: data.meta_keywords_de || [],
+          meta_keywords_pl: data.meta_keywords_pl || [],
+          meta_keywords_se: data.meta_keywords_se || [],
+          meta_keywords_no: data.meta_keywords_no || [],
+          meta_keywords_dk: data.meta_keywords_dk || [],
+          meta_keywords_fr: data.meta_keywords_fr || [],
           payment_methods: data.payment_methods || [],
           shipping_providers: data.shipping_providers || [],
           specifications: data.specifications || {},
@@ -396,13 +460,16 @@ function ProductEditorContent() {
   };
 
   // Get materials as comma-separated string for display
-  const getMaterialsString = (): string => {
-    return formData.materials.join(', ');
+  const getMaterialsString = (lang: string): string => {
+    const key = `materials_${lang}` as keyof ProductFormData;
+    const materials = formData[key] as string[] || [];
+    return materials.join(', ');
   };
 
-  const updateMaterialsFromString = (value: string) => {
+  const updateMaterialsFromString = (lang: string, value: string) => {
+    const key = `materials_${lang}` as keyof ProductFormData;
     const materials = parseMaterials(value);
-    setFormData({ ...formData, materials });
+    setFormData({ ...formData, [key]: materials });
   };
 
   const addSpecification = () => {
@@ -1200,27 +1267,31 @@ function ProductEditorContent() {
 
             {/* Materials */}
             <div className="mb-6">
-              <label className="block text-ivory font-inter mb-2">Матеріали</label>
+              <label className="block text-ivory font-inter mb-2">Матеріали ({activeLang.toUpperCase()})</label>
               <p className="text-sage text-sm mb-2">Введіть матеріали через кому. Наприклад: натуральні річкові перли, металевий сплав (лунниця), посріблена фурнітура</p>
               <textarea
-                value={getMaterialsString()}
-                onChange={(e) => updateMaterialsFromString(e.target.value)}
+                value={getMaterialsString(activeLang)}
+                onChange={(e) => updateMaterialsFromString(activeLang, e.target.value)}
                 className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none resize-none"
                 placeholder="натуральні річкові перли, металевий сплав, посріблена фурнітура"
                 rows={3}
               />
-              {formData.materials.length > 0 && (
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {formData.materials.map((material, index) => (
-                    <span
-                      key={index}
-                      className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-sage text-sm rounded-full"
-                    >
-                      {material}
-                    </span>
-                  ))}
-                </div>
-              )}
+              {(() => {
+                const key = `materials_${activeLang}` as keyof ProductFormData;
+                const materials = formData[key] as string[] || [];
+                return materials.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {materials.map((material, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-sage text-sm rounded-full"
+                      >
+                        {material}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Specifications */}
@@ -1620,10 +1691,11 @@ function ProductEditorContent() {
               </div>
 
               <div>
-                <label className="block text-ivory font-inter mb-2">Meta Description</label>
+                <label className="block text-ivory font-inter mb-2">Meta Description ({activeLang.toUpperCase()})</label>
+                <p className="text-sage text-sm mb-2">Опис для пошукових систем...</p>
                 <textarea
-                  value={formData.meta_description}
-                  onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                  value={formData[`meta_description_${activeLang}` as keyof ProductFormData] as string || ''}
+                  onChange={(e) => setFormData({ ...formData, [`meta_description_${activeLang}`]: e.target.value })}
                   className="w-full px-4 py-3 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none"
                   rows={3}
                   placeholder="Опис для пошукових систем..."
@@ -1633,18 +1705,34 @@ function ProductEditorContent() {
 
             {/* Meta Keywords */}
             <div className="mt-6">
-              <label className="block text-ivory font-inter mb-2">Meta Keywords</label>
-              <p className="text-sage/70 text-sm mb-2">Введіть ключові слова через кому (наприклад: слов&apos;янські прикраси, лунниця, оберіг)</p>
+              <label className="block text-ivory font-inter mb-2">Meta Keywords ({activeLang.toUpperCase()})</label>
+              <p className="text-sage/70 text-sm mb-2">Введіть ключові слова через кому (наприклад: слов&apos;янські прикраси, лунниця, оберіг) - мають бути індивідуальні для кожної мови</p>
               <input
                 type="text"
-                value={formData.meta_keywords.join(', ')}
+                value={(formData[`meta_keywords_${activeLang}` as keyof ProductFormData] as string[] || []).join(', ')}
                 onChange={(e) => setFormData({ 
                   ...formData, 
-                  meta_keywords: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
+                  [`meta_keywords_${activeLang}`]: e.target.value.split(',').map(s => s.trim()).filter(s => s) 
                 })}
                 placeholder="слов'янські прикраси, лунниця, оберіг, етно, бохо"
                 className="w-full px-4 py-2 bg-deep-black/50 border border-sage/30 text-ivory rounded-sm focus:border-oxblood focus:outline-none text-sm"
               />
+              {(() => {
+                const key = `meta_keywords_${activeLang}` as keyof ProductFormData;
+                const keywords = formData[key] as string[] || [];
+                return keywords.length > 0 && (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {keywords.map((keyword, index) => (
+                      <span
+                        key={index}
+                        className="px-3 py-1 bg-oxblood/20 border border-oxblood/50 text-sage text-sm rounded-full"
+                      >
+                        {keyword}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </form>

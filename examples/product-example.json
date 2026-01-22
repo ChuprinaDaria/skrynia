@@ -1,0 +1,187 @@
+{
+  "title_uk": "Лунниця з натуральними річковими перлами",
+  "title_en": "Lunnytsya with Natural River Pearls",
+  "title_de": "Lunnytsya mit natürlichen Flussperlen",
+  "title_pl": "Lunnytsya z naturalnymi perłami rzecznymi",
+  "title_se": "Lunnytsya med naturliga flodpärlor",
+  "title_no": "Lunnytsya med naturlige elveperler",
+  "title_dk": "Lunnytsya med naturlige flodperler",
+  "title_fr": "Lunnytsya avec perles de rivière naturelles",
+  
+  "slug": "lunnytsya-z-naturalnymy-richkovymy-perlamy",
+  
+  "description_uk": "Унікальна лунниця з натуральними річковими перлами - це не просто прикраса, а справжній слов'янський оберіг, який несе в собі енергію місяця та захисту.\n\n**Особливості:**\n- Натуральні річкові перли вручну підібрані\n- Металевий сплав з посрібленням\n- Ручна робота майстра\n- Унікальний дизайн",
+  
+  "_comment_description_files": "АБО використовуйте окремі .md файли для довгих текстів:",
+  "_description_uk_file": "description-uk.md",
+  "_description_en_file": "description-en.md",
+  
+  "description_en": "Unique lunnytsya with natural river pearls - this is not just jewelry, but a true Slavic amulet that carries the energy of the moon and protection.\n\n**Features:**\n- Natural river pearls hand-selected\n- Metal alloy with silver plating\n- Handmade by master craftsman\n- Unique design",
+  
+  "description_de": "Einzigartige Lunnytsya mit natürlichen Flussperlen - dies ist nicht nur Schmuck, sondern ein wahrer slawischer Amulett, der die Energie des Mondes und des Schutzes trägt.",
+  
+  "description_pl": "Unikalna lunnytsya z naturalnymi perłami rzecznymi - to nie tylko biżuteria, ale prawdziwy słowiański amulet, który niesie w sobie energię księżyca i ochrony.",
+  
+  "legend_title_uk": "Легенда про Лунницю",
+  "legend_title_en": "Legend of Lunnytsya",
+  "legend_title_de": "Legende der Lunnytsya",
+  "legend_title_pl": "Legenda Lunnytsya",
+  
+  "legend_content_uk": "Лунниця - це древній слов'янський символ, який зображує місячний серп. Вважається, що вона:\n\n- Захищає від злого ока\n- Приносить удачу та достаток\n- Зберігає любов у родині\n- Допомагає у важкі моменти",
+  
+  "_comment_legend_files": "АБО використовуйте окремі .md файли:",
+  "_legend_content_uk_file": "legend-content-uk.md",
+  "_legend_content_en_file": "legend-content-en.md",
+  
+  "legend_content_en": "Lunnytsya is an ancient Slavic symbol depicting a crescent moon. It is believed to:\n\n- Protect from the evil eye\n- Bring luck and prosperity\n- Preserve love in the family\n- Help in difficult moments",
+  
+  "price": 450.00,
+  "currency": "zł",
+  "compare_at_price": 550.00,
+  
+  "stock_quantity": 5,
+  "sku": "LUN-PEARL-001",
+  
+  "materials_uk": [
+    "натуральні річкові перли",
+    "металевий сплав (лунниця)",
+    "посріблена фурнітура"
+  ],
+  "materials_en": [
+    "natural river pearls",
+    "metal alloy (lunnytsya)",
+    "silvered fittings"
+  ],
+  "materials_de": [
+    "natürliche Flussperlen",
+    "Metalllegierung (Lunnytsya)",
+    "versilberte Beschläge"
+  ],
+  "materials_pl": [
+    "naturalne perły rzeczne",
+    "stop metali (lunnytsya)",
+    "posrebrzane okucia"
+  ],
+  
+  "specifications": {
+    "Довжина": "45 см",
+    "Ширина": "8 см",
+    "Вага": "25 г",
+    "Довжина ланцюжка": "60 см"
+  },
+  
+  "is_handmade": true,
+  "category_id": 1,
+  
+  "tags_uk": [
+    "слов'янський оберіг",
+    "лунниця",
+    "перли",
+    "ручна робота",
+    "етно",
+    "бохо"
+  ],
+  "tags_en": [
+    "slavic amulet",
+    "lunnytsya",
+    "pearls",
+    "handmade",
+    "ethnic",
+    "boho"
+  ],
+  "tags_de": [
+    "slawisches Amulett",
+    "Lunnytsya",
+    "Perlen",
+    "handgemacht",
+    "ethnisch"
+  ],
+  "tags_pl": [
+    "słowiański amulet",
+    "lunnytsya",
+    "perły",
+    "ręczna robota",
+    "etno"
+  ],
+  
+  "symbols": ["love", "protection", "wealth"],
+  
+  "is_active": true,
+  "is_featured": true,
+  
+  "is_made_to_order": false,
+  "made_to_order_duration": null,
+  
+  "meta_description_uk": "Унікальна лунниця з натуральними річковими перлами. Слов'янський оберіг ручної роботи. Доставка по всьому світу. Захист та удача в одній прикрасі.",
+  "meta_description_en": "Unique lunnytsya with natural river pearls. Handmade Slavic amulet. Worldwide shipping. Protection and luck in one piece of jewelry.",
+  "meta_description_de": "Einzigartige Lunnytsya mit natürlichen Flussperlen. Handgefertigtes slawisches Amulett. Weltweiter Versand.",
+  "meta_description_pl": "Unikalna lunnytsya z naturalnymi perłami rzecznymi. Ręcznie wykonany słowiański amulet. Dostawa na cały świat.",
+  
+  "meta_keywords_uk": [
+    "слов'янські прикраси",
+    "лунниця",
+    "оберіг",
+    "етно прикраси",
+    "бохо стиль",
+    "ручна робота",
+    "натуральні перли"
+  ],
+  "meta_keywords_en": [
+    "slavic jewelry",
+    "lunnytsya",
+    "amulet",
+    "ethnic jewelry",
+    "boho style",
+    "handmade",
+    "natural pearls"
+  ],
+  "meta_keywords_de": [
+    "slawischer Schmuck",
+    "Lunnytsya",
+    "Amulett",
+    "ethnischer Schmuck",
+    "handgemacht"
+  ],
+  "meta_keywords_pl": [
+    "biżuteria słowiańska",
+    "lunnytsya",
+    "amulet",
+    "biżuteria etniczna",
+    "ręczna robota"
+  ],
+  
+  "images": [
+    {
+      "filename": "01-main.jpg",
+      "alt_text": "Лунниця з натуральними перлами - головне зображення",
+      "position": 0,
+      "is_primary": true
+    },
+    {
+      "filename": "02-detail.jpg",
+      "alt_text": "Деталь лунниці з перлами",
+      "position": 1,
+      "is_primary": false
+    },
+    {
+      "filename": "03-back.jpg",
+      "alt_text": "Зворотна сторона лунниці",
+      "position": 2,
+      "is_primary": false
+    },
+    {
+      "filename": "04-packaging.jpg",
+      "alt_text": "Упаковка лунниці",
+      "position": 3,
+      "is_primary": false
+    }
+  ],
+  
+  "videos": [
+    {
+      "filename": "video.mp4",
+      "alt_text": "Відео презентація лунниці з перлами"
+    }
+  ]
+}
+
