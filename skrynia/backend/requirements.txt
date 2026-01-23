@@ -19,7 +19,7 @@ qrcode[pil]==7.4.2
 # Payment Gateways
 stripe==8.2.0
 # Przelewy24 (using requests for API calls)
-requests==2.32.3
+requests==2.32.5
 
 # Email
 fastapi-mail==1.4.1
