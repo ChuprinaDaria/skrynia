@@ -40,5 +40,5 @@ pytest-asyncio==0.23.3
 httpx==0.26.0
 
 # Utils
-python-slugify==8.0.2
+python-slugify==8.0.4
 markdown==3.5.2
